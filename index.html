@@ -527,6 +527,12 @@ body.viewer-mode .gp-card-btns{display:none!important;}
   pointer-events:none;
 }
 .hse-photo img{width:100%;height:100%;object-fit:cover}
+/* Medical team cards — equal size, no shrink */
+#medTeamGrid{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))!important;gap:16px!important;align-items:stretch!important;}
+#medTeamGrid .hse-card{display:flex!important;flex-direction:column!important;min-height:280px!important;height:100%!important;overflow:hidden!important;border-radius:14px!important;}
+#medTeamGrid .hse-photo{height:180px!important;min-height:180px!important;flex-shrink:0!important;background:rgba(0,0,0,0.25)!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;}
+#medTeamGrid .hse-photo img{width:100%!important;height:100%!important;object-fit:cover!important;}
+#medTeamGrid .hse-card > div:last-child{flex:1!important;padding:12px!important;}
 .hse-nop{color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:1px}
 
 .hse-body{padding:12px}
@@ -2283,13 +2289,17 @@ a,button,input,select,textarea,.nav-item,.header-btn,.kpi-card{touch-action:mani
 #mblTechBgRoot .mbl-tech-bg{
   position:absolute;
   inset:0;
-  opacity:0.45;
+  opacity:0.88;
 }
 .mbl-tech-bg canvas{
   width:100%;
   height:100%;
   display:block;
 }
+/* Soften old blob/sphere so the tech network is the main motion */
+.bg-blob{opacity:0.12!important;filter:blur(90px)!important;}
+.geo-sphere{opacity:0.08!important;}
+.particle-field{opacity:0.05!important;}
 /* Welcome: keep fixed fullscreen overlay; animation is a child layer only */
 #welcomeOverlay{
   position:fixed !important;
@@ -2311,7 +2321,7 @@ a,button,input,select,textarea,.nav-item,.header-btn,.kpi-card{touch-action:mani
   position:absolute !important;
   inset:0 !important;
   z-index:0 !important;
-  opacity:0.95;
+  opacity:1;
 }
 #welcomeOverlay .welcome-logo,
 #welcomeOverlay .welcome-msg,
@@ -2329,8 +2339,9 @@ a,button,input,select,textarea,.nav-item,.header-btn,.kpi-card{touch-action:mani
 }
 .app-container{position:relative;z-index:1;}
 body[data-morphism="neuro-light"] #mblTechBgRoot .mbl-tech-bg,
-body[data-morphism="flat"] #mblTechBgRoot .mbl-tech-bg{opacity:0.18;}
-body[data-theme="white"] #mblTechBgRoot .mbl-tech-bg{opacity:0.12;filter:brightness(0.55);}
+body[data-morphism="flat"] #mblTechBgRoot .mbl-tech-bg{opacity:0.35;}
+body[data-theme="white"] #mblTechBgRoot .mbl-tech-bg{opacity:0.22;filter:brightness(0.55);}
+body[data-theme="black"] #mblTechBgRoot .mbl-tech-bg{opacity:0.75;}
 
 
 /* =========================================================
@@ -2886,7 +2897,7 @@ FILE_MAP["drills"] = "HSE_Drills_and_Campaigns_Tracker_FY2026.xlsx";
 <script>
 // ===== DASHBOARD JS =====
 // ===== STATE =====
-let currentCategory = 'manpower';
+let currentCategory = 'overview';
 let currentSubKey = null;
 let currentFilters = {};
 let currentPage = 1;
@@ -2967,6 +2978,11 @@ function navigateToCore(key){
   sortDir = 'asc';
   currentFilters = {};
   currentSubKey = null;
+  try {
+    var _ca = document.getElementById('contentArea');
+    if(_ca){ _ca.scrollTop = 0; }
+    window.scrollTo(0, 0);
+  } catch(_e){}
   document.querySelectorAll('.nav-item').forEach(el => { el.classList.toggle('active', el.dataset.key === key); });
   // Mobile: close sidebar after selection for smooth flow
   try {
@@ -5009,9 +5025,18 @@ function impPtwLocation(v, fallback){
   return (s === s.toLowerCase() || s === s.toUpperCase()) ? impTitle(s) : s;
 }
 
-// Read every "MBL - <building>" permit sheet, normalise and de-skew dates
+// Read every building permit sheet (MBL - X, Open/Closed variants), normalise and de-skew dates
 function impPtwImport(wb){
-  const sheets = (wb.SheetNames || []).filter(n => /^mbl\s*-/i.test(impTxt(n)));
+  const allNames = wb.SheetNames || [];
+  // Accept: "MBL - Fangxin", "Fangxin", "Fangxin Open", "Bentler Closed", etc.
+  const sheets = allNames.filter(n => {
+    const t = impTxt(n);
+    if(/^mbl\s*-/i.test(t)) return true;
+    for(let i = 0; i < PTW_BUILDING.length; i++){
+      if(PTW_BUILDING[i][0].test(t)) return true;
+    }
+    return /permit|ptw|open|closed/i.test(t);
+  });
   const out = {rows: [], sheets: []};
   if(!sheets.length) return out;
 
@@ -5021,25 +5046,54 @@ function impPtwImport(wb){
     if(!ws) return;
     const aoa = impSheetAOA(ws);
     if(!aoa.length) return;
-    // header on row 2, records from row 3, columns A..J
-    let hIdx = 0;
-    for(let r = 0; r < Math.min(aoa.length, 12); r++){
-      if(impAlnum((aoa[r] || [])[0]) === 'permitnumber'){ hIdx = r; break; }
+    let hIdx = -1;
+    for(let r = 0; r < Math.min(aoa.length, 15); r++){
+      const row0 = impAlnum((aoa[r] || [])[0] || '');
+      const rowJoined = impAlnum((aoa[r] || []).slice(0, 8).join(' '));
+      if(row0 === 'permitnumber' || /permitnumber/.test(rowJoined)){ hIdx = r; break; }
     }
+    if(hIdx < 0) hIdx = 0;
     const building = impPtwBuilding(name);
+    // Status hint from sheet name when Status column is empty
+    const nameStatus = /open/i.test(name) && !/closed|close/i.test(name) ? 'Open'
+      : (/closed|close/i.test(name) ? 'Closed' : '');
     let n = 0;
+    // Detect column positions from header row
+    const hdr = (aoa[hIdx] || []).map(function(c){ return impAlnum(c); });
+    function colOf(){
+      var map = {pnum:0, status:1, type:2, shift:3, desc:4, loc:5, area:6, req:7, close:8, company:9};
+      for(var c = 0; c < hdr.length; c++){
+        var h = hdr[c] || '';
+        if(/permitnumber|permitno|ptwno/.test(h)) map.pnum = c;
+        else if(/^status$/.test(h)) map.status = c;
+        else if(/typeofpermit|permittype|type/.test(h) && map.type === 2) map.type = c;
+        else if(/^shift$/.test(h)) map.shift = c;
+        else if(/desc|activity|workdescription/.test(h)) map.desc = c;
+        else if(/^location$|^loc$/.test(h)) map.loc = c;
+        else if(/^area$|zone/.test(h)) map.area = c;
+        else if(/requestdate|issuedate|startdate|opendate/.test(h)) map.req = c;
+        else if(/closedate|enddate|completion/.test(h)) map.close = c;
+        else if(/company|contractor|subcontractor/.test(h)) map.company = c;
+      }
+      return map;
+    }
+    const col = colOf();
     for(let r = hIdx + 1; r < aoa.length; r++){
       const row = aoa[r] || [];
-      let pnum = impTxt(row[0]);
+      let pnum = impTxt(row[col.pnum]);
       if(!pnum || !/\d/.test(pnum)) continue;
       pnum = pnum.replace(/\s*-\s*/g, '-');
+      let status = impPtwStatus(row[col.status]);
+      if(!status && nameStatus) status = nameStatus;
       staged.push({
         pnum: pnum, building: building,
-        status: impPtwStatus(row[1]), type: impPtwType(row[2]), shift: impPtwShift(row[3]),
-        desc: impTxt(row[4]) || 'Not Specified',
-        loc: impPtwLocation(row[5], building) + (impTxt(row[6]) ? ' / ' + impTxt(row[6]) : ''),
-        company: impPtwCompany(row[9]), remarks: impTxt(row[9]),
-        rq: impParseDateParts(row[7]), cl: impParseDateParts(row[8])
+        status: status, type: impPtwType(row[col.type]), shift: impPtwShift(row[col.shift]),
+        desc: impTxt(row[col.desc]) || 'Not Specified',
+        loc: impPtwLocation(row[col.loc], building) + (impTxt(row[col.area]) ? ' / ' + impTxt(row[col.area]) : ''),
+        company: impPtwCompany(row[col.company]),
+        remarks: impTxt(row[col.company]),
+        rq: impParseDateParts(row[col.req]), cl: impParseDateParts(row[col.close]),
+        sheet: name
       });
       n++;
     }
@@ -5047,18 +5101,28 @@ function impPtwImport(wb){
   });
   if(!staged.length) return out;
 
-  // Work out the real reporting window from unambiguous dates (day > 12),
-  // then repair swapped day/month cells and off-by-one-year typos.
+  // Deduplicate by Permit Number + Building (prefer row with more filled fields / Closed status)
+  const byKey = {};
+  staged.forEach(s => {
+    const key = (s.pnum || '').toUpperCase() + '|' + (s.building || '');
+    const score = (s.status ? 2 : 0) + (s.rq ? 2 : 0) + (s.cl ? 1 : 0) + (s.company && s.company !== 'Not Specified' ? 1 : 0) + (s.type && s.type !== 'Not Specified' ? 1 : 0);
+    if(!byKey[key] || score >= (byKey[key]._score || 0)){
+      s._score = score;
+      byKey[key] = s;
+    }
+  });
+  const unique = Object.keys(byKey).map(k => byKey[k]);
+
   const yearCount = {};
   let maxMonth = 0, maxYear = 0;
-  staged.forEach(s => {
+  unique.forEach(s => {
     if(s.rq && !s.rq.amb){
       yearCount[s.rq.y] = (yearCount[s.rq.y] || 0) + 1;
       if(s.rq.y > maxYear) maxYear = s.rq.y;
     }
   });
   Object.keys(yearCount).forEach(y => { if(yearCount[y] > (yearCount[maxYear] || 0)) maxYear = parseInt(y, 10); });
-  staged.forEach(s => { if(s.rq && !s.rq.amb && s.rq.y === maxYear && s.rq.m > maxMonth) maxMonth = s.rq.m; });
+  unique.forEach(s => { if(s.rq && !s.rq.amb && s.rq.y === maxYear && s.rq.m > maxMonth) maxMonth = s.rq.m; });
   if(!maxMonth) maxMonth = 12;
 
   function fix(p){
@@ -5071,17 +5135,20 @@ function impPtwImport(wb){
     return {y: y, m: m, d: dd, note: note};
   }
 
-  const rows = staged.map(s => {
+  const rows = unique.map(s => {
     const rq = fix(s.rq), cl = fix(s.cl);
     const iso = rq ? (rq.y + '-' + impPad(rq.m) + '-' + impPad(rq.d)) : '';
     let remarks = s.remarks;
     if(rq && rq.note) remarks = (remarks ? remarks + ' | ' : '') + rq.note;
+    // If still no status: Open when no close date, else Closed
+    let status = s.status;
+    if(!status) status = cl ? 'Closed' : 'Open';
     return {
       'Permit Number': s.pnum,
       'Building': s.building,
       'Company': s.company,
       'Type of Permit': s.type,
-      'Status': s.status || 'Closed',
+      'Status': status,
       'Shift': s.shift,
       'Description': s.desc,
       'Location': s.loc,
@@ -6468,31 +6535,38 @@ function incPrefetchKeys(rows){
 
 
 function mblGetAllOfficers(){
-  var set = {};
-  function add(n){
-    n = mblNormName(n);
-    if(!n || n==='N/A' || n==='Not Mentioned' || n==='-' || n.length<2) return;
-    set[n] = (set[n]||0)+1;
-  }
-  var vRows = (APP_DATA.violations && APP_DATA.violations.rows) || [];
-  vRows.forEach(function(r){ add(r['ISSUER']); });
-  var oRows = (APP_DATA.observations && APP_DATA.observations.rows) || [];
-  oRows.forEach(function(r){ add(r['Observation Taken By']); });
-  var iRows = (APP_DATA.incidents && APP_DATA.incidents.rows) || [];
-  iRows.forEach(function(r){ add(r['Reported By']); add(r['Action Owner']); });
-  var dRows = (APP_DATA.drills && APP_DATA.drills.rows) || [];
-  dRows.forEach(function(r){ add(r['Responsible Person']); });
-  var hRows = (APP_DATA.hira && APP_DATA.hira.rows) || [];
-  hRows.forEach(function(r){ add(r['Responsible Person']); });
-  // Good practice recordedBy
-  if(typeof gpGallery !== 'undefined' && Array.isArray(gpGallery)){
-    gpGallery.forEach(function(item){
-      (item.pictures||[]).forEach(function(p){ add(p.recordedBy); });
-    });
-  }
-  // HSE team names as well
+  // Only MBL officers from Our HSE Team (not subcontractors or external issuers)
   var team = (typeof hseData !== 'undefined' && hseData.length) ? hseData : (typeof HSE_TEAM_ORIGINAL !== 'undefined' ? HSE_TEAM_ORIGINAL : []);
-  team.forEach(function(m){ add(m.Name || m.name); });
+  function isMblCompany(c){
+    c = String(c||'').trim();
+    if(!c) return false;
+    // Exact MBL or MBL + role/unit, exclude pure subcontractor brands
+    if(/^MBL$/i.test(c)) return true;
+    if(/^MBL[\s\-]/i.test(c) && !/logistic|construction|contractor/i.test(c)) return true;
+    return false;
+  }
+  var mblTeam = team.filter(function(m){ return isMblCompany(m.Company || m.company); });
+  // If no explicit MBL company rows, fall back to whole HSE team list (still synced from Our HSE Team only)
+  var source = mblTeam.length ? mblTeam : team;
+  var set = {};
+  source.forEach(function(m){
+    var n = mblNormName(m.Name || m.name);
+    if(!n || n==='N/A' || n.length<2) return;
+    set[n] = (set[n]||0)+1;
+  });
+  // Enrich hit counts from KPI modules for ranking, but do not add non-team names
+  function bump(n){
+    n = mblNormName(n);
+    if(n && set[n] != null) set[n] = (set[n]||0)+1;
+  }
+  ((APP_DATA.violations&&APP_DATA.violations.rows)||[]).forEach(function(r){ bump(r['ISSUER']); });
+  ((APP_DATA.observations&&APP_DATA.observations.rows)||[]).forEach(function(r){ bump(r['Observation Taken By']); });
+  ((APP_DATA.incidents&&APP_DATA.incidents.rows)||[]).forEach(function(r){ bump(r['Reported By']); bump(r['Action Owner']); });
+  ((APP_DATA.drills&&APP_DATA.drills.rows)||[]).forEach(function(r){ bump(r['Responsible Person']); });
+  ((APP_DATA.hira&&APP_DATA.hira.rows)||[]).forEach(function(r){ bump(r['Responsible Person']); });
+  if(typeof gpGallery !== 'undefined' && Array.isArray(gpGallery)){
+    gpGallery.forEach(function(item){ (item.pictures||[]).forEach(function(p){ bump(p.recordedBy); }); });
+  }
   return Object.keys(set).sort(function(a,b){ return set[b]-set[a] || a.localeCompare(b); }).map(function(n){ return { name:n, hits:set[n] }; });
 }
 
@@ -6566,7 +6640,7 @@ function renderEvaluateOfficerPage(){
   var officers = mblGetAllOfficers();
   var html = '<div class="glass-card animate-in" style="margin-bottom:18px">';
   html += '<div class="card-header"><div class="card-title"><i class="fas fa-user-tie"></i> Evaluate Officer</div>';
-  html += '<div class="card-actions"><span style="font-size:12px;color:var(--text-secondary)">'+officers.length+' officers found across all modules</span></div></div>';
+  html += '<div class="card-actions"><span style="font-size:12px;color:var(--text-secondary)">'+officers.length+' MBL HSE officers (synced from Our HSE Team)</span></div></div>';
   html += '<p style="padding:0 18px 12px;font-size:13px;color:var(--text-secondary);line-height:1.5">Select an officer to scan all KPI data where their name appears (Violations Issuer, Observations Taken By, Incidents, Drills, HIRA, Good Practices recorded by). Then download a branded live performance report (up to 20 pages).</p>';
   html += '<div style="padding:0 18px 18px"><input type="text" id="officerSearch" class="filter-input" style="width:100%;max-width:420px" placeholder="Search officer name…" oninput="mblFilterOfficerList(this.value)"></div>';
   html += '</div>';
@@ -7062,18 +7136,65 @@ function mblBuildPeriodReport(opts){
       pdf.setTextColor(80,100,96);
       pdf.text('Following pages: one KPI module per page with summary cards and period detail records.', M, y);
 
-      // ONE PAGE PER SECTION
+      // ONE PAGE PER SECTION — KPI cards first, short summary only (not full multi-page tables)
       sections.forEach(function(sec){
         if(pageCount >= maxPages) return;
         y = newPage(sec.label, opts.title + '  ·  ' + (opts.label||''));
         var kpis = sec.kpi(sec.rows);
         y = kpiCards(y, kpis);
+        // Compact highlights instead of dumping every row
         pdf.setFontSize(10);
         pdf.setFont(undefined,'bold');
         pdf.setTextColor(PDF_C.primaryDark[0],PDF_C.primaryDark[1],PDF_C.primaryDark[2]);
-        pdf.text(sec.label + ' — Detail Records ('+sec.rows.length+')', M, y);
-        y += 4;
-        drawTable(y, sec.rows, sec.cols);
+        pdf.text(sec.label + ' — Period snapshot ('+sec.rows.length+' records)', M, y);
+        y += 6;
+        // Top breakdowns as cards (category / company / status style)
+        try{
+          var breakdown = {};
+          var sampleCols = sec.cols || [];
+          var keyCol = sampleCols[0] || null;
+          // Prefer meaningful categorical fields
+          var prefer = ['VIOLATION CATEGORY','Type Of Observation','Incident Category','Status','Type of Permit','Building','COMPANY','Company','Area/Building','Classification of Hazard'];
+          for(var pi=0; pi<prefer.length; pi++){
+            if(sec.rows.length && sec.rows[0] && prefer[pi] in sec.rows[0]){ keyCol = prefer[pi]; break; }
+          }
+          if(keyCol){
+            sec.rows.forEach(function(r){ var k=String(r[keyCol]||'Other').trim()||'Other'; breakdown[k]=(breakdown[k]||0)+1; });
+            var top = Object.entries(breakdown).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
+            if(top.length){
+              pdf.setFontSize(8.5);
+              pdf.setFont(undefined,'normal');
+              pdf.setTextColor(60,80,76);
+              pdf.text('Top by '+keyCol+':', M, y);
+              y += 5;
+              var colW = (pageW - 2*M) / 2;
+              top.forEach(function(entry, i){
+                var col = i % 2;
+                var row = Math.floor(i / 2);
+                var xx = M + col * colW;
+                var yy = y + row * 9;
+                pdf.setFillColor(236,244,243);
+                pdf.roundedRect(xx, yy-4, colW-3, 8, 1.5, 1.5, 'F');
+                pdf.setTextColor(30,50,46);
+                pdf.setFontSize(8);
+                pdf.text(String(entry[0]).substring(0,36), xx+2, yy+1);
+                pdf.setFont(undefined,'bold');
+                pdf.text(String(entry[1]), xx + colW - 14, yy+1);
+                pdf.setFont(undefined,'normal');
+              });
+              y += Math.ceil(top.length/2)*9 + 4;
+            }
+          }
+        }catch(e){}
+        // Only a short sample table (max 8 rows) so report stays card-first and complete on KPIs
+        if(sec.cols && sec.rows.length){
+          pdf.setFontSize(9);
+          pdf.setFont(undefined,'bold');
+          pdf.setTextColor(PDF_C.primaryDark[0],PDF_C.primaryDark[1],PDF_C.primaryDark[2]);
+          pdf.text('Sample records (showing up to 8 of '+sec.rows.length+')', M, y);
+          y += 3;
+          drawTable(y, sec.rows.slice(0, 8), sec.cols);
+        }
       });
 
       // Helper: draw image frames with captions
@@ -7233,7 +7354,7 @@ function generateWeeklyReport(){
     label: w.label,
     start: w.start,
     end: w.end,
-    maxPages: 15,
+    maxPages: 12,
     filename: 'MBL_HSE_Weekly_'+mblDateKey(w.start)+'_to_'+mblDateKey(w.end)
   });
 }
@@ -7247,7 +7368,7 @@ function generateMonthlyReport(){
     label: m.label,
     start: m.start,
     end: m.end,
-    maxPages: 15,
+    maxPages: 12,
     filename: 'MBL_HSE_Monthly_'+m.year+'_'+String(m.month).padStart(2,'0')
   });
 }
@@ -8924,6 +9045,26 @@ async function mblCollectHsePhotos(){
   return photos;
 }
 
+async function mblCollectMedPhotos(){
+  var photos = {};
+  try{
+    if(typeof medLoadTeam === 'function') medLoadTeam();
+    var list = (typeof medTeamData !== 'undefined' && Array.isArray(medTeamData)) ? medTeamData : [];
+    for(var i = 0; i < list.length; i++){
+      var m = list[i];
+      if(!m || !m.id) continue;
+      try{
+        var raw = await medGetPhoto(m.id);
+        if(raw){
+          var small = (typeof mblResizeDataUrl === 'function') ? await mblResizeDataUrl(raw, 480, 0.75) : raw;
+          if(small) photos[m.id] = small;
+        }
+      }catch(e){}
+    }
+  }catch(e){}
+  return photos;
+}
+
 
 // ===== GOOD PRACTICE GALLERY =====
 const GP_GALLERY_KEY = 'MBL_GOOD_PRACTICE_GALLERY_V1';
@@ -9463,6 +9604,8 @@ async function mblPublishLive(){
     mblWriteStore();
 
     var photos = await mblCollectHsePhotos();
+    var medPhotos = {};
+    try{ if(typeof mblCollectMedPhotos === 'function') medPhotos = await mblCollectMedPhotos(); }catch(e){}
     var hsePayload = [];
     if(typeof hseData !== 'undefined' && Array.isArray(hseData)){
       hsePayload = hseData.map(function(x){
@@ -9499,6 +9642,7 @@ async function mblPublishLive(){
       theme: document.body.getAttribute('data-theme') || 'teal',
       morphism: document.body.getAttribute('data-morphism') || 'glass',
       medicalTeam: (function(){ try{ return JSON.parse(mblLS.getItem('MBL_MEDICAL_TEAM_V1')||'[]'); }catch(e){ return []; } })(),
+      medicalPhotos: medPhotos,
       hseOvertime: (function(){ try{ if(typeof otLoad==='function') otLoad(); return Array.isArray(hseOvertimeData)?hseOvertimeData:[]; }catch(e){ return []; } })()
     };
     Object.keys(APP_DATA).forEach(function(k){
@@ -9606,9 +9750,15 @@ async function mblLoadLiveData(){
       }
     }
 
-    // Apply Medical Team if present
+    // Apply Medical Team if present (metadata + photos so every viewer sees clinic pictures)
     if(Array.isArray(d.medicalTeam)){
       try{ mblLS.setItem('MBL_MEDICAL_TEAM_V1', JSON.stringify(d.medicalTeam)); medTeamData = d.medicalTeam; }catch(e){}
+    }
+    if(d.medicalPhotos && typeof d.medicalPhotos === 'object' && typeof medPutPhoto === 'function'){
+      var medKeys = Object.keys(d.medicalPhotos);
+      for(var mi = 0; mi < medKeys.length; mi++){
+        try{ await medPutPhoto(medKeys[mi], d.medicalPhotos[medKeys[mi]]); }catch(e){}
+      }
     }
 
     // Apply HSE Overtime
@@ -9651,7 +9801,13 @@ async function mblLoadLiveData(){
       if(stamp && stamp !== window.__mblLastLiveStamp){
         window.__mblLastLiveStamp = stamp;
         if(typeof currentCategory !== 'undefined' && currentCategory && typeof navigateTo === 'function' && window.__mblInited){
-          navigateTo(currentCategory);
+          // First successful live load should land on Dashboard Overview, not Manpower
+          if(!window.__mblDidFirstNav){
+            window.__mblDidFirstNav = true;
+            navigateTo('overview');
+          } else {
+            navigateTo(currentCategory);
+          }
         }
       } else if(!window.__mblLastLiveStamp && stamp){
         window.__mblLastLiveStamp = stamp;
@@ -10613,13 +10769,13 @@ function renderClinicPage(){
   }
   html += '</div>';
   html += '<p style="font-size:12px;color:var(--text-secondary);margin:0 0 12px">Name, Iqama, Shift, WhatsApp and Position are filled for each person. Admin can add photos and adjust framing.</p>';
-  html += '<div id="medTeamGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">';
+  html += '<div id="medTeamGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;align-items:stretch">';
   if(!medTeamData.length){
     html += '<div style="color:var(--text-muted);font-size:13px;padding:12px">No medical team members yet.'+(window.isAdmin?' Click Add Picture / Person.':'')+'</div>';
   } else {
     medTeamData.forEach(function(m, idx){
       html += '<div class="hse-card" style="overflow:hidden;border-radius:14px;border:1px solid rgba(var(--accent-rgb),0.2);background:rgba(var(--surface-rgb),0.5)">';
-      html += '<div class="hse-photo" id="med_photo_'+idx+'" style="height:160px;background:rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;color:var(--text-muted)"><i class="fas fa-user-md" style="font-size:36px;opacity:0.4"></i></div>';
+      html += '<div class="hse-photo" id="med_photo_'+idx+'" style="height:180px;min-height:180px;background:rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;color:var(--text-muted);overflow:hidden;flex-shrink:0"><i class="fas fa-user-md" style="font-size:36px;opacity:0.4"></i></div>';
       html += '<div style="padding:12px">';
       html += '<div class="hse-name" style="font-weight:700;color:var(--text-primary);margin-bottom:6px">'+clinicEsc(m.Name||'')+'</div>';
       html += '<div class="hse-meta" style="font-size:12px;line-height:1.55;color:var(--text-secondary)">';
@@ -10890,7 +11046,7 @@ function medOpenForm(idx){
       medSaveTeam();
       modal.remove();
       renderClinicPage();
-      showToast('Medical team member saved','success');
+      showToast('Saved. Click Publish Live so all viewers see the clinic pictures.','success');
     };
     if(state.photo){
       medPutPhoto(item.id, state.photo).then(done).catch(done);
@@ -11462,31 +11618,33 @@ function buildEquipDetailCharts(d){
     function build(){
       nodes = [];
       icons = [];
-      var count = strong ? 70 : 48;
+      // Same vivid network for Welcome and Dashboard (fast + noticeable)
+      var count = Math.max(55, Math.floor((w * h) / 14000));
+      if(count > 95) count = 95;
       for(var i = 0; i < count; i++){
         nodes.push({
           x: Math.random() * w,
           y: Math.random() * h,
-          vx: (Math.random() - 0.5) * 0.15,
-          vy: (Math.random() - 0.5) * 0.15,
-          r: 1.2 + Math.random() * 2.2,
+          vx: (Math.random() - 0.5) * 0.85,
+          vy: (Math.random() - 0.5) * 0.85,
+          r: 2.0 + Math.random() * 3.2,
           pulse: Math.random() * Math.PI * 2,
-          speed: 0.5 + Math.random() * 1.2,
-          gold: Math.random() > 0.55
+          speed: 1.6 + Math.random() * 2.4,
+          gold: Math.random() > 0.5
         });
       }
       var types = ['hat','crane','building','med','chart'];
-      var nIcon = strong ? 10 : 6;
+      var nIcon = 14;
       for(var i = 0; i < nIcon; i++){
         icons.push({
           x: Math.random() * w,
           y: Math.random() * h,
           type: types[i % types.length],
-          size: strong ? (28 + Math.random() * 18) : (22 + Math.random() * 12),
+          size: 36 + Math.random() * 28,
           pulse: Math.random() * Math.PI * 2,
-          speed: 0.3 + Math.random() * 0.5,
-          gold: Math.random() > 0.4,
-          drift: (Math.random() - 0.5) * 0.08
+          speed: 1.1 + Math.random() * 1.6,
+          gold: Math.random() > 0.35,
+          drift: (Math.random() - 0.5) * 0.55
         });
       }
     }
@@ -11497,16 +11655,21 @@ function buildEquipDetailCharts(d){
       var t = (now - t0) / 1000;
       ctx.clearRect(0, 0, w, h);
 
-      // deep navy base glow (matches MBL poster)
-      var g1 = ctx.createRadialGradient(w * 0.15, h * 0.2, 0, w * 0.2, h * 0.25, w * 0.6);
-      g1.addColorStop(0, strong ? 'rgba(40,70,120,0.35)' : 'rgba(20,50,90,0.2)');
+      // deep navy base glow (same on Welcome + Dashboard)
+      var g1 = ctx.createRadialGradient(w * 0.15, h * 0.2, 0, w * 0.2, h * 0.25, w * 0.65);
+      g1.addColorStop(0, 'rgba(40,70,120,0.38)');
       g1.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = g1;
       ctx.fillRect(0, 0, w, h);
-      var g2 = ctx.createRadialGradient(w * 0.85, h * 0.35, 0, w * 0.8, h * 0.4, w * 0.55);
-      g2.addColorStop(0, strong ? 'rgba(0,160,200,0.22)' : 'rgba(0,120,160,0.12)');
+      var g2 = ctx.createRadialGradient(w * 0.85, h * 0.35, 0, w * 0.8, h * 0.4, w * 0.6);
+      g2.addColorStop(0, 'rgba(0,170,210,0.26)');
       g2.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = g2;
+      ctx.fillRect(0, 0, w, h);
+      var g3 = ctx.createRadialGradient(w * 0.5, h * 0.85, 0, w * 0.5, h * 0.9, w * 0.45);
+      g3.addColorStop(0, 'rgba(180,140,40,0.14)');
+      g3.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g3;
       ctx.fillRect(0, 0, w, h);
 
       // move nodes slowly
@@ -11520,8 +11683,8 @@ function buildEquipDetailCharts(d){
       }
 
       // constellation links
-      var linkDist = strong ? 160 : 130;
-      ctx.lineWidth = 0.85;
+      var linkDist = 200;
+      ctx.lineWidth = 1.25;
       for(var i = 0; i < nodes.length; i++){
         var a = nodes[i];
         for(var j = i + 1; j < nodes.length; j++){
@@ -11529,8 +11692,8 @@ function buildEquipDetailCharts(d){
           var dx = a.x - b.x, dy = a.y - b.y;
           var dist = Math.sqrt(dx*dx + dy*dy);
           if(dist < linkDist){
-            var alpha = (1 - dist / linkDist) * (strong ? 0.45 : 0.28);
-            alpha *= (0.65 + 0.35 * Math.sin(t * 0.7 + a.pulse));
+            var alpha = (1 - dist / linkDist) * 0.55;
+            alpha *= (0.55 + 0.45 * Math.sin(t * 2.2 + a.pulse));
             var col = (a.gold || b.gold)
               ? ('rgba(212, 175, 55, ' + alpha + ')')
               : ('rgba(80, 200, 230, ' + alpha + ')');
@@ -11543,49 +11706,50 @@ function buildEquipDetailCharts(d){
         }
       }
 
-      // nodes
+      // nodes — bright, fast pulse (same Welcome + Dashboard)
       for(var i = 0; i < nodes.length; i++){
         var n = nodes[i];
         var glow = 0.5 + 0.5 * Math.sin(t * n.speed + n.pulse);
         ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r + glow * 0.9, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, n.r + glow * 1.4, 0, Math.PI * 2);
         if(n.gold){
-          ctx.fillStyle = 'rgba(232, 200, 90, ' + (0.4 + glow * 0.55) + ')';
-          ctx.shadowColor = 'rgba(212, 175, 55, 0.85)';
+          ctx.fillStyle = 'rgba(242, 210, 95, ' + (0.55 + glow * 0.45) + ')';
+          ctx.shadowColor = 'rgba(232, 190, 50, 0.95)';
         } else {
-          ctx.fillStyle = 'rgba(100, 220, 240, ' + (0.4 + glow * 0.55) + ')';
-          ctx.shadowColor = 'rgba(0, 200, 230, 0.85)';
+          ctx.fillStyle = 'rgba(110, 230, 250, ' + (0.55 + glow * 0.45) + ')';
+          ctx.shadowColor = 'rgba(0, 220, 255, 0.95)';
         }
-        ctx.shadowBlur = 10 + glow * 12;
+        ctx.shadowBlur = 14 + glow * 18;
         ctx.fill();
         ctx.shadowBlur = 0;
       }
 
-      // floating HSE / construction icons
+      // floating HSE / construction icons — larger, faster drift (same everywhere)
       for(var i = 0; i < icons.length; i++){
         var ic = icons[i];
         ic.x += ic.drift;
-        if(ic.x < -40) ic.x = w + 40;
-        if(ic.x > w + 40) ic.x = -40;
-        var a = (strong ? 0.22 : 0.12) + 0.12 * Math.sin(t * ic.speed + ic.pulse);
+        ic.y += Math.sin(t * ic.speed + ic.pulse) * 0.35;
+        if(ic.x < -50) ic.x = w + 50;
+        if(ic.x > w + 50) ic.x = -50;
+        if(ic.y < -50) ic.y = h + 50;
+        if(ic.y > h + 50) ic.y = -50;
+        var a = 0.28 + 0.18 * Math.sin(t * ic.speed + ic.pulse);
         ctx.strokeStyle = ic.gold
-          ? ('rgba(212, 175, 55, ' + a + ')')
-          : ('rgba(160, 200, 220, ' + a + ')');
-        ctx.lineWidth = 1.4;
-        ctx.shadowColor = ic.gold ? 'rgba(212,175,55,0.35)' : 'rgba(0,180,220,0.3)';
-        ctx.shadowBlur = 8;
-        iconPath(ctx, ic.type, ic.x, ic.y + Math.sin(t * ic.speed + ic.pulse) * 6, ic.size);
+          ? ('rgba(222, 185, 60, ' + a + ')')
+          : ('rgba(170, 220, 240, ' + a + ')');
+        ctx.lineWidth = 1.8;
+        ctx.shadowColor = ic.gold ? 'rgba(232,190,50,0.55)' : 'rgba(0,200,240,0.5)';
+        ctx.shadowBlur = 12;
+        iconPath(ctx, ic.type, ic.x, ic.y + Math.sin(t * ic.speed + ic.pulse) * 10, ic.size);
         ctx.shadowBlur = 0;
       }
 
-      // subtle bottom gold edge (poster floor)
-      if(strong){
-        var lg = ctx.createLinearGradient(0, h * 0.75, 0, h);
-        lg.addColorStop(0, 'rgba(0,0,0,0)');
-        lg.addColorStop(1, 'rgba(180,140,40,0.12)');
-        ctx.fillStyle = lg;
-        ctx.fillRect(0, h * 0.75, w, h * 0.25);
-      }
+      // bottom gold edge (poster floor) on Welcome and Dashboard
+      var lg = ctx.createLinearGradient(0, h * 0.72, 0, h);
+      lg.addColorStop(0, 'rgba(0,0,0,0)');
+      lg.addColorStop(1, 'rgba(180,140,40,0.14)');
+      ctx.fillStyle = lg;
+      ctx.fillRect(0, h * 0.72, w, h * 0.28);
     }
 
     function start(){
