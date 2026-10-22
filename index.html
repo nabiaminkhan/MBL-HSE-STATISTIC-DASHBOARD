@@ -34,17 +34,17 @@
   --accent-rgb:0,188,212;--accent2-rgb:0,150,136;--surface-rgb:0,20,16;--bg-deep:#004d40;--blob1:#00695c;--blob2:#00acc1;--blob3:#4dd0e1;--blob4:#80cbc4;--heat-empty:rgba(255,255,255,0.04);--hover-soft:rgba(255,255,255,0.04);--radius:22px;--radius-sm:14px;--sidebar-w:280px;--header-h:64px;
 }
 html,body{height:100%;width:100%;font-family:'Inter','Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,var(--bg-dark) 0%,var(--bg-purple) 50%,var(--bg-deep) 100%);color:var(--text-primary);overflow:hidden;}
-.bg-blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:0.35;pointer-events:none;z-index:0;animation:float-blob 20s ease-in-out infinite alternate;}
-.bg-blob.b1{width:500px;height:500px;background:radial-gradient(circle,var(--blob1),transparent 70%);top:-10%;left:-5%;animation-duration:25s;}
-.bg-blob.b2{width:400px;height:400px;background:radial-gradient(circle,var(--blob2),transparent 70%);bottom:-10%;right:-5%;animation-duration:30s;}
-.bg-blob.b3{width:350px;height:350px;background:radial-gradient(circle,var(--blob3),transparent 70%);top:40%;left:50%;animation-duration:22s;}
-.bg-blob.b4{width:300px;height:300px;background:radial-gradient(circle,var(--blob4),transparent 70%);top:20%;right:20%;animation-duration:28s;}
-@keyframes float-blob{0%{transform:translate(0,0) scale(1);}33%{transform:translate(30px,-40px) scale(1.1);}66%{transform:translate(-20px,30px) scale(0.95);}100%{transform:translate(10px,-10px) scale(1.05);}}
-.geo-sphere{position:fixed;pointer-events:none;z-index:0;border:1px solid rgba(var(--accent-rgb),0.08);border-radius:50%;animation:sphere-float 15s ease-in-out infinite alternate;}
-.geo-sphere.s1{width:120px;height:120px;top:10%;right:15%;animation-duration:18s;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.05),transparent);}
-.geo-sphere.s2{width:80px;height:80px;bottom:20%;left:30%;animation-duration:22s;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.04),transparent);}
-.geo-sphere.s3{width:60px;height:60px;top:60%;right:40%;animation-duration:16s;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.06),transparent);}
-@keyframes sphere-float{0%{transform:translateY(0) rotate(0deg);}100%{transform:translateY(-30px) rotate(180deg);}}
+.bg-blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:0.18;pointer-events:none;z-index:0;animation:float-blob 48s ease-in-out infinite alternate;will-change:transform;}
+.bg-blob.b1{width:420px;height:420px;background:radial-gradient(circle,var(--blob1),transparent 70%);top:-10%;left:-5%;animation-duration:56s;}
+.bg-blob.b2{width:340px;height:340px;background:radial-gradient(circle,var(--blob2),transparent 70%);bottom:-10%;right:-5%;animation-duration:64s;}
+.bg-blob.b3{width:300px;height:300px;background:radial-gradient(circle,var(--blob3),transparent 70%);top:40%;left:50%;animation-duration:52s;}
+.bg-blob.b4{width:260px;height:260px;background:radial-gradient(circle,var(--blob4),transparent 70%);top:20%;right:20%;animation-duration:60s;}
+@keyframes float-blob{0%{transform:translate(0,0) scale(1);}50%{transform:translate(18px,-22px) scale(1.04);}100%{transform:translate(-12px,14px) scale(0.98);}}
+.geo-sphere{position:fixed;pointer-events:none;z-index:0;border:1px solid rgba(var(--accent-rgb),0.06);border-radius:50%;animation:sphere-float 40s ease-in-out infinite alternate;opacity:0.55;}
+.geo-sphere.s1{width:100px;height:100px;top:10%;right:15%;animation-duration:44s;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.04),transparent);}
+.geo-sphere.s2{width:70px;height:70px;bottom:20%;left:30%;animation-duration:52s;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.03),transparent);}
+.geo-sphere.s3{width:50px;height:50px;top:60%;right:40%;animation-duration:38s;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.04),transparent);}
+@keyframes sphere-float{0%{transform:translateY(0) rotate(0deg);}100%{transform:translateY(-16px) rotate(90deg);}}
 .app-container{position:relative;z-index:1;display:flex;height:100vh;width:100vw;overflow:hidden;}
 .sidebar{width:var(--sidebar-w);height:100vh;background:rgba(var(--surface-rgb),0.75);backdrop-filter:blur(var(--blur));-webkit-backdrop-filter:blur(var(--blur));border-right:1px solid var(--glass-border);display:flex;flex-direction:column;flex-shrink:0;transition:transform 0.8s ease;z-index:10;}
 .sidebar-header{padding:20px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.06);}
@@ -270,9 +270,10 @@ button, .header-btn, .nav-item, .hse-btn, .sub-tab, .kpi-card, .officer-card, .m
     radial-gradient(1px 1px at 80% 60%,rgba(255,255,255,0.08),transparent),
     radial-gradient(1.5px 1.5px at 10% 80%,rgba(var(--accent-rgb),0.2),transparent),
     radial-gradient(1.5px 1.5px at 70% 10%,rgba(var(--accent2-rgb),0.15),transparent);
-  animation:particleDrift 20s linear infinite;
+  animation:particleDrift 48s linear infinite;
+  opacity:0.08;
 }
-@keyframes particleDrift{0%{transform:translateY(0)}100%{transform:translateY(-20px)}}
+@keyframes particleDrift{0%{transform:translateY(0)}100%{transform:translateY(-10px)}}
 
 /* Active nav item pulsing glow */
 .nav-item.active::before{
@@ -527,12 +528,66 @@ body.viewer-mode .gp-card-btns{display:none!important;}
   pointer-events:none;
 }
 .hse-photo img{width:100%;height:100%;object-fit:cover}
-/* Medical team cards — equal size, no shrink */
-#medTeamGrid{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))!important;gap:16px!important;align-items:stretch!important;}
-#medTeamGrid .hse-card{display:flex!important;flex-direction:column!important;min-height:280px!important;height:100%!important;overflow:hidden!important;border-radius:14px!important;}
-#medTeamGrid .hse-photo{height:180px!important;min-height:180px!important;flex-shrink:0!important;background:rgba(0,0,0,0.25)!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;}
-#medTeamGrid .hse-photo img{width:100%!important;height:100%!important;object-fit:cover!important;}
-#medTeamGrid .hse-card > div:last-child{flex:1!important;padding:12px!important;}
+/* Medical team cards — equal size for admin AND viewer */
+#medTeamGrid{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important;
+  gap:16px!important;
+  align-items:stretch!important;
+}
+#medTeamGrid .med-card,
+#medTeamGrid .hse-card{
+  display:flex!important;
+  flex-direction:column!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  border-radius:14px!important;
+  box-sizing:border-box!important;
+}
+/* Fixed square photo frame — same size every card, viewer or admin */
+#medTeamGrid .hse-photo,
+#medTeamGrid .med-photo{
+  width:100%!important;
+  aspect-ratio:1 / 1!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  flex:0 0 auto!important;
+  position:relative!important;
+  background:rgba(0,0,0,0.25)!important;
+  display:block!important;
+  overflow:hidden!important;
+}
+#medTeamGrid .hse-photo img,
+#medTeamGrid .med-photo img{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:cover!important;
+  object-position:center center!important;
+}
+#medTeamGrid .med-card-body,
+#medTeamGrid .hse-card > .med-card-body{
+  flex:1 1 auto!important;
+  padding:12px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  min-height:120px!important;
+}
+#medTeamGrid .med-card-actions{
+  margin-top:auto!important;
+  display:flex!important;
+  gap:6px!important;
+  min-height:36px!important; /* reserve space so admin/viewer cards match height */
+}
+body.viewer-mode #medTeamGrid .med-card-actions{
+  visibility:hidden!important; /* keep height, hide buttons */
+  pointer-events:none!important;
+}
 .hse-nop{color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:1px}
 
 .hse-body{padding:12px}
@@ -2113,32 +2168,201 @@ body[data-morphism="embroidery"] .data-table thead th{
   border-bottom:2px dashed rgba(var(--accent-rgb),0.35)!important;
 }
 
-/* ===== ELONGATED NEON KPI CARD (Safe Manhours) ===== */
+/* ===== ELONGATED / SAFE MANHOURS KPI — theme-aware, GPU-light flip ===== */
+/* Uses --accent-rgb / --accent-cyan so it follows the active theme */
 .kpi-card.kpi-elongated{
-  grid-column:span 2;
-  min-height:126px;
-  display:flex;flex-direction:column;justify-content:center;
-  padding:22px 26px;
-  animation:kpiNeonPulse 2.4s ease-in-out .45s infinite!important;
+  grid-column: span 2;
+  min-height: 126px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 22px 26px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(var(--accent-rgb), 0.35);
+  background: linear-gradient(120deg,
+    rgba(var(--accent-rgb), 0.18),
+    rgba(var(--accent-rgb), 0.07) 55%,
+    rgba(var(--accent-rgb), 0.02));
+  box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.12);
 }
-@keyframes kpiNeonPulse{
-  0%,100%{border-color:rgba(0,188,212,0.30);box-shadow:0 0 16px rgba(0,229,255,0.16),0 0 42px rgba(0,229,255,0.05);}
-  50%{border-color:rgba(0,229,255,0.80);box-shadow:0 0 34px rgba(0,229,255,0.45),0 0 88px rgba(0,229,255,0.16),inset 0 0 26px rgba(0,229,255,0.06);}
+.kpi-elongated .kpi-value{
+  font-size: clamp(28px, 4.5vw, 40px);
+  letter-spacing: .5px;
+  font-weight: 800;
+  color: var(--accent-cyan) !important;
+  text-shadow: 0 0 14px rgba(var(--accent-rgb), 0.35);
 }
-.kpi-elongated .kpi-value{font-size:40px;letter-spacing:.5px;animation:kpiNeonText 2.4s ease-in-out .45s infinite;}
-@keyframes kpiNeonText{
-  0%,100%{text-shadow:0 0 12px rgba(0,229,255,0.35);}
-  50%{text-shadow:0 0 26px rgba(0,229,255,0.85),0 0 58px rgba(0,229,255,0.35);}
+.kpi-elongated .kpi-label{
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-secondary);
 }
-.kpi-elongated .kpi-label{font-size:12px;}
-.kpi-elongated .kpi-icon{top:50%;right:26px;transform:translateY(-50%);width:52px;height:52px;font-size:20px;border-radius:14px;animation:kpiIconPulse 2.4s ease-in-out .45s infinite;}
-@keyframes kpiIconPulse{0%,100%{filter:drop-shadow(0 0 4px rgba(0,229,255,0.35));}50%{filter:drop-shadow(0 0 14px rgba(0,229,255,0.9));}}
-.kpi-elongated .kpi-sweep{position:absolute;top:0;bottom:0;width:38%;pointer-events:none;
-  background:linear-gradient(100deg,transparent,rgba(0,229,255,0.10),rgba(255,255,255,0.05),transparent);
-  animation:kpiSweep 3.6s linear infinite;}
-@keyframes kpiSweep{0%{transform:translateX(-140%)}100%{transform:translateX(320%)}}
-.kpi-elongated .kpi-underline{animation:kpiUnderline 2.4s ease-in-out .45s infinite;}
-@keyframes kpiUnderline{0%,100%{opacity:.35}50%{opacity:1}}
+.kpi-elongated .kpi-icon{
+  top: 50%; right: 26px; transform: translateY(-50%);
+  width: 52px; height: 52px; font-size: 20px; border-radius: 14px;
+  color: var(--accent-cyan) !important;
+  background: rgba(var(--accent-rgb), 0.18) !important;
+}
+.kpi-elongated .kpi-sweep{
+  position: absolute; top: 0; bottom: 0; width: 38%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(var(--accent-rgb), 0.10), rgba(255,255,255,0.04), transparent);
+  animation: kpiSweep 5s linear infinite;
+}
+.kpi-elongated .kpi-underline{
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+  border-radius: 0 0 var(--radius) var(--radius);
+  opacity: 0.7;
+}
+@keyframes kpiSweep{ 0%{ transform: translateX(-140%); } 100%{ transform: translateX(320%); } }
+
+/* Hero flip card — isolated compositor layer to avoid chart lag */
+.kpi-safe-flip{
+  grid-column: 1 / -1;
+  min-height: 158px;
+  position: relative;
+  margin-bottom: 4px;
+  /* Isolate from chart canvas repaints */
+  contain: layout style paint;
+  isolation: isolate;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+.kpi-safe-flip-inner{
+  position: relative;
+  width: 100%;
+  min-height: 158px;
+  transform-style: preserve-3d;
+  /* transform-only transition = compositor-friendly, no layout/paint on siblings */
+  transition: transform 0.75s cubic-bezier(.4,.15,.2,1);
+  will-change: auto; /* set to transform only while flipping via JS */
+}
+.kpi-safe-flip.is-flipping .kpi-safe-flip-inner{
+  will-change: transform;
+}
+.kpi-safe-flip.is-flipped .kpi-safe-flip-inner{
+  transform: rotateY(180deg);
+}
+.kpi-safe-face{
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius, 16px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 26px 32px;
+  overflow: hidden;
+  /* Theme tokens — follow active palette */
+  border: 1px solid rgba(var(--accent-rgb), 0.42);
+  background: linear-gradient(120deg,
+    rgba(var(--accent-rgb), 0.22),
+    rgba(var(--accent-rgb), 0.09) 55%,
+    rgba(var(--accent-rgb), 0.03));
+  box-shadow:
+    0 0 22px rgba(var(--accent-rgb), 0.16),
+    0 0 56px rgba(var(--accent-rgb), 0.05);
+  /* Own layer */
+  transform: translateZ(0);
+}
+.kpi-safe-face.back{
+  transform: rotateY(180deg) translateZ(0);
+  border-color: rgba(var(--accent2-rgb), 0.45);
+  background: linear-gradient(120deg,
+    rgba(var(--accent2-rgb), 0.20),
+    rgba(var(--accent-rgb), 0.10) 50%,
+    rgba(var(--accent-rgb), 0.04));
+}
+.kpi-safe-face .kpi-value{
+  font-size: clamp(34px, 5.8vw, 52px);
+  font-weight: 800;
+  letter-spacing: .5px;
+  color: var(--accent-cyan);
+  text-shadow: 0 0 18px rgba(var(--accent-rgb), 0.45);
+}
+.kpi-safe-face.back .kpi-value{
+  color: var(--accent-mint, var(--accent-cyan));
+  text-shadow: 0 0 16px rgba(var(--accent2-rgb), 0.45);
+  font-size: clamp(18px, 3.2vw, 26px);
+}
+.kpi-safe-face .kpi-label{
+  font-size: 13px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-secondary, #90a4ae);
+  margin-bottom: 6px;
+}
+.kpi-safe-face .kpi-icon{
+  position: absolute;
+  top: 50%; right: 28px;
+  transform: translateY(-50%);
+  width: 58px; height: 58px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  color: var(--accent-cyan);
+  background: rgba(var(--accent-rgb), 0.18);
+}
+.kpi-safe-face.back .kpi-icon{
+  color: var(--accent-mint, var(--accent-cyan));
+  background: rgba(var(--accent2-rgb), 0.18);
+}
+.kpi-safe-face .kpi-sweep{
+  position: absolute; top: 0; bottom: 0; width: 36%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(var(--accent-rgb), 0.12), rgba(255,255,255,0.04), transparent);
+  /* slower, lighter sweep — less constant paint */
+  animation: kpiSweep 7s linear infinite;
+}
+.kpi-safe-face .kpi-underline{
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+  border-radius: 0 0 var(--radius, 16px) var(--radius, 16px);
+  opacity: 0.75;
+}
+.kpi-safe-face.back .kpi-underline{
+  background: linear-gradient(90deg, transparent, var(--accent-mint, var(--accent-cyan)), transparent);
+}
+
+/* Entrance only once — NO continuous filter:brightness (that caused chart lag) */
+.kpi-safe-flip.kpi-safe-enter{
+  animation: kpiSafeEnter 0.95s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes kpiSafeEnter{
+  0%{ opacity: 0; transform: translateZ(0) translateY(-18px) scale(0.96); }
+  100%{ opacity: 1; transform: translateZ(0) translateY(0) scale(1); }
+}
+/* Soft attention pulse via box-shadow only (compositor-friendly, no filter) */
+.kpi-safe-face.front{
+  animation: kpiSafeGlow 5s ease-in-out 1.2s infinite;
+}
+@keyframes kpiSafeGlow{
+  0%, 100%{
+    box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.14), 0 0 48px rgba(var(--accent-rgb), 0.04);
+    border-color: rgba(var(--accent-rgb), 0.35);
+  }
+  50%{
+    box-shadow: 0 0 28px rgba(var(--accent-rgb), 0.32), 0 0 72px rgba(var(--accent-rgb), 0.10);
+    border-color: rgba(var(--accent-rgb), 0.70);
+  }
+}
+
+@media (max-width: 640px){
+  .kpi-safe-flip, .kpi-safe-flip-inner{ min-height: 128px; }
+  .kpi-safe-face{ padding: 18px 16px; }
+  .kpi-safe-face .kpi-icon{ width: 44px; height: 44px; font-size: 18px; right: 14px; }
+}
+@media (prefers-reduced-motion: reduce){
+  .kpi-safe-flip-inner{ transition: none !important; }
+  .kpi-safe-flip, .kpi-safe-face.front, .kpi-safe-face .kpi-sweep{
+    animation: none !important;
+  }
+  .kpi-elongated .kpi-sweep{ animation: none !important; }
+}
 
 /* ===== TOP 3 OBSERVERS · PODIUM LAYOUT ===== */
 .top3-wrap{display:flex;flex-direction:column;gap:14px;}
@@ -2182,9 +2406,9 @@ body[data-morphism="embroidery"] .data-table thead th{
 /* ===== WELCOME / LOGIN / ADMIN ===== */
 #welcomeOverlay{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:linear-gradient(135deg,var(--bg-dark,#001a14) 0%,var(--bg-purple,#003d33) 50%,var(--bg-deep,#004d40) 100%);
-  transition:opacity 1.2s ease,visibility 1.2s;}
+  transition:opacity 1.6s ease,visibility 1.6s;}
 #welcomeOverlay.fade-out{opacity:0;visibility:hidden;pointer-events:none;}
-.welcome-logo{width:min(280px,70vw);height:auto;filter:drop-shadow(0 0 24px rgba(var(--accent-rgb,0,188,212),0.35));margin-bottom:28px;}
+.welcome-logo{width:min(240px,62vw);height:auto;filter:drop-shadow(0 0 16px rgba(var(--accent-rgb,0,188,212),0.28));margin-bottom:24px;}
 .welcome-msg{font-size:clamp(15px,2.8vw,22px);font-weight:600;color:rgba(255,255,255,0.95);text-align:center;
   letter-spacing:0.4px;max-width:90vw;line-height:1.4;display:flex;align-items:center;gap:14px;justify-content:center;flex-wrap:wrap;}
 .welcome-thanks{margin-top:18px;font-size:clamp(12px,2.2vw,15px);font-weight:500;color:rgba(255,255,255,0.78);
@@ -2192,9 +2416,9 @@ body[data-morphism="embroidery"] .data-table thead th{
 .welcome-thanks strong{color:var(--accent-cyan,#00e5ff);font-weight:700;}
 .ecg-wrap{display:inline-flex;align-items:center;height:28px;overflow:hidden;}
 .ecg-line{width:72px;height:28px;}
-.ecg-line polyline{fill:none;stroke:var(--accent-cyan,#00e5ff);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
-  stroke-dasharray:120;stroke-dashoffset:120;animation:ecgPulse 1.4s ease-in-out infinite;}
-@keyframes ecgPulse{0%{stroke-dashoffset:120;opacity:0.4}40%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:-120;opacity:0.3}}
+.ecg-line polyline{fill:none;stroke:var(--accent-cyan,#00e5ff);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:120;stroke-dashoffset:120;animation:ecgPulse 2.8s ease-in-out infinite;}
+@keyframes ecgPulse{0%{stroke-dashoffset:120;opacity:0.35}45%{stroke-dashoffset:0;opacity:0.85}100%{stroke-dashoffset:-120;opacity:0.25}}
 #loginOverlay{position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;
   background:rgba(0,10,8,0.72);backdrop-filter:blur(12px);}
 #loginOverlay.show{display:flex;}
@@ -2344,6 +2568,14 @@ body[data-theme="white"] #mblTechBgRoot .mbl-tech-bg{opacity:0.22;filter:brightn
 body[data-theme="black"] #mblTechBgRoot .mbl-tech-bg{opacity:0.75;}
 
 
+
+/* Prefer reduced motion: pause decorative motion for accessibility + low-power devices */
+@media (prefers-reduced-motion: reduce) {
+  .bg-blob, .geo-sphere, .particle-field { animation: none !important; }
+  .ecg-line polyline { animation: none !important; stroke-dashoffset: 0; opacity: 0.7; }
+  #welcomeOverlay { transition-duration: 0.4s !important; }
+  .content-area.page-exit, .content-area.page-enter { animation: none !important; }
+}
 /* =========================================================
    MOBILE EXPERIENCE PATCH (applies at <=1024px / <=640px only)
    Desktop rendering is intentionally untouched.
@@ -2351,7 +2583,11 @@ body[data-theme="black"] #mblTechBgRoot .mbl-tech-bg{opacity:0.75;}
 
 /* Soften heavy effects on smaller screens for performance */
 @media (max-width: 1024px) {
-  .bg-blob { opacity: 0.22; filter: blur(60px); }
+  .bg-blob { opacity: 0.1; filter: blur(50px); animation-duration: 70s !important; }
+  .geo-sphere { opacity: 0.25; animation-duration: 60s !important; }
+  .particle-field { display: none !important; }
+  #welcomeOverlay .welcome-logo { width: min(200px, 55vw); margin-bottom: 18px; }
+  #mblTechBgRoot .mbl-tech-bg { opacity: 0.55; }
   .sidebar {
     position: fixed;
     left: 0; top: 0; bottom: 0;
@@ -2654,8 +2890,8 @@ body[data-theme="black"] #mblTechBgRoot .mbl-tech-bg{opacity:0.75;}
         <button class="header-btn admin-only" onclick="mblPublishLive()" title="Publish current data so all users see it" style="background:rgba(0,188,212,0.15);border-color:rgba(0,188,212,0.35);color:#4dd0e1"><i class="fas fa-cloud-upload-alt"></i> Publish Live</button>
         <button class="header-btn admin-only" onclick="mblExportFullBackup()" title="Export full dashboard backup (admin only)" style="background:rgba(0,188,212,0.12);border-color:rgba(0,188,212,0.3);color:#4dd0e1"><i class="fas fa-download"></i> <span class="btn-txt">Backup</span></button>
         <button class="header-btn admin-only" onclick="mblTriggerImportBackup()" title="Import backup to sync data (admin only)" style="background:rgba(0,188,212,0.12);border-color:rgba(0,188,212,0.3);color:#4dd0e1"><i class="fas fa-upload"></i> <span class="btn-txt">Import</span></button>
-        <button class="header-btn" onclick="showExportFormatChoice('weekly')" title="Last completed week (Sat–Fri)" style="background:rgba(102,187,106,0.15);border-color:rgba(102,187,106,0.35);color:#a5d6a7"><i class="fas fa-calendar-week"></i> <span class="btn-txt">Weekly Report</span></button>
-        <button class="header-btn" onclick="showExportFormatChoice('monthly')" title="Last completed calendar month" style="background:rgba(171,71,188,0.15);border-color:rgba(171,71,188,0.35);color:#ce93d8"><i class="fas fa-calendar-alt"></i> <span class="btn-txt">Monthly Report</span></button>
+        <button class="header-btn" onclick="showPeriodExportPicker('weekly')" title="Select week(s) to export (Sat–Fri)" style="background:rgba(102,187,106,0.15);border-color:rgba(102,187,106,0.35);color:#a5d6a7"><i class="fas fa-calendar-week"></i> <span class="btn-txt">Weekly Report</span></button>
+        <button class="header-btn" onclick="showPeriodExportPicker('monthly')" title="Select month(s) to export" style="background:rgba(171,71,188,0.15);border-color:rgba(171,71,188,0.35);color:#ce93d8"><i class="fas fa-calendar-alt"></i> <span class="btn-txt">Monthly Report</span></button>
         <button class="header-btn btn-accent" onclick="showExportFormatChoice('dashboard')"><i class="fas fa-file-export"></i> <span class="btn-txt">Export</span></button>
 
         <button class="header-btn" id="adminLoginBtn" onclick="openAdminLoginModal()" title="Admin login" style="background:rgba(0,188,212,0.18);border-color:rgba(0,188,212,0.4);color:#4dd0e1"><i class="fas fa-user-shield"></i> <span class="btn-txt">Admin Login</span></button>
@@ -2873,6 +3109,7 @@ CATEGORIES.push({"key": "hse_team", "label": "OUR HSE TEAM", "icon": "fa-hard-ha
 CATEGORIES.push({"key": "drills", "label": "DRILLS & CAMPAIGNS", "icon": "fa-bullhorn", "color": "#ff8a65", "sub": ["drills"]});
 CATEGORIES.push({"key": "good_practice", "label": "GOOD PRACTICE GALLERY", "icon": "fa-camera-retro", "color": "#66bb6a", "sub": ["good_practice"]});
 CATEGORIES.push({"key": "evaluate_officer", "label": "EVALUATE OFFICER", "icon": "fa-user-tie", "color": "#ab47bc", "sub": ["evaluate_officer"]});
+CATEGORIES.push({"key": "officer_improvements", "label": "TEAM IMPROVEMENTS", "icon": "fa-comments", "color": "#26c6da", "sub": ["officer_improvements"]});
 CATEGORIES.push({"key": "company_scorecard", "label": "COMPANY SCORECARDS", "icon": "fa-building", "color": "#5c6bc0", "sub": ["company_scorecard"]});
 
 /* ===== OUR CLINIC (MBL ASP Clinic Register) ===== */
@@ -3013,6 +3250,11 @@ function navigateToCore(key){
     document.getElementById('headerTitle').textContent = 'EVALUATE OFFICER';
     document.getElementById('headerSubtitle').textContent = 'Officer performance · KPI scan · Download live report';
     if(typeof renderEvaluateOfficerPage === 'function') renderEvaluateOfficerPage();
+  } else if(key === 'officer_improvements'){
+    Object.values(charts).forEach(c => c.destroy && c.destroy()); charts = {};
+    document.getElementById('headerTitle').textContent = 'TEAM IMPROVEMENTS';
+    document.getElementById('headerSubtitle').textContent = 'Officer coaching · Suggested messages · WhatsApp & Email send';
+    if(typeof renderOfficerImprovementsPage === 'function') renderOfficerImprovementsPage();
   } else if(key === 'company_scorecard'){
     Object.values(charts).forEach(c => c.destroy && c.destroy()); charts = {};
     document.getElementById('headerTitle').textContent = 'COMPANY SCORECARDS';
@@ -3063,7 +3305,14 @@ function renderOverview(){
   const tmp = APP_DATA.manpower_daily?.total_rows||0;
   const tptw = (APP_DATA.ptw && (APP_DATA.ptw.total_rows || (APP_DATA.ptw.rows && APP_DATA.ptw.rows.length) || 0)) || 0;
   const thse = (typeof hseData !== 'undefined' && hseData.length) ? hseData.length : (typeof HSE_TEAM_ORIGINAL !== 'undefined' ? HSE_TEAM_ORIGINAL.length : 0);
+  // Safe Manhours (hero) — first row, full width, animated
+  var totalSafeMH = 0;
+  try{
+    var _mpRows = (APP_DATA.manpower_daily && APP_DATA.manpower_daily.rows) ? APP_DATA.manpower_daily.rows : [];
+    totalSafeMH = _mpRows.reduce(function(s,r){ return s + (Number(r['Total MH']||r['Manhours']||0)||0); }, 0);
+  }catch(e){ totalSafeMH = 0; }
   let kpiHtml = '<div class="kpi-grid">';
+  kpiHtml += kpiCardSafeManhours(Math.round(totalSafeMH));
   kpiHtml += kpiCard('Total Violations', tv, '#ef5350', 'fa-exclamation-triangle');
   kpiHtml += kpiCard('Safety Observations', to, '#26a69a', 'fa-eye');
   kpiHtml += kpiCard('Training & Induction', tt+ti, '#00897b', 'fa-graduation-cap');
@@ -3131,14 +3380,87 @@ function kpiCard(label, value, color, icon){
     '<div class="kpi-value" style="color:' + color + '">' + value.toLocaleString() + '</div></div>';
 }
 function kpiCardSpecial(label, value, color, icon){
-  return '<div class="kpi-card kpi-elongated" style="--card-accent:' + color + ';background:linear-gradient(120deg,rgba(0,172,193,0.16),rgba(0,230,255,0.06) 60%,rgba(0,230,255,0.02));">' +
+  // Generic elongated KPI (theme-aware via CSS vars; color is fallback only)
+  var displayVal = (typeof value === 'number') ? value.toLocaleString() : String(value);
+  return '<div class="kpi-card kpi-elongated animate-in" style="--card-accent:' + (color||'var(--accent-cyan)') + '">' +
     '<div class="kpi-sweep"></div>' +
-    '<div class="kpi-icon" style="color:' + color + ';background:rgba(0,188,212,0.18)"><i class="fas ' + icon + '"></i></div>' +
-    '<div class="kpi-label" style="letter-spacing:2px;">' + label + '</div>' +
-    '<div class="kpi-value" style="color:' + color + '">' + value.toLocaleString() + '</div>' +
-    '<div class="kpi-underline" style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,' + color + ',transparent);border-radius:0 0 var(--radius) var(--radius);"></div>' +
+    '<div class="kpi-icon"><i class="fas ' + (icon||'fa-chart-line') + '"></i></div>' +
+    '<div class="kpi-label">' + label + '</div>' +
+    '<div class="kpi-value">' + displayVal + '</div>' +
+    '<div class="kpi-underline"></div>' +
     '</div>';
 }
+/** Hero Safe Manhours card — full-width, theme-linked, light 3D flip every 5s */
+function kpiCardSafeManhours(value){
+  var displayVal = (typeof value === 'number') ? value.toLocaleString() : String(value);
+  var id = 'safeMhFlip_' + Math.random().toString(36).slice(2, 9);
+  var html = ''
+    + '<div class="kpi-safe-flip kpi-safe-enter" id="'+id+'" data-safe-mh="1">'
+    +   '<div class="kpi-safe-flip-inner">'
+    +     '<div class="kpi-safe-face front">'
+    +       '<div class="kpi-sweep"></div>'
+    +       '<div class="kpi-icon"><i class="fas fa-shield-alt"></i></div>'
+    +       '<div class="kpi-label">Safe Manhours</div>'
+    +       '<div class="kpi-value">'+displayVal+'</div>'
+    +       '<div class="kpi-underline"></div>'
+    +     '</div>'
+    +     '<div class="kpi-safe-face back">'
+    +       '<div class="kpi-sweep"></div>'
+    +       '<div class="kpi-icon"><i class="fas fa-hard-hat"></i></div>'
+    +       '<div class="kpi-label">Zero Harm Target</div>'
+    +       '<div class="kpi-value">Safety First — Every Hour Counts</div>'
+    +       '<div class="kpi-underline"></div>'
+    +     '</div>'
+    +   '</div>'
+    + '</div>';
+  setTimeout(function(){ if(typeof mblStartSafeMhFlip==='function') mblStartSafeMhFlip(id); }, 120);
+  return html;
+}
+function mblStartSafeMhFlip(id){
+  var el = document.getElementById(id);
+  if(!el) return;
+  if(el._flipTimer){ try{ clearInterval(el._flipTimer); }catch(e){} }
+  try{
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  }catch(e){}
+  // Single global interval owner — avoid stacking timers across navigations
+  if(window._mblSafeMhFlipTimer){
+    try{ clearInterval(window._mblSafeMhFlipTimer); }catch(e){}
+  }
+  window._mblSafeMhFlipTimer = setInterval(function(){
+    var card = document.getElementById(id);
+    if(!card || !document.body.contains(card)){
+      clearInterval(window._mblSafeMhFlipTimer);
+      window._mblSafeMhFlipTimer = null;
+      return;
+    }
+    if(document.hidden) return;
+    // will-change only during the transition window
+    card.classList.add('is-flipping');
+    card.classList.toggle('is-flipped');
+    setTimeout(function(){
+      if(card) card.classList.remove('is-flipping');
+    }, 800);
+  }, 5000);
+  // Stop flip when navigating away (contentArea replaced)
+  try{
+    var area = document.getElementById('contentArea');
+    if(area && !area._safeMhObs){
+      area._safeMhObs = new MutationObserver(function(){
+        if(!document.getElementById(id)){
+          if(window._mblSafeMhFlipTimer){
+            clearInterval(window._mblSafeMhFlipTimer);
+            window._mblSafeMhFlipTimer = null;
+          }
+        }
+      });
+      area._safeMhObs.observe(area, { childList: true });
+    }
+  }catch(e){}
+}
+window.mblStartSafeMhFlip = mblStartSafeMhFlip;
+window.kpiCardSafeManhours = kpiCardSafeManhours;
+
 
 
 function chartCard(id, title, icon){
@@ -3444,14 +3766,19 @@ function buildCategoryKPIs(cat, activeSubKey){
         if(st[s]==null) st[s]=0;
         st[s]++;
       });
-      html += kpiCard('Total Equipment', erows.length, cat.color, 'fa-truck');
+      // Theme-linked card colours (status stays semantic: red / amber / green)
+      var eqTh = (typeof mblClinicThemePalette === 'function') ? mblClinicThemePalette() : null;
+      var eqAccent = (eqTh && eqTh.accent) || (getComputedStyle(document.body).getPropertyValue('--accent-cyan').trim()) || cat.color || '#00bcd4';
+      var eqMint = (eqTh && eqTh.palette && eqTh.palette[2]) || eqAccent;
+      var eqTeal = (eqTh && eqTh.palette && eqTh.palette[1]) || eqAccent;
+      html += kpiCard('Total Equipment', erows.length, eqAccent, 'fa-truck');
       html += kpiCard('Expired', st.EXPIRED||0, '#ef5350', 'fa-times-circle');
       html += kpiCard('Alert ≤30 days', st.ALERT||0, '#ffb74d', 'fa-exclamation-triangle');
       html += kpiCard('Valid', st.VALID||0, '#66bb6a', 'fa-check-circle');
       var cos = countBy(erows, 'Company Name');
-      html += kpiCard('Companies', Object.keys(cos).filter(Boolean).length, '#42a5f5', 'fa-building');
+      html += kpiCard('Companies', Object.keys(cos).filter(Boolean).length, eqTeal, 'fa-building');
       var types = countBy(erows, 'Equipment Type');
-      html += kpiCard('Equipment Types', Object.keys(types).filter(Boolean).length, '#26a69a', 'fa-cogs');
+      html += kpiCard('Equipment Types', Object.keys(types).filter(Boolean).length, eqMint, 'fa-cogs');
     }
     else if(sk==='observations'){
       html += kpiCard('Total Observations', d.total_rows, cat.color, 'fa-eye');
@@ -3461,7 +3788,7 @@ function buildCategoryKPIs(cat, activeSubKey){
     }
     else if(sk==='manpower_daily'){
       const totalMH = d.rows.reduce((s,r) => s + (r['Total MH']||0), 0);
-      html += kpiCardSpecial('Safe Manhours', totalMH.toLocaleString(), '#00e5ff', 'fa-shield-alt');
+      html += kpiCardSafeManhours(totalMH);
       const totalMP = d.rows.reduce((s,r) => s + (r['Total MP']||0), 0);
       html += kpiCard('Total Manpower', totalMP.toLocaleString(), '#00acc1', 'fa-users');
       const maxMP = Math.max(...d.rows.map(r=>r['Total MP']||0));
@@ -5700,6 +6027,184 @@ function pdfActiveFilters(){
 }
 
 
+// ===== SELECTIVE PERIOD EXPORT (WEEKLY / MONTHLY) =====
+// Allows user to choose which week(s) or month(s) to include in the report.
+// Selected periods are merged into a single continuous date range (earliest start → latest end).
+window._mblExportPeriod = null; // { kind, start, end, label, count }
+
+function mblListRecentWeeks(count){
+  count = count || 16;
+  var list = [];
+  var cur = mblLastCompletedWeek();
+  var start = new Date(cur.start);
+  var end = new Date(cur.end);
+  for(var i=0;i<count;i++){
+    list.push({
+      start: new Date(start),
+      end: new Date(end),
+      label: mblDateKey(start)+' → '+mblDateKey(end),
+      key: mblDateKey(start)
+    });
+    // step back one week
+    end = new Date(start);
+    end.setDate(end.getDate() - 1);
+    start = new Date(end);
+    start.setDate(start.getDate() - 6);
+  }
+  return list;
+}
+
+function mblListRecentMonths(count){
+  count = count || 12;
+  var list = [];
+  var now = new Date();
+  var y = now.getFullYear(), m = now.getMonth(); // current month (0-based)
+  // start from previous completed month
+  var prevM = m === 0 ? 11 : m-1;
+  var prevY = m === 0 ? y-1 : y;
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  for(var i=0;i<count;i++){
+    var start = new Date(prevY, prevM, 1);
+    var end = new Date(prevY, prevM+1, 0);
+    list.push({
+      start: start,
+      end: end,
+      label: months[prevM]+' '+prevY,
+      key: prevY+'-'+String(prevM+1).padStart(2,'0'),
+      year: prevY,
+      month: prevM+1
+    });
+    prevM--;
+    if(prevM < 0){ prevM = 11; prevY--; }
+  }
+  return list;
+}
+
+function showPeriodExportPicker(kind){
+  kind = (kind === 'monthly') ? 'monthly' : 'weekly';
+  var existing = document.getElementById('periodExportModal');
+  if(existing) existing.remove();
+  var isWeek = kind === 'weekly';
+  var periods = isWeek ? mblListRecentWeeks(16) : mblListRecentMonths(12);
+  var title = isWeek ? 'Select Week(s) for Weekly Report' : 'Select Month(s) for Monthly Report';
+  var hint = isWeek
+    ? 'Week runs Saturday – Friday. Select one or more weeks (1, 2, 3 or all). Export covers the full selected range.'
+    : 'Select one or more calendar months (1, 2, 3 or all). Export covers the full selected range.';
+
+  var modal = document.createElement('div');
+  modal.id = 'periodExportModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px)';
+
+  var rows = periods.map(function(p, idx){
+    var checked = idx === 0 ? ' checked' : '';
+    return '<label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;border:1px solid transparent" onmouseover="this.style.background=\'rgba(0,188,212,0.08)\'" onmouseout="this.style.background=\'transparent\'">'
+      + '<input type="checkbox" class="period-chk" data-idx="'+idx+'"'+checked+' style="width:16px;height:16px;accent-color:#00bcd4">'
+      + '<span style="font-size:13px;color:#e0f7fa;flex:1">'+p.label+'</span>'
+      + (idx===0 ? '<span style="font-size:10px;color:#a5d6a7;background:rgba(102,187,106,0.2);padding:2px 8px;border-radius:10px">Latest</span>' : '')
+      + '</label>';
+  }).join('');
+
+  modal.innerHTML = ''
+    + '<div style="background:var(--card-bg,#1a2332);border:1px solid rgba(0,188,212,0.35);border-radius:16px;padding:24px 28px;max-width:520px;width:94%;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,0.45)">'
+    +   '<div style="font-size:18px;font-weight:700;color:#e0f7fa;margin-bottom:6px"><i class="fas fa-'+(isWeek?'calendar-week':'calendar-alt')+'" style="color:'+(isWeek?'#a5d6a7':'#ce93d8')+';margin-right:8px"></i>'+title+'</div>'
+    +   '<div style="font-size:12px;color:var(--text-muted,#90a4ae);margin-bottom:14px;line-height:1.45">'+hint+'</div>'
+    +   '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">'
+    +     '<button type="button" class="header-btn" id="periodSel1" style="padding:6px 12px;font-size:12px">Last 1</button>'
+    +     '<button type="button" class="header-btn" id="periodSel2" style="padding:6px 12px;font-size:12px">Last 2</button>'
+    +     '<button type="button" class="header-btn" id="periodSel3" style="padding:6px 12px;font-size:12px">Last 3</button>'
+    +     '<button type="button" class="header-btn" id="periodSelAll" style="padding:6px 12px;font-size:12px">Select All</button>'
+    +     '<button type="button" class="header-btn" id="periodSelNone" style="padding:6px 12px;font-size:12px">Clear</button>'
+    +   '</div>'
+    +   '<div id="periodList" style="max-height:280px;overflow:auto;border:1px solid rgba(0,188,212,0.2);border-radius:10px;padding:6px;margin-bottom:14px;background:rgba(0,0,0,0.2)">'
+    +     rows
+    +   '</div>'
+    +   '<div id="periodSummary" style="font-size:12px;color:#80deea;margin-bottom:14px;min-height:18px"></div>'
+    +   '<div style="display:flex;gap:10px;flex-wrap:wrap">'
+    +     '<button type="button" id="periodExportGo" class="header-btn btn-accent" style="flex:1;min-width:140px;justify-content:center;padding:12px"><i class="fas fa-file-export"></i> Continue to Export</button>'
+    +     '<button type="button" id="periodExportCancel" class="header-btn" style="min-width:100px;justify-content:center;padding:12px">Cancel</button>'
+    +   '</div>'
+    + '</div>';
+
+  document.body.appendChild(modal);
+
+  function getSelected(){
+    var chks = modal.querySelectorAll('.period-chk:checked');
+    var sel = [];
+    chks.forEach(function(c){
+      var i = parseInt(c.getAttribute('data-idx'),10);
+      if(!isNaN(i) && periods[i]) sel.push(periods[i]);
+    });
+    return sel;
+  }
+
+  function updateSummary(){
+    var sel = getSelected();
+    var el = document.getElementById('periodSummary');
+    if(!sel.length){
+      el.textContent = 'No period selected.';
+      el.style.color = '#ef9a9a';
+      return;
+    }
+    var starts = sel.map(function(p){ return p.start.getTime(); });
+    var ends = sel.map(function(p){ return p.end.getTime(); });
+    var minS = new Date(Math.min.apply(null, starts));
+    var maxE = new Date(Math.max.apply(null, ends));
+    el.style.color = '#80deea';
+    el.textContent = sel.length + ' selected · Range: ' + mblDateKey(minS) + ' → ' + mblDateKey(maxE);
+  }
+
+  function setLastN(n){
+    var chks = modal.querySelectorAll('.period-chk');
+    chks.forEach(function(c, i){ c.checked = i < n; });
+    updateSummary();
+  }
+
+  modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
+  document.getElementById('periodExportCancel').onclick = function(){ modal.remove(); };
+  document.getElementById('periodSel1').onclick = function(){ setLastN(1); };
+  document.getElementById('periodSel2').onclick = function(){ setLastN(2); };
+  document.getElementById('periodSel3').onclick = function(){ setLastN(3); };
+  document.getElementById('periodSelAll').onclick = function(){ setLastN(periods.length); };
+  document.getElementById('periodSelNone').onclick = function(){
+    modal.querySelectorAll('.period-chk').forEach(function(c){ c.checked = false; });
+    updateSummary();
+  };
+  modal.querySelectorAll('.period-chk').forEach(function(c){
+    c.addEventListener('change', updateSummary);
+  });
+  updateSummary();
+
+  document.getElementById('periodExportGo').onclick = function(){
+    var sel = getSelected();
+    if(!sel.length){
+      showToast('Select at least one '+(isWeek?'week':'month'), 'error');
+      return;
+    }
+    var starts = sel.map(function(p){ return p.start.getTime(); });
+    var ends = sel.map(function(p){ return p.end.getTime(); });
+    var minS = new Date(Math.min.apply(null, starts));
+    var maxE = new Date(Math.max.apply(null, ends));
+    var label;
+    if(sel.length === 1){
+      label = sel[0].label;
+    } else if(isWeek){
+      label = sel.length + ' weeks: ' + mblDateKey(minS) + ' → ' + mblDateKey(maxE);
+    } else {
+      label = sel.length + ' months: ' + sel[sel.length-1].label + ' – ' + sel[0].label;
+    }
+    window._mblExportPeriod = {
+      kind: kind,
+      start: minS,
+      end: maxE,
+      label: label,
+      count: sel.length,
+      items: sel
+    };
+    modal.remove();
+    showExportFormatChoice(kind);
+  };
+}
+
 // ===== EXPORT FORMAT CHOICE (PDF / PPTX) =====
 function showExportFormatChoice(kind){
   kind = kind || 'dashboard';
@@ -5740,10 +6245,10 @@ function runExportByKind(kind, format){
     else if(typeof hseExportPPTX === 'function') hseExportPPTX();
     else { showToast('PPTX for HSE Team uses dashboard-style export','info'); exportPPTX(); }
   } else if(kind === 'weekly'){
-    if(format === 'pdf') generateWeeklyReport();
+    if(format === 'pdf') generateWeeklyReport(window._mblExportPeriod);
     else exportPeriodAsPptx('weekly');
   } else if(kind === 'monthly'){
-    if(format === 'pdf') generateMonthlyReport();
+    if(format === 'pdf') generateMonthlyReport(window._mblExportPeriod);
     else exportPeriodAsPptx('monthly');
   } else if(kind === 'mgmt_pack'){
     if(format === 'pdf') generateManagementPack();
@@ -6634,6 +7139,771 @@ function mblOfficerStats(name){
   return stats;
 }
 
+
+// ===== OFFICER IMPROVEMENT COACHING · CONTINUOUS · SUGGEST → REVIEW → SEND =====
+// Always-on evaluation for every HSE team member (new and existing).
+// Well-performing officers stay ON TRACK; underperformance triggers suggestions immediately.
+// Nothing is sent until the user clicks WhatsApp / Email.
+window._mblImprPlans = [];
+window._mblImprLastScan = null;
+window._mblImprScanBusy = false;
+var MBL_IMPR_STORE = 'MBL_IMPR_CONTINUOUS_V1';
+var MBL_IMPR_ROSTER_KEY = 'MBL_IMPR_KNOWN_ROSTER_V1';
+
+function mblImprLoadState(){
+  try{
+    var raw = localStorage.getItem(MBL_IMPR_STORE);
+    return raw ? JSON.parse(raw) : { lastScanAt: null, alerts: {}, acknowledged: {} };
+  }catch(e){ return { lastScanAt: null, alerts: {}, acknowledged: {} }; }
+}
+function mblImprSaveState(st){
+  try{ localStorage.setItem(MBL_IMPR_STORE, JSON.stringify(st)); }catch(e){}
+}
+function mblImprLoadKnownRoster(){
+  try{
+    var raw = localStorage.getItem(MBL_IMPR_ROSTER_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+function mblImprSaveKnownRoster(map){
+  try{ localStorage.setItem(MBL_IMPR_ROSTER_KEY, JSON.stringify(map)); }catch(e){}
+}
+
+function mblFindTeamContact(name){
+  var n = mblNormName(name).toLowerCase();
+  var team = (typeof hseData !== 'undefined' && hseData.length) ? hseData : (typeof HSE_TEAM_ORIGINAL !== 'undefined' ? HSE_TEAM_ORIGINAL : []);
+  var best = null;
+  team.forEach(function(m){
+    var mn = mblNormName(m.Name || m.name).toLowerCase();
+    if(!mn) return;
+    if(mn === n || mn.indexOf(n) >= 0 || n.indexOf(mn) >= 0){
+      if(!best || mn === n) best = m;
+    }
+  });
+  if(!best) return { whatsapp: '', email: '', company: '', area: '', phone: '', status: '' };
+  var wa = String(best.WhatsApp || best.whatsapp || best.Phone || best.Mobile || '').trim();
+  var em = String(best.Email || best.email || best['E-mail'] || best['Email Address'] || '').trim();
+  return {
+    whatsapp: wa,
+    email: em,
+    company: best.Company || best.company || '',
+    area: best['Area / Location'] || best.Area || '',
+    phone: wa,
+    status: best.Status || best.status || '',
+    raw: best
+  };
+}
+
+function mblWaDigits(phone){
+  var p = String(phone || '').replace(/[^0-9]/g, '');
+  if(!p) return '';
+  if(p.startsWith('0')) p = '966' + p.substring(1);
+  if(!p.startsWith('966') && !p.startsWith('971') && p.length <= 10) p = '966' + p;
+  return p;
+}
+
+/** Full coaching roster: all HSE team members + any KPI-active officers */
+function mblGetCoachingRoster(){
+  var set = {};
+  var team = (typeof hseData !== 'undefined' && hseData.length) ? hseData : (typeof HSE_TEAM_ORIGINAL !== 'undefined' ? HSE_TEAM_ORIGINAL : []);
+  team.forEach(function(m){
+    var n = mblNormName(m.Name || m.name);
+    if(!n || n === 'N/A' || n.length < 2) return;
+    set[n] = { name: n, source: 'team' };
+  });
+  try{
+    if(typeof mblGetAllOfficers === 'function'){
+      mblGetAllOfficers().forEach(function(o){
+        var n = mblNormName(o.name);
+        if(!n) return;
+        if(!set[n]) set[n] = { name: n, source: 'kpi' };
+        else set[n].source = 'team+kpi';
+      });
+    }
+  }catch(e){}
+  return Object.keys(set).sort().map(function(k){ return set[k]; });
+}
+
+/** Filter officer stats to a recent day window (continuous performance, not lifetime only) */
+function mblOfficerStatsRecent(name, days){
+  days = days || 14;
+  var full = mblOfficerStats(name);
+  var cut = new Date();
+  cut.setHours(0,0,0,0);
+  cut.setDate(cut.getDate() - days);
+  var cutT = cut.getTime();
+
+  function rowDate(r, keys){
+    for(var i=0;i<keys.length;i++){
+      var d = null;
+      try{
+        if(typeof mblParseAnyDate === 'function') d = mblParseAnyDate(r[keys[i]]);
+        else if(typeof mblParseDate === 'function'){
+          var s = mblParseDate(r[keys[i]]);
+          if(s) d = new Date(s);
+        }
+      }catch(e){}
+      if(d && !isNaN(d.getTime())) return d.getTime();
+    }
+    return null;
+  }
+
+  function inWin(arr, keys){
+    return (arr || []).filter(function(r){
+      var t = rowDate(r, keys);
+      if(t == null) return true; // keep undated so we do not hide data wrongly
+      return t >= cutT;
+    });
+  }
+
+  var recent = {
+    name: name,
+    violations: inWin(full.violations, ['ISSUING DATE','Date','Timestamp']),
+    observations: inWin(full.observations, ['Timestamp','Date']),
+    goodPracticeObs: [],
+    incidentsReported: inWin(full.incidentsReported, ['Event Date','Date','Timestamp']),
+    incidentsOwned: inWin(full.incidentsOwned, ['Event Date','Date','Timestamp']),
+    injuriesFirstAid: inWin(full.injuriesFirstAid, ['Event Date','Date','Timestamp']),
+    drills: inWin(full.drills, ['Planned Date','Actual Date','Date']),
+    hira: full.hira || [],
+    goodPractices: (full.goodPractices || []).filter(function(g){
+      if(!g.date) return true;
+      var d = null;
+      try{ d = typeof mblParseAnyDate === 'function' ? mblParseAnyDate(g.date) : new Date(g.date); }catch(e){}
+      if(!d || isNaN(d.getTime())) return true;
+      return d.getTime() >= cutT;
+    }),
+    totals: {},
+    lifetime: full.totals,
+    windowDays: days
+  };
+  recent.goodPracticeObs = recent.observations.filter(function(r){
+    var t = String(r['Type Of Observation']||'') + ' ' + String(r['Classification of Hazard']||'');
+    return /good\s*practice/i.test(t);
+  });
+  recent.totals = {
+    violations: recent.violations.length,
+    observations: recent.observations.length,
+    goodPracticeObs: recent.goodPracticeObs.length,
+    incidentsReported: recent.incidentsReported.length,
+    incidentsOwned: recent.incidentsOwned.length,
+    injuriesFirstAid: recent.injuriesFirstAid.length,
+    drills: recent.drills.length,
+    hira: recent.hira.length,
+    goodPractices: recent.goodPractices.length,
+    overall: recent.violations.length + recent.observations.length + recent.incidentsReported.length + recent.incidentsOwned.length + recent.drills.length + recent.goodPractices.length
+  };
+  return recent;
+}
+
+function mblEvaluateAllOfficersForImprovement(){
+  var roster = mblGetCoachingRoster();
+  var known = mblImprLoadKnownRoster();
+  var nowIso = new Date().toISOString();
+  var evaluated = [];
+
+  roster.forEach(function(o){
+    var lifetime = mblOfficerStats(o.name);
+    var recent = mblOfficerStatsRecent(o.name, 14);
+    var scoreLife = Math.round(mblScoreOfficer(lifetime));
+    var scoreRecent = Math.round(mblScoreOfficer(recent));
+    // Blend: recent activity weighs more for continuous coaching
+    var score = Math.round(scoreRecent * 0.65 + scoreLife * 0.35);
+    var isNew = !known[o.name];
+    evaluated.push({
+      name: o.name,
+      score: score,
+      scoreRecent: scoreRecent,
+      scoreLifetime: scoreLife,
+      stats: recent,
+      statsLifetime: lifetime,
+      contact: mblFindTeamContact(o.name),
+      isNew: isNew,
+      source: o.source
+    });
+  });
+
+  evaluated.sort(function(a,b){
+    // New + high priority first, then lowest score
+    if(a.isNew !== b.isNew) return a.isNew ? -1 : 1;
+    return a.score - b.score;
+  });
+
+  var scores = evaluated.map(function(e){ return e.score; });
+  var activeScores = scores.filter(function(x){ return x > 0; });
+  var avg = activeScores.length ? activeScores.reduce(function(a,b){ return a+b; }, 0) / activeScores.length : 0;
+  var median = 0;
+  if(activeScores.length){
+    var sorted = activeScores.slice().sort(function(a,b){ return a-b; });
+    var mid = Math.floor(sorted.length / 2);
+    median = sorted.length % 2 ? sorted[mid] : (sorted[mid-1] + sorted[mid]) / 2;
+  }
+  var peer = { avgObs: 0, avgGP: 0, avgVio: 0, avgDrill: 0, avgOverall: 0, n: evaluated.length };
+  if(evaluated.length){
+    evaluated.forEach(function(e){
+      peer.avgObs += e.stats.totals.observations || 0;
+      peer.avgGP += e.stats.totals.goodPractices || 0;
+      peer.avgVio += e.stats.totals.violations || 0;
+      peer.avgDrill += e.stats.totals.drills || 0;
+      peer.avgOverall += e.stats.totals.overall || 0;
+    });
+    peer.avgObs /= evaluated.length;
+    peer.avgGP /= evaluated.length;
+    peer.avgVio /= evaluated.length;
+    peer.avgDrill /= evaluated.length;
+    peer.avgOverall /= evaluated.length;
+  }
+
+  evaluated.forEach(function(e){
+    e.plan = mblBuildImprovementPlan(e, { avg: avg, median: median, peer: peer });
+  });
+
+  // Update known roster so next scan can detect brand-new people
+  var nextKnown = {};
+  evaluated.forEach(function(e){
+    nextKnown[e.name] = known[e.name] || nowIso;
+  });
+  mblImprSaveKnownRoster(nextKnown);
+
+  return { list: evaluated, avg: avg, median: median, peer: peer, scannedAt: nowIso };
+}
+
+function mblBuildImprovementPlan(entry, bench){
+  var t = entry.stats.totals || {};
+  var life = (entry.statsLifetime && entry.statsLifetime.totals) || {};
+  var name = entry.name;
+  var suggestions = [];
+  var priority = 'low';
+
+  // Brand-new team member → immediate onboarding coaching
+  if(entry.isNew){
+    suggestions.push({
+      code: 'NEW_JOINER',
+      severity: 'high',
+      title: 'New team member — onboarding coaching',
+      tip: 'Welcome to the HSE team. Within 7 days: complete site induction refresh, record at least 3 safety observations, capture 1 good practice photo, and confirm your WhatsApp contact is correct on the dashboard.'
+    });
+    priority = 'high';
+  }
+
+  // Recent window (14 days) — continuous performance
+  if((t.observations || 0) === 0){
+    suggestions.push({
+      code: 'OBS_ZERO_RECENT',
+      severity: 'high',
+      title: 'No observations in the last 14 days',
+      tip: 'Start today: complete at least 5 documented safety observations this week across different areas (unsafe acts, unsafe conditions, and good practices).'
+    });
+    priority = 'high';
+  } else if((t.observations || 0) < Math.max(2, (bench.peer.avgObs || 0) * 0.5)){
+    suggestions.push({
+      code: 'OBS_LOW_RECENT',
+      severity: 'medium',
+      title: 'Observation volume below team average (14 days)',
+      tip: 'Increase field presence: aim for ' + Math.ceil(Math.max(5, bench.peer.avgObs || 5)) + '+ observations this period, focusing on high-risk activities (lifting, work at height, energy isolation).'
+    });
+    if(priority === 'low') priority = 'medium';
+  }
+
+  if((t.goodPractices || 0) === 0){
+    suggestions.push({
+      code: 'GP_ZERO_RECENT',
+      severity: 'medium',
+      title: 'No good practices in the last 14 days',
+      tip: 'Photograph and register at least 2 good practices this week to reinforce positive behaviours and share learning with the site team.'
+    });
+    if(priority === 'low') priority = 'medium';
+  }
+
+  if((t.violations || 0) === 0 && (t.observations || 0) === 0){
+    suggestions.push({
+      code: 'PASSIVE_RECENT',
+      severity: 'high',
+      title: 'No field KPI activity recently',
+      tip: 'Re-engage immediately: daily site tour, minimum 1 observation per shift, and update records the same day. Balance coaching with formal action where site rules require it.'
+    });
+    priority = 'high';
+  }
+
+  if((t.drills || 0) === 0 && (life.drills || 0) === 0){
+    suggestions.push({
+      code: 'DRILL_ZERO',
+      severity: 'medium',
+      title: 'No drills / campaigns ownership',
+      tip: 'Lead or support at least one toolbox talk, drill, or HSE campaign this month and record attendance and outcomes.'
+    });
+    if(priority === 'low') priority = 'medium';
+  }
+
+  // Lifetime completely empty (old account never active)
+  if((life.overall || 0) === 0 && !entry.isNew){
+    suggestions.push({
+      code: 'LIFETIME_INACTIVE',
+      severity: 'high',
+      title: 'No measurable HSE KPI activity on record',
+      tip: 'Establish a baseline this week: observations, good practices, and participation in at least one drill or campaign. Report progress to your HSE supervisor.'
+    });
+    priority = 'high';
+  }
+
+  if(entry.score > 0 && bench.median > 0 && entry.score < bench.median * 0.55){
+    suggestions.push({
+      code: 'SCORE_LOW',
+      severity: 'medium',
+      title: 'Performance score below team median',
+      tip: 'Focus on the highest-impact KPIs: observations, good practices, and closed corrective actions. Review top-performer methods with your supervisor.'
+    });
+    if(priority === 'low') priority = 'medium';
+  }
+
+  // Strong performance — positive reinforcement only
+  if(!suggestions.length || (priority === 'low' && entry.score >= bench.median && (t.observations || 0) > 0)){
+    if(!suggestions.length){
+      suggestions.push({
+        code: 'ON_TRACK',
+        severity: 'low',
+        title: 'Performing well — keep it up',
+        tip: 'Strong recent activity. Maintain daily field presence, mentor one colleague this week, and keep documenting good practices for site learning.'
+      });
+    }
+    priority = 'low';
+  }
+
+  var needsCoaching = priority === 'high' || priority === 'medium';
+
+  var bulletTips = suggestions.map(function(s, i){ return (i+1) + ') ' + s.tip; }).join('\n');
+  var scoreLine = 'Dashboard score (continuous): ' + entry.score + ' · Last 14 days: ' + (entry.scoreRecent || entry.score) + ' · Lifetime: ' + (entry.scoreLifetime || 0) + ' · Team median ≈ ' + Math.round(bench.median) + '.';
+  var kpiLine = 'Last 14 days — Observations: ' + (t.observations||0)
+    + ' · Good practices: ' + (t.goodPractices||0)
+    + ' · Violations issued: ' + (t.violations||0)
+    + ' · Drills/campaigns: ' + (t.drills||0)
+    + ' · Overall actions: ' + (t.overall||0) + '.';
+
+  var greetingExtra = entry.isNew ? 'Welcome to the MBL HSE team. ' : '';
+  var waMsg = 'Assalamu alaikum ' + name + ',\n\n'
+    + greetingExtra
+    + 'This is a continuous coaching note from MBL HSE based on your KPI activity on the ASP dashboard.\n\n'
+    + scoreLine + '\n'
+    + kpiLine + '\n\n'
+    + 'Suggested improvements:\n' + bulletTips + '\n\n'
+    + 'Please confirm your plan for this week. We are here to support you — Safety First, Every Task, Every Time.\n\n'
+    + '— MBL HSE Leadership';
+
+  var emailSubject = entry.isNew
+    ? ('MBL HSE Welcome & Coaching — ' + name)
+    : ('MBL HSE Coaching — Improvement plan for ' + name);
+  var emailBody = 'Dear ' + name + ',\n\n'
+    + greetingExtra
+    + 'Following continuous review of HSE performance indicators on the MBL ASP dashboard, please find your personalised coaching points below.\n\n'
+    + scoreLine + '\n'
+    + kpiLine + '\n\n'
+    + 'Recommended actions:\n' + bulletTips + '\n\n'
+    + 'Kindly acknowledge receipt and share your weekly action plan with your HSE supervisor.\n\n'
+    + 'Regards,\nMBL HSE Leadership\nModern Building Leaders — ASP Project';
+
+  return {
+    priority: priority,
+    needsCoaching: needsCoaching,
+    suggestions: suggestions,
+    waMsg: waMsg,
+    emailSubject: emailSubject,
+    emailBody: emailBody,
+    score: entry.score,
+    totals: t,
+    isNew: !!entry.isNew
+  };
+}
+
+/**
+ * Continuous scan — runs on load, after data changes, and on a timer.
+ * Immediately surfaces high-priority coaching via toast + notification state.
+ */
+function mblRunContinuousCoachingScan(reason){
+  if(window._mblImprScanBusy) return window._mblImprLastScan;
+  window._mblImprScanBusy = true;
+  reason = reason || 'auto';
+  try{
+    var pack = mblEvaluateAllOfficersForImprovement();
+    window._mblImprPlans = pack.list;
+    window._mblImprLastScan = pack;
+
+    var st = mblImprLoadState();
+    st.lastScanAt = pack.scannedAt;
+    st.reason = reason;
+
+    var need = pack.list.filter(function(e){ return e.plan && e.plan.needsCoaching; });
+    var high = need.filter(function(e){ return e.plan.priority === 'high'; });
+    var newcomers = pack.list.filter(function(e){ return e.isNew; });
+
+    // Detect newly critical people since last alert (immediate suggestion)
+    var freshHigh = [];
+    high.forEach(function(e){
+      var prev = st.alerts[e.name];
+      if(!prev || prev.priority !== 'high'){
+        freshHigh.push(e.name);
+      }
+      st.alerts[e.name] = { priority: e.plan.priority, at: pack.scannedAt, score: e.score };
+    });
+    // Clear alerts for people now on track
+    pack.list.forEach(function(e){
+      if(e.plan && !e.plan.needsCoaching && st.alerts[e.name]){
+        delete st.alerts[e.name];
+      }
+    });
+    mblImprSaveState(st);
+
+    // Immediate toast only when NEW high-priority cases appear (not every scan)
+    if(freshHigh.length && typeof showToast === 'function'){
+      var sample = freshHigh.slice(0, 3).join(', ');
+      var more = freshHigh.length > 3 ? (' +' + (freshHigh.length - 3) + ' more') : '';
+      showToast('Coaching needed now: ' + sample + more + ' — open Team Improvements', 'warn');
+    } else if(newcomers.length && reason === 'roster' && typeof showToast === 'function'){
+      showToast(newcomers.length + ' new team member(s) — onboarding coaching ready', 'info');
+    }
+
+    try{ if(typeof mblRenderNotificationBell === 'function') mblRenderNotificationBell(); }catch(e){}
+    try{ mblImprUpdateLiveBanner(pack); }catch(e){}
+
+    // Refresh open Team Improvements page if user is viewing it
+    try{
+      if(typeof currentCategory !== 'undefined' && currentCategory === 'officer_improvements'){
+        if(typeof renderOfficerImprovementsPage === 'function') renderOfficerImprovementsPage();
+      }
+    }catch(e){}
+
+    return pack;
+  }catch(err){
+    console.warn('continuous coaching scan', err);
+    return window._mblImprLastScan;
+  }finally{
+    window._mblImprScanBusy = false;
+  }
+}
+
+function mblImprBannerFingerprint(need, high){
+  return String(need) + '|' + String(high);
+}
+function mblImprIsBannerDismissed(fp){
+  try{
+    var raw = localStorage.getItem('MBL_IMPR_BANNER_DISMISS_V1');
+    if(!raw) return false;
+    var o = JSON.parse(raw);
+    // Dismiss only holds while the same situation is active; new high-priority forces re-show
+    return o && o.fp === fp;
+  }catch(e){ return false; }
+}
+function mblImprDismissBanner(ev){
+  if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+  var pack = window._mblImprLastScan;
+  var need = 0, high = 0;
+  if(pack && pack.list){
+    var n = pack.list.filter(function(e){ return e.plan && e.plan.needsCoaching; });
+    need = n.length;
+    high = n.filter(function(e){ return e.plan.priority === 'high'; }).length;
+  }
+  var fp = mblImprBannerFingerprint(need, high);
+  try{
+    localStorage.setItem('MBL_IMPR_BANNER_DISMISS_V1', JSON.stringify({ fp: fp, at: Date.now() }));
+  }catch(e){}
+  var b = document.getElementById('mblImprLiveBanner');
+  if(b) b.remove();
+  mblImprShowReopenChip(need, high);
+}
+function mblImprShowReopenChip(need, high){
+  var chip = document.getElementById('mblImprReopenChip');
+  if(!need){
+    if(chip) chip.remove();
+    return;
+  }
+  if(!chip){
+    chip = document.createElement('button');
+    chip.id = 'mblImprReopenChip';
+    chip.type = 'button';
+    chip.title = 'Show continuous coaching';
+    chip.style.cssText = 'position:fixed;top:72px;right:16px;z-index:9000;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,167,38,0.55);background:rgba(20,24,32,0.94);color:#ffa726;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.3);font-family:inherit;display:flex;align-items:center;gap:6px';
+    chip.onclick = function(){
+      try{ localStorage.removeItem('MBL_IMPR_BANNER_DISMISS_V1'); }catch(e){}
+      chip.remove();
+      mblImprUpdateLiveBanner(window._mblImprLastScan);
+    };
+    document.body.appendChild(chip);
+  }
+  chip.innerHTML = '<i class="fas fa-comments"></i> Coaching'
+    + (need ? (' <span style="background:rgba(255,167,38,0.25);padding:1px 7px;border-radius:10px;font-size:10px">' + need + '</span>') : '')
+    + (high ? (' <span style="background:rgba(239,83,80,0.3);color:#ef9a9a;padding:1px 7px;border-radius:10px;font-size:10px">' + high + '!</span>') : '');
+}
+function mblImprUpdateLiveBanner(pack){
+  pack = pack || window._mblImprLastScan;
+  var existing = document.getElementById('mblImprLiveBanner');
+  var chip = document.getElementById('mblImprReopenChip');
+  if(!pack || !pack.list){
+    if(existing) existing.remove();
+    if(chip) chip.remove();
+    return;
+  }
+  var needList = pack.list.filter(function(e){ return e.plan && e.plan.needsCoaching; });
+  var need = needList.length;
+  var high = needList.filter(function(e){ return e.plan.priority === 'high'; }).length;
+  if(!need){
+    if(existing) existing.remove();
+    if(chip) chip.remove();
+    try{ localStorage.removeItem('MBL_IMPR_BANNER_DISMISS_V1'); }catch(e){}
+    return;
+  }
+  var fp = mblImprBannerFingerprint(need, high);
+  if(mblImprIsBannerDismissed(fp)){
+    if(existing) existing.remove();
+    mblImprShowReopenChip(need, high);
+    return;
+  }
+  if(chip) chip.remove();
+  if(!existing){
+    existing = document.createElement('div');
+    existing.id = 'mblImprLiveBanner';
+    existing.style.cssText = 'position:fixed;top:72px;right:16px;z-index:9000;max-width:min(340px,92vw);padding:12px 14px;padding-right:36px;border-radius:14px;background:rgba(20,24,32,0.96);border:1px solid rgba(255,167,38,0.45);box-shadow:0 12px 40px rgba(0,0,0,0.35);backdrop-filter:blur(10px)';
+    document.body.appendChild(existing);
+  }
+  existing.innerHTML = ''
+    + '<button type="button" id="mblImprBannerClose" title="Close" aria-label="Close" '
+    + 'style="position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.75);cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;font-family:inherit">'
+    + '&times;</button>'
+    + '<div style="font-size:12px;font-weight:700;color:#ffa726;margin-bottom:4px;cursor:pointer" id="mblImprBannerOpen">'
+    + '<i class="fas fa-comments"></i> Continuous coaching</div>'
+    + '<div style="font-size:12px;color:rgba(255,255,255,0.85);line-height:1.4;cursor:pointer" id="mblImprBannerBody">'
+    + need + ' officer(s) need improvement'
+    + (high ? (' · <b style="color:#ef5350">' + high + ' high priority</b>') : '')
+    + '</div>'
+    + '<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px;cursor:pointer" id="mblImprBannerHint">Tap to review — send only when ready</div>';
+  var closeBtn = document.getElementById('mblImprBannerClose');
+  if(closeBtn) closeBtn.onclick = mblImprDismissBanner;
+  function openPage(ev){
+    if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+    if(typeof navigateTo === 'function') navigateTo('officer_improvements');
+  }
+  ['mblImprBannerOpen','mblImprBannerBody','mblImprBannerHint'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.onclick = openPage;
+  });
+}
+window.mblImprDismissBanner = mblImprDismissBanner;
+
+
+function mblStartContinuousCoachingMonitor(){
+  if(window._mblImprMonitorStarted) return;
+  window._mblImprMonitorStarted = true;
+  // Initial scan after app data settles
+  setTimeout(function(){ mblRunContinuousCoachingScan('startup'); }, 1800);
+  // Periodic re-scan (every 3 minutes) — continuous, not session-bound
+  setInterval(function(){
+    if(document.hidden) return;
+    mblRunContinuousCoachingScan('interval');
+  }, 180000);
+  // Re-scan when tab becomes visible again
+  document.addEventListener('visibilitychange', function(){
+    if(!document.hidden) mblRunContinuousCoachingScan('visible');
+  });
+}
+
+function renderOfficerImprovementsPage(){
+  var area = document.getElementById('contentArea');
+  if(!area) return;
+  // Always fresh continuous evaluation when opening the page
+  var pack = mblRunContinuousCoachingScan('page') || mblEvaluateAllOfficersForImprovement();
+  window._mblImprPlans = pack.list;
+
+  var needCount = pack.list.filter(function(e){ return e.plan.needsCoaching; }).length;
+  var highCount = pack.list.filter(function(e){ return e.plan.priority === 'high'; }).length;
+  var onTrack = pack.list.filter(function(e){ return !e.plan.needsCoaching; }).length;
+  var newCount = pack.list.filter(function(e){ return e.isNew; }).length;
+  var scanned = pack.scannedAt ? new Date(pack.scannedAt).toLocaleString() : '—';
+
+  var html = '';
+  html += '<div class="glass-card animate-in" style="padding:18px 20px;margin-bottom:16px">';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">';
+  html += '<div><div style="font-size:16px;font-weight:700;color:var(--text-primary)"><i class="fas fa-comments" style="color:var(--accent-cyan);margin-right:8px"></i>Team Improvement Coaching <span style="font-size:11px;font-weight:600;color:#69f0ae;margin-left:6px">● LIVE</span></div>';
+  var isAdm = !!(window.isAdmin || (typeof isAdmin !== 'undefined' && isAdmin));
+  html += '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px;line-height:1.45">Continuous evaluation for <b>all</b> team members (new and existing). The team can <b>view</b> suggestions; only <b>Admin</b> can send WhatsApp or Email.</div>';
+  if(!isAdm){
+    html += '<div style="margin-top:8px;padding:8px 12px;border-radius:10px;background:rgba(255,167,38,0.12);border:1px solid rgba(255,167,38,0.35);font-size:12px;color:#ffcc80"><i class="fas fa-lock" style="margin-right:6px"></i>View-only mode — unlock Admin to send coaching messages.</div>';
+  }
+  html += '<div style="font-size:11px;color:var(--text-muted);margin-top:6px">Last scan: '+escHtml(scanned)+'</div></div>';
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  html += '<button class="header-btn btn-accent" onclick="mblRunContinuousCoachingScan(\'manual\');renderOfficerImprovementsPage()"><i class="fas fa-sync-alt"></i> Scan now</button>';
+  html += '<button class="header-btn" onclick="mblImprFilterMode(\'need\')"><i class="fas fa-filter"></i> Needs coaching</button>';
+  html += '<button class="header-btn" onclick="mblImprFilterMode(\'new\')"><i class="fas fa-user-plus"></i> New members</button>';
+  html += '<button class="header-btn" onclick="mblImprFilterMode(\'ok\')"><i class="fas fa-check-circle"></i> On track</button>';
+  html += '<button class="header-btn" onclick="mblImprFilterMode(\'all\')"><i class="fas fa-list"></i> Show all</button>';
+  html += '</div></div>';
+  html += '<div class="kpi-grid" style="margin-top:16px;margin-bottom:0">';
+  html += kpiCard('Assessed', pack.list.length, 'var(--accent-cyan)', 'fa-user-tie');
+  html += kpiCard('Need coaching', needCount, '#ffa726', 'fa-hand-point-right');
+  html += kpiCard('High priority', highCount, '#ef5350', 'fa-exclamation-circle');
+  html += kpiCard('On track', onTrack, '#66bb6a', 'fa-thumbs-up');
+  html += kpiCard('New members', newCount, '#42a5f5', 'fa-user-plus');
+  html += kpiCard('Team median', Math.round(pack.median), '#ab47bc', 'fa-chart-line');
+  html += '</div></div>';
+
+  html += '<div id="mblImprList">';
+  if(!pack.list.length){
+    html += '<div class="glass-card" style="padding:24px;color:var(--text-muted)">No team members found. Add people under <b>OUR HSE TEAM</b> — they will be evaluated automatically.</div>';
+  } else {
+    pack.list.forEach(function(e, idx){
+      html += mblImprCardHtml(e, idx);
+    });
+  }
+  html += '</div>';
+
+  area.innerHTML = html;
+  try{
+    var adm = !!(window.isAdmin || (typeof isAdmin !== 'undefined' && isAdmin));
+    area.querySelectorAll('.admin-only').forEach(function(el){
+      el.style.display = adm ? '' : 'none';
+    });
+  }catch(e){}
+}
+
+function mblImprCardHtml(e, idx){
+  var p = e.plan;
+  var priCol = p.priority === 'high' ? '#ef5350' : (p.priority === 'medium' ? '#ffa726' : '#66bb6a');
+  var priLabel = p.priority === 'high' ? 'HIGH PRIORITY' : (p.priority === 'medium' ? 'COACHING SUGGESTED' : 'ON TRACK');
+  var hasWa = !!(e.contact.whatsapp);
+  var hasEm = !!(e.contact.email);
+  var html = '';
+  html += '<div class="glass-card animate-in mbl-impr-card" data-impr-idx="'+idx+'" data-need="'+(p.needsCoaching?'1':'0')+'" data-new="'+(e.isNew?'1':'0')+'" data-ok="'+(p.needsCoaching?'0':'1')+'" style="padding:0;margin-bottom:14px;overflow:hidden;border-left:4px solid '+priCol+'">';
+  html += '<div style="padding:14px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;justify-content:space-between">';
+  html += '<div style="min-width:0;flex:1">';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px">';
+  html += '<span style="font-size:15px;font-weight:700;color:var(--text-primary)">'+escHtml(e.name)+'</span>';
+  if(e.isNew) html += '<span style="font-size:10px;font-weight:800;letter-spacing:.06em;padding:3px 10px;border-radius:999px;background:rgba(66,165,245,0.2);color:#42a5f5;border:1px solid rgba(66,165,245,0.5)">NEW</span>';
+  html += '<span style="font-size:10px;font-weight:800;letter-spacing:.06em;padding:3px 10px;border-radius:999px;background:rgba(0,0,0,0.25);color:'+priCol+';border:1px solid '+priCol+'">'+priLabel+'</span>';
+  html += '<span style="font-size:12px;color:var(--text-muted)">Score <b style="color:var(--text-primary)">'+p.score+'</b> <span style="opacity:.7">(14d: '+(e.scoreRecent||0)+' · life: '+(e.scoreLifetime||0)+')</span></span>';
+  html += '</div>';
+  html += '<div style="font-size:12px;color:var(--text-secondary)">';
+  html += 'Last 14 days — Obs <b>'+(p.totals.observations||0)+'</b> · GP <b>'+(p.totals.goodPractices||0)+'</b> · Violations <b>'+(p.totals.violations||0)+'</b> · Drills <b>'+(p.totals.drills||0)+'</b>';
+  if(e.contact.company) html += ' · '+escHtml(e.contact.company);
+  if(e.contact.area) html += ' · '+escHtml(e.contact.area);
+  html += '</div>';
+  html += '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">';
+  html += hasWa ? ('<i class="fab fa-whatsapp" style="color:#25d366"></i> '+escHtml(e.contact.whatsapp)+' ') : '<span style="color:#ef9a9a"><i class="fab fa-whatsapp"></i> No WhatsApp on file</span> ';
+  html += hasEm ? (' · <i class="fas fa-envelope" style="color:var(--accent-cyan)"></i> '+escHtml(e.contact.email)) : ' · <span style="color:#ef9a9a"><i class="fas fa-envelope"></i> No email on file</span>';
+  html += '</div>';
+  html += '</div>';
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  html += '<button class="header-btn" style="font-size:12px" onclick="mblImprToggleDraft('+idx+')"><i class="fas fa-eye"></i> Review draft</button>';
+  html += '<button class="header-btn admin-only" style="font-size:12px;background:rgba(37,211,102,0.15);border-color:rgba(37,211,102,0.45);color:#69f0ae" onclick="mblImprSendWhatsApp('+idx+')"'+(hasWa?'':' title="Add WhatsApp number in Our HSE Team first"')+'><i class="fab fa-whatsapp"></i> Send WhatsApp</button>';
+  html += '<button class="header-btn admin-only" style="font-size:12px;background:rgba(var(--accent-rgb),0.12);border-color:rgba(var(--accent-rgb),0.35);color:var(--accent-cyan)" onclick="mblImprSendEmail('+idx+')"><i class="fas fa-envelope"></i> Send Email</button>';
+  html += '</div></div>';
+
+  html += '<div style="padding:0 16px 12px;display:flex;flex-wrap:wrap;gap:8px">';
+  p.suggestions.forEach(function(s){
+    var sc = s.severity === 'high' ? '#ef5350' : (s.severity === 'medium' ? '#ffa726' : '#66bb6a');
+    html += '<div style="flex:1 1 220px;min-width:200px;padding:10px 12px;border-radius:12px;background:rgba(0,0,0,0.18);border:1px solid rgba(255,255,255,0.06)">';
+    html += '<div style="font-size:11px;font-weight:700;color:'+sc+';margin-bottom:4px">'+escHtml(s.title)+'</div>';
+    html += '<div style="font-size:12px;color:var(--text-secondary);line-height:1.4">'+escHtml(s.tip)+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  html += '<div id="mblImprDraft_'+idx+'" style="display:none;padding:0 16px 16px;border-top:1px solid rgba(255,255,255,0.06)">';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">';
+  var canSend = !!(window.isAdmin || (typeof isAdmin !== 'undefined' && isAdmin));
+  var ro = canSend ? '' : ' readonly';
+  var roStyle = canSend ? '' : 'opacity:0.9;cursor:default;';
+  html += '<div><label style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.04em">WHATSAPP MESSAGE'+(canSend?' (editable)':' (view only)')+'</label>';
+  html += '<textarea id="mblImprWa_'+idx+'" rows="12"'+ro+' style="width:100%;margin-top:6px;padding:12px;border-radius:12px;border:1px solid rgba(var(--accent-rgb),0.25);background:rgba(0,0,0,0.28);color:var(--text-primary);font-size:12.5px;line-height:1.45;font-family:inherit;resize:vertical;'+roStyle+'">'+escHtml(p.waMsg)+'</textarea></div>';
+  html += '<div><label style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.04em">EMAIL SUBJECT</label>';
+  html += '<input id="mblImprSub_'+idx+'"'+ro+' style="width:100%;margin-top:6px;margin-bottom:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(var(--accent-rgb),0.25);background:rgba(0,0,0,0.28);color:var(--text-primary);font-size:12.5px;font-family:inherit;'+roStyle+'" value="'+escHtml(p.emailSubject)+'">';
+  html += '<label style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.04em">EMAIL BODY'+(canSend?' (editable)':' (view only)')+'</label>';
+  html += '<textarea id="mblImprEm_'+idx+'" rows="10"'+ro+' style="width:100%;margin-top:6px;padding:12px;border-radius:12px;border:1px solid rgba(var(--accent-rgb),0.25);background:rgba(0,0,0,0.28);color:var(--text-primary);font-size:12.5px;line-height:1.45;font-family:inherit;resize:vertical;'+roStyle+'">'+escHtml(p.emailBody)+'</textarea>';
+  if(!hasEm && canSend){
+    html += '<label style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.04em;display:block;margin-top:8px">EMAIL ADDRESS (not on file — enter to send)</label>';
+    html += '<input id="mblImprEmailTo_'+idx+'" placeholder="name@example.com" style="width:100%;margin-top:6px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.28);color:var(--text-primary);font-size:12.5px;font-family:inherit">';
+  }
+  html += '</div></div>';
+  if(canSend){
+    html += '<div style="margin-top:10px;font-size:11px;color:var(--text-muted)"><i class="fas fa-info-circle"></i> Admin: review the draft, then Send WhatsApp or Send Email. Nothing is sent until you click.</div>';
+  } else {
+    html += '<div style="margin-top:10px;font-size:11px;color:#ffcc80"><i class="fas fa-lock"></i> View only — Admin login is required to send WhatsApp or Email.</div>';
+  }
+
+  html += '</div></div>';
+  return html;
+}
+
+function mblImprToggleDraft(idx){
+  var el = document.getElementById('mblImprDraft_'+idx);
+  if(!el) return;
+  el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+}
+
+function mblImprFilterMode(mode){
+  document.querySelectorAll('.mbl-impr-card').forEach(function(card){
+    if(mode === 'all'){ card.style.display = ''; return; }
+    if(mode === 'need'){ card.style.display = card.getAttribute('data-need') === '1' ? '' : 'none'; return; }
+    if(mode === 'new'){ card.style.display = card.getAttribute('data-new') === '1' ? '' : 'none'; return; }
+    if(mode === 'ok'){ card.style.display = card.getAttribute('data-ok') === '1' ? '' : 'none'; return; }
+  });
+}
+
+function mblImprSendWhatsApp(idx){
+  if(!(window.isAdmin || (typeof isAdmin !== 'undefined' && isAdmin))){
+    showToast('Admin only — unlock Admin to send WhatsApp coaching messages','error');
+    return;
+  }
+  var e = (window._mblImprPlans || [])[idx];
+  if(!e){ showToast('Plan not found — scan again','error'); return; }
+  var phone = mblWaDigits(e.contact.whatsapp);
+  if(!phone){
+    showToast('No WhatsApp number on file for '+e.name+'. Add it under Our HSE Team.','error');
+    return;
+  }
+  var ta = document.getElementById('mblImprWa_'+idx);
+  var msg = ta ? ta.value : e.plan.waMsg;
+  var url = 'https://wa.me/'+phone+'?text='+encodeURIComponent(msg);
+  try{ if(typeof mblAudit==='function') mblAudit('Improvement WhatsApp', e.name); }catch(err){}
+  try{ if(typeof hseAddAudit==='function') hseAddAudit('Coaching', 'WhatsApp draft opened for '+e.name); }catch(err){}
+  window.open(url, '_blank');
+  showToast('WhatsApp opened for '+e.name+' — review then send in WhatsApp','success');
+}
+
+function mblImprSendEmail(idx){
+  if(!(window.isAdmin || (typeof isAdmin !== 'undefined' && isAdmin))){
+    showToast('Admin only — unlock Admin to send Email coaching messages','error');
+    return;
+  }
+  var e = (window._mblImprPlans || [])[idx];
+  if(!e){ showToast('Plan not found — scan again','error'); return; }
+  var to = e.contact.email || '';
+  var toEl = document.getElementById('mblImprEmailTo_'+idx);
+  if(toEl && toEl.value.trim()) to = toEl.value.trim();
+  if(!to){
+    var draft = document.getElementById('mblImprDraft_'+idx);
+    if(draft) draft.style.display = 'block';
+    showToast('Enter an email address for '+e.name+' then click Send Email again','error');
+    return;
+  }
+  var subEl = document.getElementById('mblImprSub_'+idx);
+  var bodyEl = document.getElementById('mblImprEm_'+idx);
+  var subject = subEl ? subEl.value : e.plan.emailSubject;
+  var body = bodyEl ? bodyEl.value : e.plan.emailBody;
+  var url = 'mailto:'+encodeURIComponent(to)
+    + '?subject='+encodeURIComponent(subject)
+    + '&body='+encodeURIComponent(body);
+  try{ if(typeof mblAudit==='function') mblAudit('Improvement Email', e.name+' → '+to); }catch(err){}
+  try{ if(typeof hseAddAudit==='function') hseAddAudit('Coaching', 'Email draft opened for '+e.name); }catch(err){}
+  window.location.href = url;
+  showToast('Email draft opened for '+e.name,'success');
+}
+
+window.renderOfficerImprovementsPage = renderOfficerImprovementsPage;
+window.mblImprSendWhatsApp = mblImprSendWhatsApp;
+window.mblImprSendEmail = mblImprSendEmail;
+window.mblImprToggleDraft = mblImprToggleDraft;
+window.mblImprFilterMode = mblImprFilterMode;
+window.mblRunContinuousCoachingScan = mblRunContinuousCoachingScan;
+window.mblStartContinuousCoachingMonitor = mblStartContinuousCoachingMonitor;
+window.mblEvaluateAllOfficersForImprovement = mblEvaluateAllOfficersForImprovement;
+
 function renderEvaluateOfficerPage(){
   var area = document.getElementById('contentArea');
   if(!area) return;
@@ -6930,7 +8200,7 @@ function mblBuildPeriodReport(opts){
         var mp = rows.reduce(function(s,r){return s+(Number(r['Total MP'])||0);},0);
         return [
           {l:'Days Recorded', v: rows.length},
-          {l:'Total Manhours', v: mh.toLocaleString()},
+          {l:'Safe Manhours', v: mh.toLocaleString()},
           {l:'Total Manpower (sum)', v: mp.toLocaleString()},
           {l:'Peak Manpower', v: Math.max.apply(null, rows.map(function(r){return Number(r['Total MP'])||0}).concat([0]))}
         ];
@@ -7345,32 +8615,58 @@ function mblBuildPeriodReport(opts){
   });
 }
 
-function generateWeeklyReport(){
+function generateWeeklyReport(periodOpt){
   try{ if(typeof mblSyncPdfTheme==='function') mblSyncPdfTheme(); }catch(e){}
-  var w = mblLastCompletedWeek();
+  var w;
+  if(periodOpt && periodOpt.start && periodOpt.end){
+    w = { start: periodOpt.start, end: periodOpt.end, label: periodOpt.label || (mblDateKey(periodOpt.start)+' → '+mblDateKey(periodOpt.end)) };
+  } else {
+    w = mblLastCompletedWeek();
+  }
+  var multi = periodOpt && periodOpt.count && periodOpt.count > 1;
   mblBuildPeriodReport({
-    title: 'Weekly HSE Report',
-    subtitle: 'Last completed week (Saturday – Friday)',
+    title: multi ? 'Weekly HSE Report (Multi-Week)' : 'Weekly HSE Report',
+    subtitle: multi ? (periodOpt.count + ' weeks selected · Saturday – Friday windows') : 'Selected week (Saturday – Friday)',
     label: w.label,
     start: w.start,
     end: w.end,
-    maxPages: 12,
+    maxPages: multi ? 18 : 12,
     filename: 'MBL_HSE_Weekly_'+mblDateKey(w.start)+'_to_'+mblDateKey(w.end)
   });
+  window._mblExportPeriod = null;
 }
 
-function generateMonthlyReport(){
+function generateMonthlyReport(periodOpt){
   try{ if(typeof mblSyncPdfTheme==='function') mblSyncPdfTheme(); }catch(e){}
-  var m = mblLastCompletedMonth();
+  var m;
+  if(periodOpt && periodOpt.start && periodOpt.end){
+    m = {
+      start: periodOpt.start,
+      end: periodOpt.end,
+      label: periodOpt.label || (mblDateKey(periodOpt.start)+' → '+mblDateKey(periodOpt.end)),
+      year: periodOpt.start.getFullYear(),
+      month: periodOpt.start.getMonth()+1
+    };
+  } else {
+    m = mblLastCompletedMonth();
+  }
+  var multi = periodOpt && periodOpt.count && periodOpt.count > 1;
+  var fname;
+  if(multi){
+    fname = 'MBL_HSE_Monthly_'+mblDateKey(m.start)+'_to_'+mblDateKey(m.end);
+  } else {
+    fname = 'MBL_HSE_Monthly_'+m.year+'_'+String(m.month).padStart(2,'0');
+  }
   mblBuildPeriodReport({
-    title: 'Monthly HSE Report',
+    title: multi ? 'Monthly HSE Report (Multi-Month)' : 'Monthly HSE Report',
     subtitle: m.label,
     label: m.label,
     start: m.start,
     end: m.end,
-    maxPages: 12,
-    filename: 'MBL_HSE_Monthly_'+m.year+'_'+String(m.month).padStart(2,'0')
+    maxPages: multi ? 18 : 12,
+    filename: fname
   });
+  window._mblExportPeriod = null;
 }
 
 function mblFindOfficerPhoto(name){
@@ -7653,7 +8949,10 @@ function hseMigratePhotos(){
 function hsePersist(){
   let save = hseData.map(x=>{let c={...x};delete c._photoURL;return c;});
   mblLS.setItem(HSE_DATA_KEY, JSON.stringify(save));
-  buildSidebar();}
+  buildSidebar();
+  // New or updated team members → continuous coaching scan immediately
+  try{ if(typeof mblRunContinuousCoachingScan==='function') setTimeout(function(){ mblRunContinuousCoachingScan('roster'); }, 400); }catch(e){}
+}
 function hseLoadData(){
   let stored = mblLS.getItem(HSE_DATA_KEY);
   if(stored){
@@ -9660,6 +10959,7 @@ async function mblPublishLive(){
     var fresh = document.getElementById('dataFreshness');
     if(fresh) fresh.textContent = 'Live · ' + new Date(json.updatedAt || Date.now()).toLocaleString();
     showToast('Published live! All viewers will see this data (refresh or wait up to 3 minutes).', 'success');
+    try{ if(typeof mblRunContinuousCoachingScan==='function') setTimeout(function(){ mblRunContinuousCoachingScan('publish'); }, 500); }catch(e){}
     try{
       // Confirm the public /api/data endpoint can read what we just wrote
       setTimeout(function(){
@@ -10352,62 +11652,139 @@ function mblOfficerWeightedScore(name, period){
 }
 
 // Notifications / digests
+function mblNotifStableId(n){
+  return String(n.type || 'info') + '::' + String(n.title || '') + '::' + String(n.msg || '');
+}
+function mblLoadSeenNotifs(){
+  try{
+    var raw = localStorage.getItem('MBL_NOTIF_SEEN_V1');
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+function mblSaveSeenNotifs(map){
+  try{ localStorage.setItem('MBL_NOTIF_SEEN_V1', JSON.stringify(map)); }catch(e){}
+}
+function mblMarkNotificationsRead(notes){
+  var seen = mblLoadSeenNotifs();
+  var now = Date.now();
+  (notes || []).forEach(function(n){
+    var id = n.id || mblNotifStableId(n);
+    seen[id] = now;
+  });
+  // Drop very old seen keys (keep map small)
+  var cutoff = now - 30 * 24 * 3600 * 1000;
+  Object.keys(seen).forEach(function(k){
+    if(seen[k] < cutoff) delete seen[k];
+  });
+  mblSaveSeenNotifs(seen);
+}
+function mblCountUnreadNotifications(notes){
+  var seen = mblLoadSeenNotifs();
+  var c = 0;
+  (notes || []).forEach(function(n){
+    var id = n.id || mblNotifStableId(n);
+    if(!seen[id]) c++;
+  });
+  return c;
+}
+
 function mblCollectNotifications(){
   var notes = [];
   var today = new Date();
   // Saturday weekly report
-  if(today.getDay()===6){
+  if(today.getDay() === 6){
     notes.push({ type:'info', title:'Weekly Report', msg:'Saturday — Weekly Report is ready to export.', action:'generateWeeklyReport()' });
   }
   // CAPA overdue
-  mblLoadCapa();
-  var overdue = capaActions.filter(mblIsOverdue);
-  if(overdue.length){
-    notes.push({ type:'warn', title:'Overdue CAPA', msg: overdue.length+' corrective action(s) past due date.', action:"navigateTo('capa')" });
-  }
-  // Open high-risk incidents
-  var high = mblOpenHighRiskIncidents(20);
-  if(high.length){
-    notes.push({ type:'danger', title:'High-risk incidents open', msg: high.length+' open incident(s) with elevated severity/risk.', action:"navigateTo('incidents')" });
-  }
-  // Open incidents > 7 days
-  var stale = 0;
-  ((APP_DATA.incidents&&APP_DATA.incidents.rows)||[]).forEach(function(r){
-    if(/closed|complete/i.test(String(r['Status']||''))) return;
-    var d = mblParseDate(r['Event Date']);
-    if(d && mblDaysBetween(d, today.toISOString().substring(0,10)) > 7) stale++;
-  });
-  if(stale){
-    notes.push({ type:'warn', title:'Aging incidents', msg: stale+' open incident(s) older than 7 days.', action:"navigateTo('incidents')" });
-  }
-  // Drills overdue (planned date past, status not completed)
-  var drillOd = 0;
-  ((APP_DATA.drills&&APP_DATA.drills.rows)||[]).forEach(function(r){
-    if(/complete/i.test(String(r['Status']||''))) return;
-    var d = mblParseDate(r['Planned Date']);
-    if(d && d < today.toISOString().substring(0,10)) drillOd++;
-  });
-  if(drillOd){
-    notes.push({ type:'warn', title:'Drills overdue', msg: drillOd+' drill/campaign(s) past planned date.', action:"navigateTo('drills')" });
-  }
-  // HSE team interviews pending
   try{
-    if(typeof hseData!=='undefined' && Array.isArray(hseData)){
-      var pending = hseData.filter(function(x){ return !x.interviewed && String(x.status||'').toLowerCase().indexOf('interview')<0 && String(x.interviewStatus||x.status||'Pending').toLowerCase().indexOf('pending')>=0 || x.interviewed===false; }).length;
-      // simpler: count without interview date
-      pending = hseData.filter(function(x){
-        var s = String(x.status||x.Status||x.interviewStatus||'');
-        return /pending|not interviewed/i.test(s) || (!x.interviewDate && !x.Interviewed);
-      }).length;
-      if(pending>0){
-        notes.push({ type:'info', title:'HSE interviews pending', msg: pending+' HSE team member(s) pending interview.', action:"navigateTo('hse_team')" });
+    if(typeof mblLoadCapa === 'function') mblLoadCapa();
+    if(typeof capaActions !== 'undefined' && Array.isArray(capaActions) && typeof mblIsOverdue === 'function'){
+      var overdue = capaActions.filter(mblIsOverdue);
+      if(overdue.length){
+        notes.push({ type:'warn', title:'Overdue CAPA', msg: overdue.length + ' corrective action(s) past due date.', action:"navigateTo('capa')" });
       }
     }
   }catch(e){}
+  // Open high-risk incidents
+  try{
+    if(typeof mblOpenHighRiskIncidents === 'function'){
+      var high = mblOpenHighRiskIncidents(20);
+      if(high && high.length){
+        notes.push({ type:'danger', title:'High-risk incidents open', msg: high.length + ' open incident(s) with elevated severity/risk.', action:"navigateTo('incidents')" });
+      }
+    }
+  }catch(e){}
+  // Open incidents > 7 days
+  try{
+    var stale = 0;
+    ((APP_DATA.incidents && APP_DATA.incidents.rows) || []).forEach(function(r){
+      if(/closed|complete/i.test(String(r['Status'] || ''))) return;
+      var d = typeof mblParseDate === 'function' ? mblParseDate(r['Event Date']) : null;
+      if(d && typeof mblDaysBetween === 'function' && mblDaysBetween(d, today.toISOString().substring(0, 10)) > 7) stale++;
+    });
+    if(stale){
+      notes.push({ type:'warn', title:'Aging incidents', msg: stale + ' open incident(s) older than 7 days.', action:"navigateTo('incidents')" });
+    }
+  }catch(e){}
+  // Drills overdue
+  try{
+    var drillOd = 0;
+    ((APP_DATA.drills && APP_DATA.drills.rows) || []).forEach(function(r){
+      if(/complete/i.test(String(r['Status'] || ''))) return;
+      var d = typeof mblParseDate === 'function' ? mblParseDate(r['Planned Date']) : null;
+      if(d && d < today.toISOString().substring(0, 10)) drillOd++;
+    });
+    if(drillOd){
+      notes.push({ type:'warn', title:'Drills overdue', msg: drillOd + ' drill/campaign(s) past planned date.', action:"navigateTo('drills')" });
+    }
+  }catch(e){}
+  // HSE team interviews pending — only true Pending / not interviewed
+  try{
+    if(typeof hseData !== 'undefined' && Array.isArray(hseData)){
+      var pending = hseData.filter(function(x){
+        var s = String(x.Status || x.status || x.interviewStatus || '').toLowerCase();
+        if(/interviewed|complete|done|yes/.test(s)) return false;
+        if(/pending|not\s*interviewed/.test(s)) return true;
+        if(!x.interviewDate && !x.Interviewed && String(x['Interviewed with MBL'] || '').toLowerCase() !== 'yes') return true;
+        return false;
+      }).length;
+      if(pending > 0){
+        notes.push({ type:'info', title:'HSE interviews pending', msg: pending + ' HSE team member(s) pending interview.', action:"navigateTo('hse_team')" });
+      }
+    }
+  }catch(e){}
+  // Continuous officer coaching
+  try{
+    var pack = window._mblImprLastScan;
+    if(!pack && typeof mblRunContinuousCoachingScan === 'function'){
+      pack = mblRunContinuousCoachingScan('notif');
+    }
+    if(pack && pack.list){
+      var need = pack.list.filter(function(e){ return e.plan && e.plan.needsCoaching; });
+      var highP = need.filter(function(e){ return e.plan.priority === 'high'; });
+      var newcomers = pack.list.filter(function(e){ return e.isNew; });
+      if(need.length){
+        notes.push({
+          type: highP.length ? 'warn' : 'info',
+          title: highP.length ? 'Immediate coaching needed' : 'Continuous coaching active',
+          msg: need.length + ' officer(s) need improvement'
+            + (highP.length ? (' · ' + highP.length + ' high priority') : '')
+            + (newcomers.length ? (' · ' + newcomers.length + ' new') : '')
+            + '. Suggestions are ready — send only when you approve.',
+          action: "navigateTo('officer_improvements')"
+        });
+      }
+    }
+  }catch(e){}
+
+  // Stable ids for read/unread
+  notes.forEach(function(n){ n.id = mblNotifStableId(n); });
   return notes;
 }
+
 function mblRenderNotificationBell(){
   var notes = mblCollectNotifications();
+  var unread = mblCountUnreadNotifications(notes);
   var btn = document.getElementById('mblNotifBtn');
   if(!btn){
     var headerRight = document.querySelector('.header-right');
@@ -10419,28 +11796,58 @@ function mblRenderNotificationBell(){
     btn.onclick = function(){ mblToggleNotifPanel(); };
     headerRight.insertBefore(btn, headerRight.firstChild);
   }
-  var n = notes.length;
-  btn.innerHTML = '<i class="fas fa-bell"></i>'+(n?' <span style="background:#e53935;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700">'+n+'</span>':'');
+  btn.innerHTML = '<i class="fas fa-bell"></i>'
+    + (unread ? (' <span id="mblNotifBadge" style="background:#e53935;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700">' + unread + '</span>') : '');
+  btn.title = unread ? (unread + ' unread notification(s)') : 'Notifications — all read';
 }
+
 function mblToggleNotifPanel(){
   var existing = document.getElementById('mblNotifPanel');
-  if(existing){ existing.remove(); return; }
+  if(existing){
+    existing.remove();
+    return;
+  }
   var notes = mblCollectNotifications();
+  // Opening the panel = mark current notifications as read
+  mblMarkNotificationsRead(notes);
+  mblRenderNotificationBell();
+
   var panel = document.createElement('div');
   panel.id = 'mblNotifPanel';
   panel.style.cssText = 'position:fixed;top:64px;right:16px;z-index:9000;width:min(360px,94vw);max-height:70vh;overflow:auto;background:rgba(0,25,20,0.97);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:12px;box-shadow:0 16px 40px rgba(0,0,0,0.45)';
-  var h = '<div style="font-weight:700;margin-bottom:10px;color:#fff"><i class="fas fa-bell" style="color:#4dd0e1"></i> Notifications</div>';
-  if(!notes.length) h += '<div style="color:var(--text-muted);font-size:13px;padding:12px">All clear — no alerts right now.</div>';
+  var h = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+    + '<div style="font-weight:700;color:#fff"><i class="fas fa-bell" style="color:#4dd0e1"></i> Notifications</div>'
+    + '<button type="button" class="header-btn" style="padding:4px 10px;font-size:11px" onclick="document.getElementById(\'mblNotifPanel\').remove()">Close</button>'
+    + '</div>';
+  if(!notes.length){
+    h += '<div style="color:var(--text-muted);font-size:13px;padding:12px">All clear — no alerts right now.</div>';
+  } else {
+    h += '<div style="font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:8px">Marked as read · badge clears when you open this panel</div>';
+  }
   notes.forEach(function(n){
-    var col = n.type==='danger'?'#ef5350':(n.type==='warn'?'#ffa726':'#4dd0e1');
-    h += '<div style="padding:10px;border-radius:10px;margin-bottom:8px;background:rgba(255,255,255,0.04);border-left:3px solid '+col+'">';
-    h += '<div style="font-weight:600;font-size:13px;color:#fff">'+n.title+'</div>';
-    h += '<div style="font-size:12px;color:rgba(255,255,255,0.7);margin:4px 0 8px">'+n.msg+'</div>';
-    if(n.action) h += '<button class="header-btn" style="padding:4px 10px;font-size:11px" onclick="document.getElementById(\'mblNotifPanel\').remove();'+n.action+'">Open</button>';
+    var col = n.type === 'danger' ? '#ef5350' : (n.type === 'warn' ? '#ffa726' : '#4dd0e1');
+    h += '<div style="padding:10px;border-radius:10px;margin-bottom:8px;background:rgba(255,255,255,0.04);border-left:3px solid ' + col + '">';
+    h += '<div style="font-weight:600;font-size:13px;color:#fff">' + n.title + '</div>';
+    h += '<div style="font-size:12px;color:rgba(255,255,255,0.7);margin:4px 0 8px">' + n.msg + '</div>';
+    if(n.action){
+      h += '<button class="header-btn" style="padding:4px 10px;font-size:11px" onclick="document.getElementById(\'mblNotifPanel\').remove();' + n.action + '">Open</button>';
+    }
     h += '</div>';
   });
   panel.innerHTML = h;
   document.body.appendChild(panel);
+  // Click outside to close
+  setTimeout(function(){
+    function outside(ev){
+      var p = document.getElementById('mblNotifPanel');
+      var b = document.getElementById('mblNotifBtn');
+      if(!p){ document.removeEventListener('click', outside, true); return; }
+      if(p.contains(ev.target) || (b && b.contains(ev.target))) return;
+      p.remove();
+      document.removeEventListener('click', outside, true);
+    }
+    document.addEventListener('click', outside, true);
+  }, 30);
 }
 
 // Roles
@@ -10769,14 +12176,14 @@ function renderClinicPage(){
   }
   html += '</div>';
   html += '<p style="font-size:12px;color:var(--text-secondary);margin:0 0 12px">Name, Iqama, Shift, WhatsApp and Position are filled for each person. Admin can add photos and adjust framing.</p>';
-  html += '<div id="medTeamGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;align-items:stretch">';
+  html += '<div id="medTeamGrid">';
   if(!medTeamData.length){
-    html += '<div style="color:var(--text-muted);font-size:13px;padding:12px">No medical team members yet.'+(window.isAdmin?' Click Add Picture / Person.':'')+'</div>';
+    html += '<div style="color:var(--text-muted);font-size:13px;padding:12px;grid-column:1/-1">No medical team members yet.'+(window.isAdmin?' Click Add Picture / Person.':'')+'</div>';
   } else {
     medTeamData.forEach(function(m, idx){
-      html += '<div class="hse-card" style="overflow:hidden;border-radius:14px;border:1px solid rgba(var(--accent-rgb),0.2);background:rgba(var(--surface-rgb),0.5)">';
-      html += '<div class="hse-photo" id="med_photo_'+idx+'" style="height:180px;min-height:180px;background:rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;color:var(--text-muted);overflow:hidden;flex-shrink:0"><i class="fas fa-user-md" style="font-size:36px;opacity:0.4"></i></div>';
-      html += '<div style="padding:12px">';
+      html += '<div class="hse-card med-card" style="border:1px solid rgba(var(--accent-rgb),0.22);background:rgba(var(--surface-rgb),0.55)">';
+      html += '<div class="hse-photo med-photo" id="med_photo_'+idx+'"><i class="fas fa-user-md" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:36px;opacity:0.35;color:var(--text-muted)"></i></div>';
+      html += '<div class="med-card-body">';
       html += '<div class="hse-name" style="font-weight:700;color:var(--text-primary);margin-bottom:6px">'+clinicEsc(m.Name||'')+'</div>';
       html += '<div class="hse-meta" style="font-size:12px;line-height:1.55;color:var(--text-secondary)">';
       html += '<div><strong>Iqama</strong> '+clinicEsc(m.Iqama||'—')+'</div>';
@@ -10784,12 +12191,11 @@ function renderClinicPage(){
       html += '<div><strong>WhatsApp</strong> '+clinicEsc(m.WhatsApp||'—')+'</div>';
       html += '<div><strong>Position</strong> '+clinicEsc(m.Position||'—')+'</div>';
       html += '</div>';
-      if(window.isAdmin){
-        html += '<div style="display:flex;gap:6px;margin-top:10px" class="med-team-admin">';
-        html += '<button class="header-btn" style="font-size:11px;padding:6px 8px" onclick="medOpenEdit('+idx+')"><i class="fas fa-edit"></i> Edit</button>';
-        html += '<button class="header-btn" style="font-size:11px;padding:6px 8px" onclick="medDeletePerson('+idx+')"><i class="fas fa-trash"></i></button>';
-      }
-      html += '</div></div></div>';
+      html += '<div class="med-card-actions med-team-admin clinic-admin-only">';
+      html += '<button class="header-btn admin-only" style="font-size:11px;padding:6px 8px" onclick="medOpenEdit('+idx+')"><i class="fas fa-edit"></i> Edit</button>';
+      html += '<button class="header-btn admin-only" style="font-size:11px;padding:6px 8px" onclick="medDeletePerson('+idx+')"><i class="fas fa-trash"></i></button>';
+      html += '</div>';
+      html += '</div></div>';
     });
   }
   html += '</div></div>';
@@ -10827,16 +12233,63 @@ function renderClinicPage(){
         if(!el) return;
         var ox = (typeof m.photoX==='number') ? m.photoX : 0;
         var oy = (typeof m.photoY==='number') ? m.photoY : 0;
-        var sc = (typeof m.photoScale==='number') ? m.photoScale : 1;
-        if(m.photoX!=null || m.photoY!=null || m.photoScale!=null){
-          el.style.overflow='hidden'; el.style.position='relative';
-          el.innerHTML = '<img src="'+url+'" style="position:absolute;left:50%;top:50%;width:auto;height:120%;max-width:none;transform:translate(calc(-50% + '+ox+'px), calc(-50% + '+oy+'px)) scale('+sc+');">';
-        } else {
-          el.innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;object-position:'+(m.photoPos||'center center')+'">';
-        }
+        var sc = (typeof m.photoScale==='number' && m.photoScale > 0) ? m.photoScale : 1;
+        // Always fill the fixed square frame (same for admin + viewer)
+        el.innerHTML = '<img src="'+url+'" alt="'+clinicEsc(m.Name||'')+'" '
+          + 'style="position:absolute;left:50%;top:50%;width:100%;height:100%;object-fit:cover;'
+          + 'transform:translate(calc(-50% + '+ox+'px), calc(-50% + '+oy+'px)) scale('+sc+');'
+          + 'transform-origin:center center;">';
       });
     });
   }, 80);
+}
+
+function mblClinicThemePalette(){
+  // Build chart colors from active CSS theme tokens
+  var cs = getComputedStyle(document.body);
+  function cssVar(name, fb){
+    var v = (cs.getPropertyValue(name) || '').trim();
+    return v || fb;
+  }
+  function rgbTriplet(name, fb){
+    var v = cssVar(name, fb);
+    if(/^\d+\s*,\s*\d+\s*,\s*\d+/.test(v)) return v;
+    return fb;
+  }
+  var accent = cssVar('--accent-cyan', '#00bcd4');
+  var teal = cssVar('--accent-teal', '#009688');
+  var mint = cssVar('--accent-mint', '#26a69a');
+  var aRgb = rgbTriplet('--accent-rgb', '0,188,212');
+  var a2Rgb = rgbTriplet('--accent2-rgb', '0,150,136');
+  function rgba(trip, a){ return 'rgba(' + trip + ',' + a + ')'; }
+  // Primary theme ramp + a few complementary shades derived from accent
+  var palette = [
+    accent,
+    teal,
+    mint,
+    rgba(aRgb, 0.85),
+    rgba(a2Rgb, 0.9),
+    rgba(aRgb, 0.55),
+    '#ef5350',
+    '#ff7043',
+    '#42a5f5',
+    '#ab47bc',
+    '#ffca28',
+    '#66bb6a'
+  ];
+  var text = cssVar('--text-secondary', 'rgba(255,255,255,0.65)');
+  var muted = cssVar('--text-muted', 'rgba(255,255,255,0.4)');
+  var grid = 'rgba(255,255,255,0.06)';
+  try{
+    // Light themes: softer grid
+    if((document.body.getAttribute('data-theme') || '') === 'white' ||
+       (document.body.getAttribute('data-morphism') || '').indexOf('light') >= 0){
+      grid = 'rgba(0,0,0,0.08)';
+      text = cssVar('--text-secondary', '#546e7a');
+      muted = cssVar('--text-muted', '#90a4ae');
+    }
+  }catch(e){}
+  return { palette: palette, text: text, muted: muted, grid: grid, accent: accent };
 }
 
 function buildClinicCharts(rows){
@@ -10845,26 +12298,47 @@ function buildClinicCharts(rows){
     (rows||[]).forEach(function(r){ var v=String(r[field]||'Unknown').trim()||'Unknown'; m[v]=(m[v]||0)+1; });
     return m;
   }
-  function pie(id, map, colors){
+  var th = mblClinicThemePalette();
+  function pie(id, map){
     var el = document.getElementById(id); if(!el || typeof Chart==='undefined') return;
     var labels = Object.keys(map); var data = labels.map(function(k){return map[k];});
+    var colors = labels.map(function(_, i){ return th.palette[i % th.palette.length]; });
     if(charts[id]) try{ charts[id].destroy(); }catch(e){}
-    charts[id] = new Chart(el, { type:'doughnut', data:{ labels:labels, datasets:[{ data:data, backgroundColor: colors||['#26c6da','#00acc1','#66bb6a','#ab47bc','#ef5350','#ff7043','#42a5f5'] }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{color:'#cfd8dc',boxWidth:10}}} } });
+    charts[id] = new Chart(el, {
+      type:'doughnut',
+      data:{ labels:labels, datasets:[{ data:data, backgroundColor: colors, borderColor: 'rgba(0,0,0,0.15)', borderWidth:1 }] },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ position:'bottom', labels:{ color: th.text, boxWidth:10, font:{ size:11 } } } }
+      }
+    });
   }
   function bar(id, map){
     var el = document.getElementById(id); if(!el || typeof Chart==='undefined') return;
     var labels = Object.keys(map); var data = labels.map(function(k){return map[k];});
-    var palette = ['#26c6da','#66bb6a','#ab47bc','#ef5350','#ff7043','#42a5f5','#00acc1','#ffca28','#7e57c2','#ec407a','#26a69a','#ffa726'];
-    var bg = labels.map(function(_,i){ return palette[i % palette.length]; });
-    var bd = bg.map(function(c){ return c; });
+    var bg = labels.map(function(_, i){ return th.palette[i % th.palette.length]; });
     if(charts[id]) try{ charts[id].destroy(); }catch(e){}
-    charts[id] = new Chart(el, { type:'bar', data:{ labels:labels, datasets:[{ data:data, backgroundColor: bg, borderColor: bd, borderWidth:1, borderRadius:6 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:'#90a4ae', maxRotation:45, minRotation:0}}, y:{ticks:{color:'#90a4ae'}, beginAtZero:true, grid:{color:'rgba(255,255,255,0.06)'} } } } });
+    charts[id] = new Chart(el, {
+      type:'bar',
+      data:{ labels:labels, datasets:[{ data:data, backgroundColor: bg, borderColor: bg, borderWidth:1, borderRadius:6 }] },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false } },
+        scales:{
+          x:{ ticks:{ color: th.muted, maxRotation:45, minRotation:0 }, grid:{ display:false } },
+          y:{ ticks:{ color: th.muted }, beginAtZero:true, grid:{ color: th.grid } }
+        }
+      }
+    });
   }
   pie('cc_clinic_visit', clinicCountBy('Visit Type'));
   bar('cc_clinic_company', clinicCountBy('Company'));
   bar('cc_clinic_nurse', clinicCountBy('Reporting Nurse'));
   bar('cc_clinic_loc', clinicCountBy('Location / Area'));
 }
+window.buildClinicCharts = buildClinicCharts;
+window.mblClinicThemePalette = mblClinicThemePalette;
+
 
 function medOpenAdd(){ medOpenForm(-1); }
 function medOpenEdit(idx){ medOpenForm(idx); }
@@ -11214,9 +12688,9 @@ function mblEnhanceOverviewHtml(){
   // Rates
   html += '<div class="kpi-grid">';
   html += kpiCard('Incidents / 100k MH', rates.per100k.toFixed(2), '#ef5350', 'fa-chart-line');
-  html += kpiCard('Total Manhours', Math.round(rates.manhours).toLocaleString(), '#00acc1', 'fa-clock');
+  html += kpiCard('Safe Manhours', Math.round(rates.manhours), '#00e5ff', 'fa-shield-alt');
   html += kpiCard('Open PTWs', rates.ptwOpen, '#7e57c2', 'fa-file-signature');
-    html += '</div>';
+  html += '</div>';
   // Trends
   var obsSeries = mblSeriesByPeriod((APP_DATA.observations&&APP_DATA.observations.rows)||[], 'Timestamp', 'week');
   var incSeries = mblSeriesByPeriod((APP_DATA.incidents&&APP_DATA.incidents.rows)||[], 'Event Date', 'week');
@@ -11481,54 +12955,126 @@ function mblRefreshEquipmentCompliance(rows){
   });
   return rows;
 }
+function mblSyncPaletteFromTheme(){
+  try{
+    var key = document.body.getAttribute('data-theme') || 'teal';
+    if(typeof THEME_PALETTES !== 'undefined' && THEME_PALETTES[key]){
+      PALETTE = THEME_PALETTES[key].slice();
+    }
+  }catch(e){}
+}
 function buildEquipDetailCharts(d){
+  mblSyncPaletteFromTheme();
   var rows = mblRefreshEquipmentCompliance((d && d.rows) ? d.rows.slice() : []);
   function topMap(map, n){
     return Object.keys(map).filter(Boolean).sort(function(a,b){ return map[b]-map[a]; }).slice(0, n||10);
   }
+  // Live theme palette (CSS vars + THEME_PALETTES)
+  var th = (typeof mblClinicThemePalette === 'function') ? mblClinicThemePalette() : null;
+  var pal = (th && th.palette && th.palette.length) ? th.palette : (PALETTE || ['#00bcd4','#009688','#26a69a']);
+  function tone(hex, alphaHex){
+    // append alpha if hex is #rrggbb
+    if(!hex) return pal[0];
+    if(hex.indexOf('rgba') === 0 || hex.indexOf('rgb') === 0) return hex;
+    if(hex.charAt(0) === '#' && hex.length === 7 && alphaHex) return hex + alphaHex;
+    return hex;
+  }
+  function colorAt(i){ return pal[i % pal.length]; }
+
   var st = countBy(rows, 'Compliance Status');
   var stOrder = ['EXPIRED','ALERT','VALID','UNKNOWN'].filter(function(k){ return st[k]; });
-  var stColors = {'EXPIRED':'#ef5350','ALERT':'#ffb74d','VALID':'#66bb6a','UNKNOWN':'#90a4ae'};
+  // Status stays semantic for safety meaning; UNKNOWN follows muted theme text
+  var stColors = {
+    'EXPIRED': '#ef5350',
+    'ALERT': '#ffb74d',
+    'VALID': '#66bb6a',
+    'UNKNOWN': (th && th.muted) ? th.muted : '#90a4ae'
+  };
   makeChart('cc_eq_status','doughnut',{
     labels: stOrder,
-    datasets:[{ data: stOrder.map(function(k){return st[k];}), backgroundColor: stOrder.map(function(k){return stColors[k]||'#90a4ae';}), borderWidth:2, borderColor:'rgba(0,0,0,0.2)' }]
+    datasets:[{
+      data: stOrder.map(function(k){ return st[k]; }),
+      backgroundColor: stOrder.map(function(k){ return stColors[k] || colorAt(0); }),
+      borderWidth: 2,
+      borderColor: 'rgba(0,0,0,0.2)'
+    }]
   });
+
   var typeMap = countBy(rows, 'Equipment Type');
   var typeLbl = topMap(typeMap, 12);
   makeChart('cc_eq_type','bar',{
     labels: typeLbl,
-    datasets:[{ label:'Units', data: typeLbl.map(function(l){return typeMap[l];}), backgroundColor: typeLbl.map(function(_,i){return PALETTE[i%PALETTE.length]+'cc';}), borderWidth:1, borderRadius:6 }]
-  }, {plugins:{legend:{display:false}}, indexAxis: typeLbl.length>6 ? 'y' : 'x'});
+    datasets:[{
+      label: 'Units',
+      data: typeLbl.map(function(l){ return typeMap[l]; }),
+      backgroundColor: typeLbl.map(function(_, i){ return tone(colorAt(i), 'cc'); }),
+      borderColor: typeLbl.map(function(_, i){ return colorAt(i); }),
+      borderWidth: 1,
+      borderRadius: 6
+    }]
+  }, { plugins:{ legend:{ display:false } }, indexAxis: typeLbl.length > 6 ? 'y' : 'x' });
+
   var coMap = countBy(rows, 'Company Name');
   var coLbl = topMap(coMap, 10);
   makeChart('cc_eq_company','bar',{
     labels: coLbl,
-    datasets:[{ label:'Units', data: coLbl.map(function(l){return coMap[l];}), backgroundColor:'#42a5f5aa', borderWidth:1, borderRadius:6 }]
-  }, {plugins:{legend:{display:false}}});
+    datasets:[{
+      label: 'Units',
+      data: coLbl.map(function(l){ return coMap[l]; }),
+      backgroundColor: coLbl.map(function(_, i){ return tone(colorAt(i), 'bb'); }),
+      borderColor: coLbl.map(function(_, i){ return colorAt(i); }),
+      borderWidth: 1,
+      borderRadius: 6
+    }]
+  }, { plugins:{ legend:{ display:false } } });
+
   var catMap = countBy(rows, 'Category');
   var catLbl = Object.keys(catMap).filter(Boolean);
   makeChart('cc_eq_category','pie',{
     labels: catLbl,
-    datasets:[{ data: catLbl.map(function(l){return catMap[l];}), backgroundColor:['#42a5f5','#26a69a','#ab47bc','#ffb74d'] }]
+    datasets:[{
+      data: catLbl.map(function(l){ return catMap[l]; }),
+      backgroundColor: catLbl.map(function(_, i){ return colorAt(i); }),
+      borderWidth: 1,
+      borderColor: 'rgba(0,0,0,0.15)'
+    }]
   });
+
   var brandMap = countBy(rows, 'Brand/Model');
   var brandLbl = topMap(brandMap, 10);
   makeChart('cc_eq_brand','bar',{
     labels: brandLbl,
-    datasets:[{ label:'Units', data: brandLbl.map(function(l){return brandMap[l];}), backgroundColor: brandLbl.map(function(_,i){return PALETTE[(i+3)%PALETTE.length]+'cc';}), borderWidth:1, borderRadius:6 }]
-  }, {plugins:{legend:{display:false}}, indexAxis:'y'});
-  var valid = (st.VALID||0), total = rows.length || 1;
+    datasets:[{
+      label: 'Units',
+      data: brandLbl.map(function(l){ return brandMap[l]; }),
+      backgroundColor: brandLbl.map(function(_, i){ return tone(colorAt(i + 2), 'cc'); }),
+      borderColor: brandLbl.map(function(_, i){ return colorAt(i + 2); }),
+      borderWidth: 1,
+      borderRadius: 6
+    }]
+  }, { plugins:{ legend:{ display:false } }, indexAxis: 'y' });
+
+  var valid = (st.VALID || 0), total = rows.length || 1;
   var rate = Math.round(100 * valid / total);
+  var otherFill = (th && th.grid) ? th.grid : 'rgba(255,255,255,0.08)';
   makeChart('cc_eq_gauge','doughnut',{
-    labels:['Valid','Other'],
-    datasets:[{ data:[valid, Math.max(0,total-valid)], backgroundColor:['#66bb6a','rgba(255,255,255,0.08)'], borderWidth:0 }]
-  }, {cutout:'72%', plugins:{legend:{display:false}}});
+    labels: ['Valid', 'Other'],
+    datasets:[{
+      data: [valid, Math.max(0, total - valid)],
+      backgroundColor: ['#66bb6a', otherFill],
+      borderWidth: 0
+    }]
+  }, { cutout: '72%', plugins:{ legend:{ display:false } } });
   var g = document.getElementById('cc_eq_gauge_txt');
-  if(g) g.textContent = rate + '%';
-  // Expiring in next 90 days (by document type)
+  if(g){
+    g.textContent = rate + '%';
+    try{ g.style.color = (th && th.accent) ? th.accent : ''; }catch(e){}
+  }
+
+  // Expiring in next 90 days (by document type) — theme palette
   var buckets = {'License':0,'Operator TUV':0,'Equipment TUV':0,'Insurance':0};
   rows.forEach(function(r){
-    function near(key){ var n=parseInt(r[key],10); return !isNaN(n) && n>=0 && n<=90; }
+    function near(key){ var n = parseInt(r[key], 10); return !isNaN(n) && n >= 0 && n <= 90; }
     if(near('Days License')) buckets['License']++;
     if(near('Days Operator TUV')) buckets['Operator TUV']++;
     if(near('Days Equipment TUV')) buckets['Equipment TUV']++;
@@ -11537,9 +13083,19 @@ function buildEquipDetailCharts(d){
   var bLbl = Object.keys(buckets);
   makeChart('cc_eq_expiring','bar',{
     labels: bLbl,
-    datasets:[{ label:'Units expiring ≤90 days', data: bLbl.map(function(l){return buckets[l];}), backgroundColor:['#7e57c2','#26a69a','#42a5f5','#ffb74d'], borderWidth:1, borderRadius:6 }]
-  }, {plugins:{legend:{display:false}}});
+    datasets:[{
+      label: 'Units expiring ≤90 days',
+      data: bLbl.map(function(l){ return buckets[l]; }),
+      backgroundColor: bLbl.map(function(_, i){ return colorAt(i); }),
+      borderColor: bLbl.map(function(_, i){ return colorAt(i); }),
+      borderWidth: 1,
+      borderRadius: 6
+    }]
+  }, { plugins:{ legend:{ display:false } } });
 }
+window.buildEquipDetailCharts = buildEquipDetailCharts;
+window.mblSyncPaletteFromTheme = mblSyncPaletteFromTheme;
+
 
 // Refresh compliance whenever equipment data is shown
 (function hookEquip(){
@@ -11550,9 +13106,19 @@ function buildEquipDetailCharts(d){
 
 
 /* ===== MBL constellation network background (welcome + dashboard) ===== */
+/* Light + slow: fewer nodes, lower DPR on mobile, capped FPS, soft motion */
 (function mblTechNetwork(){
+  function isMobileLike(){
+    try{
+      if(window.matchMedia && window.matchMedia('(max-width: 900px)').matches) return true;
+      if(navigator.maxTouchPoints > 1 && Math.min(screen.width, screen.height) < 900) return true;
+    }catch(e){}
+    return false;
+  }
+  function prefersReducedMotion(){
+    try{ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){ return false; }
+  }
   function createLayer(parent, mode){
-    // mode: 'welcome' | 'app'
     if(!parent) return null;
     if(parent.querySelector && parent.querySelector('.mbl-tech-bg')) return null;
 
@@ -11563,13 +13129,18 @@ function buildEquipDetailCharts(d){
     wrap.appendChild(canvas);
     parent.insertBefore(wrap, parent.firstChild);
 
-    var ctx = canvas.getContext('2d');
-    var nodes = [], icons = [], links = [];
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var ctx = canvas.getContext('2d', { alpha: true });
+    var nodes = [], icons = [];
+    var mobile = isMobileLike();
+    var reduced = prefersReducedMotion();
+    // Cap devicePixelRatio hard on phones to cut fill-rate cost
+    var dpr = mobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
     var w = 0, h = 0, raf = 0, t0 = performance.now();
-    var strong = (mode === 'welcome');
+    var lastDraw = 0;
+    // Target ~24fps mobile / ~30fps desktop — light on battery & CPU
+    var minFrameMs = mobile ? 42 : 33;
+    var paused = false;
 
-    // Simple path icons: hardhat, crane, building, medkit, chart
     function iconPath(ctx, type, x, y, s){
       ctx.save();
       ctx.translate(x, y);
@@ -11602,6 +13173,9 @@ function buildEquipDetailCharts(d){
     }
 
     function resize(){
+      mobile = isMobileLike();
+      dpr = mobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+      minFrameMs = mobile ? 42 : 33;
       var r = (mode === 'welcome')
         ? {width: window.innerWidth, height: window.innerHeight}
         : (parent.getBoundingClientRect ? parent.getBoundingClientRect() : {width: window.innerWidth, height: window.innerHeight});
@@ -11618,150 +13192,179 @@ function buildEquipDetailCharts(d){
     function build(){
       nodes = [];
       icons = [];
-      // Same vivid network for Welcome and Dashboard (fast + noticeable)
-      var count = Math.max(55, Math.floor((w * h) / 14000));
-      if(count > 95) count = 95;
+      // Light counts: mobile much lower; desktop moderate
+      var density = mobile ? 32000 : 22000;
+      var count = Math.max(mobile ? 18 : 32, Math.floor((w * h) / density));
+      var maxN = mobile ? 28 : 55;
+      if(count > maxN) count = maxN;
+      if(reduced) count = Math.min(count, 16);
+      var velScale = mobile ? 0.22 : 0.35; // slow drift
       for(var i = 0; i < count; i++){
         nodes.push({
           x: Math.random() * w,
           y: Math.random() * h,
-          vx: (Math.random() - 0.5) * 0.85,
-          vy: (Math.random() - 0.5) * 0.85,
-          r: 2.0 + Math.random() * 3.2,
+          vx: (Math.random() - 0.5) * velScale,
+          vy: (Math.random() - 0.5) * velScale,
+          r: (mobile ? 1.4 : 1.8) + Math.random() * (mobile ? 1.8 : 2.4),
           pulse: Math.random() * Math.PI * 2,
-          speed: 1.6 + Math.random() * 2.4,
-          gold: Math.random() > 0.5
+          speed: 0.45 + Math.random() * 0.7, // slow pulse
+          gold: Math.random() > 0.55
         });
       }
+      // Fewer icons; none when reduced-motion
       var types = ['hat','crane','building','med','chart'];
-      var nIcon = 14;
+      var nIcon = reduced ? 0 : (mobile ? 4 : 8);
       for(var i = 0; i < nIcon; i++){
         icons.push({
           x: Math.random() * w,
           y: Math.random() * h,
           type: types[i % types.length],
-          size: 36 + Math.random() * 28,
+          size: (mobile ? 22 : 28) + Math.random() * (mobile ? 12 : 18),
           pulse: Math.random() * Math.PI * 2,
-          speed: 1.1 + Math.random() * 1.6,
-          gold: Math.random() > 0.35,
-          drift: (Math.random() - 0.5) * 0.55
+          speed: 0.35 + Math.random() * 0.5,
+          gold: Math.random() > 0.4,
+          drift: (Math.random() - 0.5) * (mobile ? 0.12 : 0.2)
         });
       }
     }
 
     function frame(now){
       raf = requestAnimationFrame(frame);
-      if(document.hidden) return;
+      if(document.hidden || paused) return;
+      // Frame throttle
+      if(now - lastDraw < minFrameMs) return;
+      lastDraw = now;
       var t = (now - t0) / 1000;
       ctx.clearRect(0, 0, w, h);
 
-      // deep navy base glow (same on Welcome + Dashboard)
-      var g1 = ctx.createRadialGradient(w * 0.15, h * 0.2, 0, w * 0.2, h * 0.25, w * 0.65);
-      g1.addColorStop(0, 'rgba(40,70,120,0.38)');
+      // Soft ambient glows (cheaper than heavy multi-pass)
+      var g1 = ctx.createRadialGradient(w * 0.18, h * 0.22, 0, w * 0.22, h * 0.28, w * 0.55);
+      g1.addColorStop(0, mobile ? 'rgba(40,70,120,0.22)' : 'rgba(40,70,120,0.30)');
       g1.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = g1;
       ctx.fillRect(0, 0, w, h);
-      var g2 = ctx.createRadialGradient(w * 0.85, h * 0.35, 0, w * 0.8, h * 0.4, w * 0.6);
-      g2.addColorStop(0, 'rgba(0,170,210,0.26)');
-      g2.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = g2;
-      ctx.fillRect(0, 0, w, h);
-      var g3 = ctx.createRadialGradient(w * 0.5, h * 0.85, 0, w * 0.5, h * 0.9, w * 0.45);
-      g3.addColorStop(0, 'rgba(180,140,40,0.14)');
-      g3.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = g3;
-      ctx.fillRect(0, 0, w, h);
-
-      // move nodes slowly
-      for(var i = 0; i < nodes.length; i++){
-        var n = nodes[i];
-        n.x += n.vx; n.y += n.vy;
-        if(n.x < -20) n.x = w + 20;
-        if(n.x > w + 20) n.x = -20;
-        if(n.y < -20) n.y = h + 20;
-        if(n.y > h + 20) n.y = -20;
+      if(!mobile){
+        var g2 = ctx.createRadialGradient(w * 0.82, h * 0.38, 0, w * 0.78, h * 0.42, w * 0.5);
+        g2.addColorStop(0, 'rgba(0,170,210,0.16)');
+        g2.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g2;
+        ctx.fillRect(0, 0, w, h);
       }
 
-      // constellation links
-      var linkDist = 200;
-      ctx.lineWidth = 1.25;
+      // Move nodes slowly
+      for(var i = 0; i < nodes.length; i++){
+        var n = nodes[i];
+        n.x += n.vx;
+        n.y += n.vy;
+        if(n.x < -20) n.x = w + 20; else if(n.x > w + 20) n.x = -20;
+        if(n.y < -20) n.y = h + 20; else if(n.y > h + 20) n.y = -20;
+      }
+
+      // Links — shorter range on mobile, no shadow
+      var linkDist = mobile ? 90 : 120;
+      var linkDist2 = linkDist * linkDist;
+      ctx.lineWidth = mobile ? 0.6 : 0.75;
+      ctx.shadowBlur = 0;
       for(var i = 0; i < nodes.length; i++){
         var a = nodes[i];
-        for(var j = i + 1; j < nodes.length; j++){
+        // only check a few neighbours ahead to cut O(n^2)
+        var limit = Math.min(nodes.length, i + (mobile ? 8 : 12));
+        for(var j = i + 1; j < limit; j++){
           var b = nodes[j];
           var dx = a.x - b.x, dy = a.y - b.y;
-          var dist = Math.sqrt(dx*dx + dy*dy);
-          if(dist < linkDist){
-            var alpha = (1 - dist / linkDist) * 0.55;
-            alpha *= (0.55 + 0.45 * Math.sin(t * 2.2 + a.pulse));
-            var col = (a.gold || b.gold)
-              ? ('rgba(212, 175, 55, ' + alpha + ')')
-              : ('rgba(80, 200, 230, ' + alpha + ')');
-            ctx.strokeStyle = col;
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.stroke();
-          }
+          var d2 = dx*dx + dy*dy;
+          if(d2 > linkDist2) continue;
+          var alpha = (1 - Math.sqrt(d2) / linkDist) * (mobile ? 0.28 : 0.38);
+          ctx.strokeStyle = (a.gold || b.gold)
+            ? ('rgba(212, 175, 55, ' + alpha + ')')
+            : ('rgba(80, 200, 230, ' + alpha + ')');
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
         }
       }
 
-      // nodes — bright, fast pulse (same Welcome + Dashboard)
+      // Nodes — soft pulse, minimal shadow on mobile
       for(var i = 0; i < nodes.length; i++){
         var n = nodes[i];
-        var glow = 0.5 + 0.5 * Math.sin(t * n.speed + n.pulse);
+        var glow = 0.45 + 0.35 * Math.sin(t * n.speed + n.pulse);
         ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r + glow * 1.4, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, n.r + glow * (mobile ? 0.6 : 1.0), 0, Math.PI * 2);
         if(n.gold){
-          ctx.fillStyle = 'rgba(242, 210, 95, ' + (0.55 + glow * 0.45) + ')';
-          ctx.shadowColor = 'rgba(232, 190, 50, 0.95)';
+          ctx.fillStyle = 'rgba(242, 210, 95, ' + (0.4 + glow * 0.35) + ')';
+          if(!mobile) ctx.shadowColor = 'rgba(232, 190, 50, 0.55)';
         } else {
-          ctx.fillStyle = 'rgba(110, 230, 250, ' + (0.55 + glow * 0.45) + ')';
-          ctx.shadowColor = 'rgba(0, 220, 255, 0.95)';
+          ctx.fillStyle = 'rgba(110, 230, 250, ' + (0.4 + glow * 0.35) + ')';
+          if(!mobile) ctx.shadowColor = 'rgba(0, 220, 255, 0.55)';
         }
-        ctx.shadowBlur = 14 + glow * 18;
+        ctx.shadowBlur = mobile ? 0 : (6 + glow * 8);
         ctx.fill();
         ctx.shadowBlur = 0;
       }
 
-      // floating HSE / construction icons — larger, faster drift (same everywhere)
+      // Icons — slow drift, no heavy shadow on mobile
       for(var i = 0; i < icons.length; i++){
         var ic = icons[i];
         ic.x += ic.drift;
-        ic.y += Math.sin(t * ic.speed + ic.pulse) * 0.35;
-        if(ic.x < -50) ic.x = w + 50;
-        if(ic.x > w + 50) ic.x = -50;
-        if(ic.y < -50) ic.y = h + 50;
-        if(ic.y > h + 50) ic.y = -50;
-        var a = 0.28 + 0.18 * Math.sin(t * ic.speed + ic.pulse);
+        ic.y += Math.sin(t * ic.speed + ic.pulse) * 0.18;
+        if(ic.x < -40) ic.x = w + 40;
+        if(ic.x > w + 40) ic.x = -40;
+        if(ic.y < -40) ic.y = h + 40;
+        if(ic.y > h + 40) ic.y = -40;
+        var a = 0.18 + 0.12 * Math.sin(t * ic.speed + ic.pulse);
         ctx.strokeStyle = ic.gold
           ? ('rgba(222, 185, 60, ' + a + ')')
           : ('rgba(170, 220, 240, ' + a + ')');
-        ctx.lineWidth = 1.8;
-        ctx.shadowColor = ic.gold ? 'rgba(232,190,50,0.55)' : 'rgba(0,200,240,0.5)';
-        ctx.shadowBlur = 12;
-        iconPath(ctx, ic.type, ic.x, ic.y + Math.sin(t * ic.speed + ic.pulse) * 10, ic.size);
+        ctx.lineWidth = mobile ? 1.2 : 1.5;
+        ctx.shadowBlur = mobile ? 0 : 6;
+        if(!mobile) ctx.shadowColor = ic.gold ? 'rgba(232,190,50,0.35)' : 'rgba(0,200,240,0.3)';
+        iconPath(ctx, ic.type, ic.x, ic.y + Math.sin(t * ic.speed + ic.pulse) * 5, ic.size);
         ctx.shadowBlur = 0;
       }
 
-      // bottom gold edge (poster floor) on Welcome and Dashboard
-      var lg = ctx.createLinearGradient(0, h * 0.72, 0, h);
-      lg.addColorStop(0, 'rgba(0,0,0,0)');
-      lg.addColorStop(1, 'rgba(180,140,40,0.14)');
-      ctx.fillStyle = lg;
-      ctx.fillRect(0, h * 0.72, w, h * 0.28);
+      // Subtle floor glow (skip extra work on tiny screens)
+      if(!mobile || h > 500){
+        var lg = ctx.createLinearGradient(0, h * 0.78, 0, h);
+        lg.addColorStop(0, 'rgba(0,0,0,0)');
+        lg.addColorStop(1, 'rgba(180,140,40,0.08)');
+        ctx.fillStyle = lg;
+        ctx.fillRect(0, h * 0.78, w, h * 0.22);
+      }
     }
 
     function start(){
+      if(reduced){
+        // Static soft backdrop only — no continuous animation
+        resize();
+        ctx.clearRect(0, 0, w, h);
+        var g = ctx.createRadialGradient(w*0.5, h*0.4, 0, w*0.5, h*0.45, Math.max(w,h)*0.55);
+        g.addColorStop(0, 'rgba(40,70,120,0.25)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+        return;
+      }
       resize();
       cancelAnimationFrame(raf);
       t0 = performance.now();
+      lastDraw = 0;
       raf = requestAnimationFrame(frame);
     }
 
-    window.addEventListener('resize', function(){ resize(); });
+    var resizeTimer = 0;
+    window.addEventListener('resize', function(){
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function(){ resize(); }, 150);
+    });
     document.addEventListener('visibilitychange', function(){
-      if(!document.hidden) start();
+      if(document.hidden){
+        paused = true;
+        cancelAnimationFrame(raf);
+      } else {
+        paused = false;
+        start();
+      }
     });
     start();
     return {el: wrap};
@@ -11782,8 +13385,8 @@ function buildEquipDetailCharts(d){
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
   else mount();
-  setTimeout(mount, 30);
-  setTimeout(mount, 300);
+  // Single delayed remount only (was 30ms + 300ms — reduces double work on slow phones)
+  setTimeout(mount, 80);
   window.mblTechNetworkMount = mount;
 })();
 
@@ -12179,10 +13782,32 @@ otLoad();
 
 function startWelcomeThenLogin(){
   const wel = document.getElementById('welcomeOverlay');
+  // Calm splash: short enough on mobile, still readable on desktop
+  var holdMs = 3800;
+  var fadeMs = 1400;
+  try{
+    if(window.matchMedia && window.matchMedia('(max-width: 900px)').matches){
+      holdMs = 2800;
+      fadeMs = 1000;
+    }
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      holdMs = 1200;
+      fadeMs = 350;
+    }
+  }catch(e){}
   setTimeout(function(){
     if(wel) wel.classList.add('fade-out');
     setTimeout(function(){
       if(wel) wel.style.display = 'none';
+      // Stop welcome canvas work after splash (saves mobile CPU)
+      try{
+        var wc = wel && wel.querySelector && wel.querySelector('.mbl-tech-bg canvas');
+        if(wc){
+          var wctx = wc.getContext && wc.getContext('2d');
+          if(wctx) wctx.clearRect(0,0,wc.width,wc.height);
+          if(wc.parentNode) wc.parentNode.remove();
+        }
+      }catch(e){}
       try{
         const s = mblSS.getItem(MBL_AUTH_KEY);
         // Only restore admin mode when the server-issued token is still present
@@ -12191,8 +13816,8 @@ function startWelcomeThenLogin(){
       }catch(e){}
       // Always open dashboard as viewer after welcome — Admin Login is a header button
       enterApp(false);
-    }, 1200);
-  }, 4500);
+    }, fadeMs);
+  }, holdMs);
 }
 function openAdminLoginModal(){
   const login = document.getElementById('loginOverlay');
@@ -12349,6 +13974,11 @@ function enterApp(admin){
     init();
   }
   setTimeout(function(){ if(typeof buildSidebar === 'function') buildSidebar(); }, 400);
+  // Continuous coaching monitor — evaluates new & existing officers any time
+  try{
+    if(typeof mblStartContinuousCoachingMonitor === 'function') mblStartContinuousCoachingMonitor();
+    setTimeout(function(){ if(typeof mblRunContinuousCoachingScan === 'function') mblRunContinuousCoachingScan('enterApp'); }, 2200);
+  }catch(e){}
 }
 
 document.addEventListener('DOMContentLoaded', function(){
