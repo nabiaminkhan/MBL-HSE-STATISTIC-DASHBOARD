@@ -4006,7 +4006,7 @@ function wkpiNext(){ wkpiGo((window.__wkpiSlide||0)+1); }
 function wkpiPrev(){ wkpiGo((window.__wkpiSlide||0)-1); }
 
 
-// ===== OFFICIAL WEEKLY KPI PPTX (7-slide template matching attached report) =====
+// ===== OFFICIAL WEEKLY KPI PPTX — matches attached template + live dashboard theme =====
 function exportWeeklyKpiAsPptx(periodOpt){
   if(!pptxEnsureLib()){
     showToast('PowerPoint library (PptxGenJS) is not loaded. Please refresh the page and try again.','error');
@@ -4020,7 +4020,6 @@ function exportWeeklyKpiAsPptx(periodOpt){
   showToast('Building official Weekly HSE Statistics & KPI PowerPoint…','info');
 
   try{
-    // Optionally override week range from period picker
     var origGet = mblGetLastWeekRange;
     if(periodOpt && periodOpt.start && periodOpt.end){
       mblGetLastWeekRange = function(){ return { start: periodOpt.start, end: periodOpt.end }; };
@@ -4031,6 +4030,35 @@ function exportWeeklyKpiAsPptx(periodOpt){
     var fmt = function(n){ return (n==null||isNaN(n)) ? '0' : Number(n).toLocaleString('en-US'); };
     var pad2 = function(n){ n = Number(n)||0; return (n<10?'0':'')+n; };
 
+    // Live theme from dashboard (accent / header change with UI theme)
+    var tr = (typeof mblGetReportThemeColors === 'function') ? mblGetReportThemeColors() : null;
+    function hex(arr, fb){
+      if(!arr || arr.length < 3) return fb;
+      function p(n){ n=Math.max(0,Math.min(255,n|0)); return (n<16?'0':'')+n.toString(16); }
+      return (p(arr[0])+p(arr[1])+p(arr[2])).toUpperCase();
+    }
+    // Light professional template (matches attached PPTX) + themed accents
+    var C = {
+      bg: 'FFFFFF',
+      headerBar: hex(tr && (tr.header || tr.primary), '1A3A4A'),
+      headerText: 'FFFFFF',
+      card: 'E8E8E8',
+      cardAlt: 'F5F5F5',
+      accent: hex(tr && tr.accent, '00838F'),
+      accent2: hex(tr && tr.primary, '00695C'),
+      text: '000000',
+      label: '555555',
+      muted: '808080',
+      line: 'CCCCCC',
+      totalRow: hex(tr && tr.soft, 'E0F2F1'),
+      good: '2E7D32',
+      warn: 'EF6C00',
+      danger: 'C62828',
+      ptd: hex(tr && tr.accent, '5E35B1'),
+      white: 'FFFFFF',
+      darkCard: '333333'
+    };
+
     var pptx = pptxCreate();
     pptx.defineLayout({ name: 'MBL_WIDE', width: 13.333, height: 7.5 });
     pptx.layout = 'MBL_WIDE';
@@ -4038,229 +4066,206 @@ function exportWeeklyKpiAsPptx(periodOpt){
     pptx.title = 'Weekly HSE Statistics & KPI Report — ' + D.weekEndLabel;
     pptx.subject = 'Automotive Supplier Park | MBL';
 
-    var C = {
-      bg: '0B1520',
-      card: '132030',
-      accent: '0891B2',
-      accent2: '0D9488',
-      text: 'F1F5F9',
-      muted: '94A3B8',
-      good: '10B981',
-      warn: 'F59E0B',
-      danger: 'EF4444',
-      ptd: '8B5CF6',
-      white: 'FFFFFF',
-      line: '1E3A4A'
-    };
-
-    function addFooter(slide, page, total){
-      slide.addText('MBL · Automotive Supplier Park  |  Confidential HSE Report  |  Week Ending ' + D.weekEndLabel, {
-        x: 0.4, y: 7.15, w: 10.5, h: 0.25,
-        fontSize: 9, color: C.muted, fontFace: 'Calibri'
+    function addHeaderBar(slide, title){
+      slide.addShape(pptx.ShapeType.rect, {
+        x: 0, y: 0, w: 11.7, h: 0.72,
+        fill: { color: C.headerBar }
       });
-      slide.addText(page + ' / ' + total, {
-        x: 11.5, y: 7.15, w: 1.4, h: 0.25,
-        fontSize: 9, color: C.muted, fontFace: 'Calibri', align: 'right'
+      slide.addText(title, {
+        x: 0.35, y: 0.16, w: 11.0, h: 0.42,
+        fontSize: 18, fontFace: 'Calibri', color: C.headerText, bold: true, margin: 0
+      });
+      slide.addShape(pptx.ShapeType.rect, {
+        x: 11.7, y: 0, w: 1.633, h: 0.72,
+        fill: { color: C.accent }
       });
     }
 
-    function kpiBox(slide, x, y, w, h, label, value, sub, accentHex){
+    function addFooter(slide, page, total){
+      slide.addText('MBL · Automotive Supplier Park  |  Confidential HSE Report  |  Week Ending ' + D.weekEndLabel, {
+        x: 0.35, y: 7.18, w: 10.8, h: 0.22,
+        fontSize: 9, color: C.muted, fontFace: 'Calibri', margin: 0
+      });
+      slide.addText(page + ' / ' + total, {
+        x: 11.4, y: 7.18, w: 1.5, h: 0.22,
+        fontSize: 9, color: C.muted, fontFace: 'Calibri', align: 'right', margin: 0
+      });
+    }
+
+    function kpiBox(slide, x, y, w, h, label, value, sub){
       slide.addShape(pptx.ShapeType.roundRect, {
         x: x, y: y, w: w, h: h,
         fill: { color: C.card },
-        rectRadius: 0.08,
-        line: { color: accentHex || C.line, width: 1 }
+        rectRadius: 0.06,
+        line: { color: C.line, width: 0.5 }
       });
       slide.addText(label, {
-        x: x + 0.12, y: y + 0.1, w: w - 0.24, h: 0.28,
-        fontSize: 9, fontFace: 'Calibri', color: C.muted, bold: true, margin: 0
+        x: x + 0.12, y: y + 0.1, w: w - 0.24, h: 0.26,
+        fontSize: 10, fontFace: 'Calibri', color: C.label, bold: true, margin: 0
       });
       slide.addText(String(value), {
-        x: x + 0.12, y: y + 0.35, w: w - 0.24, h: 0.45,
+        x: x + 0.12, y: y + 0.36, w: w - 0.24, h: 0.42,
         fontSize: 22, fontFace: 'Calibri', color: C.text, bold: true, margin: 0
       });
       if(sub){
         slide.addText(sub, {
-          x: x + 0.12, y: y + 0.82, w: w - 0.24, h: 0.22,
+          x: x + 0.12, y: y + 0.8, w: w - 0.24, h: 0.2,
           fontSize: 9, fontFace: 'Calibri', color: C.muted, margin: 0
         });
       }
     }
 
-    // ========== SLIDE 1: COVER ==========
+    function sectionLabel(slide, x, y, w, text){
+      slide.addText(text, {
+        x: x, y: y, w: w, h: 0.28,
+        fontSize: 11, fontFace: 'Calibri', color: C.label, bold: true, margin: 0
+      });
+    }
+
+    var thOpt = { bold: true, color: C.white, fill: { color: C.headerBar }, align: 'center', valign: 'middle' };
+    var tdOpt = { color: C.text, align: 'center', valign: 'middle' };
+    var totOpt = { bold: true, color: C.text, fill: { color: C.totalRow }, align: 'center', valign: 'middle' };
+
+    // SLIDE 1: COVER
     var s1 = pptx.addSlide();
     s1.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
-    s1.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 0.12, h: 7.5, fill: { color: C.accent } });
-    s1.addText('MBL  ·  AUTOMOTIVE SUPPLIER PARK', {
-      x: 0.8, y: 1.8, w: 11.5, h: 0.35,
-      fontSize: 12, fontFace: 'Calibri', color: C.accent, bold: true, align: 'center', margin: 0
-    });
+    s1.addShape(pptx.ShapeType.rect, { x: 3.6, y: 0, w: 9.733, h: 7.5, fill: { color: C.cardAlt } });
+    s1.addShape(pptx.ShapeType.rect, { x: 3.6, y: 0, w: 0.12, h: 7.5, fill: { color: C.accent } });
+    s1.addShape(pptx.ShapeType.rect, { x: 1.5, y: 3.55, w: 10.3, h: 1.55, fill: { color: C.bg } });
     s1.addText('WEEKLY HSE STATISTICS\n& KPI REPORT', {
-      x: 0.8, y: 2.3, w: 11.5, h: 1.4,
-      fontSize: 36, fontFace: 'Calibri', color: C.text, bold: true, align: 'center', margin: 0
+      x: 1.5, y: 3.6, w: 10.3, h: 0.95,
+      fontSize: 32, fontFace: 'Calibri', color: C.text, bold: true, align: 'center', margin: 0
     });
-    s1.addText('Health, Safety & Environment Directorate', {
-      x: 0.8, y: 3.85, w: 11.5, h: 0.35,
-      fontSize: 14, fontFace: 'Calibri', color: C.accent2, align: 'center', margin: 0
-    });
-    s1.addShape(pptx.ShapeType.roundRect, {
-      x: 4.0, y: 4.5, w: 5.333, h: 0.7,
-      fill: { color: C.card }, rectRadius: 0.08,
-      line: { color: C.accent, width: 1 }
+    s1.addText('Automotive Supplier Park | MBL', {
+      x: 1.5, y: 4.55, w: 10.3, h: 0.28,
+      fontSize: 14, fontFace: 'Calibri', color: C.label, align: 'center', margin: 0
     });
     s1.addText('Week Ending:  ' + D.weekEndLabel, {
-      x: 4.0, y: 4.6, w: 5.333, h: 0.5,
-      fontSize: 14, fontFace: 'Calibri', color: C.text, bold: true, align: 'center', margin: 0
+      x: 1.5, y: 4.85, w: 10.3, h: 0.25,
+      fontSize: 13, fontFace: 'Calibri', color: C.muted, align: 'center', margin: 0
     });
-    s1.addText('Live operational data  ·  Automatically calculated from HSE registers  ·  Zero LTI Target', {
-      x: 0.8, y: 5.6, w: 11.5, h: 0.3,
+    s1.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.08, fill: { color: C.headerBar } });
+    s1.addText('MBL HSE Directorate  ·  Live data from site registers  ·  Zero LTI Target', {
+      x: 0.5, y: 6.9, w: 12.3, h: 0.28,
       fontSize: 11, fontFace: 'Calibri', color: C.muted, align: 'center', margin: 0
     });
-    addFooter(s1, 1, 7);
 
-    // ========== SLIDE 2: MANPOWER ==========
+    // SLIDE 2: MANPOWER
     var s2 = pptx.addSlide();
     s2.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
-    s2.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.55, fill: { color: C.card } });
-    s2.addText('MANPOWER & SAFE MANHOURS', {
-      x: 0.4, y: 0.12, w: 12.5, h: 0.35,
-      fontSize: 16, fontFace: 'Calibri', color: C.accent, bold: true, margin: 0
-    });
-    kpiBox(s2, 0.35, 0.75, 3.05, 1.15, 'MANPOWER THIS WEEK', fmt(D.manpower.manTW), 'Headcount', C.accent);
-    kpiBox(s2, 3.55, 0.75, 3.05, 1.15, 'SAFE MANHOURS THIS WEEK', fmt(D.manpower.mhTW), 'Hours', C.accent2);
-    kpiBox(s2, 6.75, 0.75, 3.05, 1.15, 'MANPOWER PROJECT TILL DATE', fmt(D.manpower.manPTD), 'PTD Cumulative', C.ptd);
-    kpiBox(s2, 9.95, 0.75, 3.05, 1.15, 'SAFE MANHOURS PROJECT TILL DATE', fmt(D.manpower.mhPTD), 'PTD Cumulative', C.ptd);
-
-    s2.addText('MANPOWER BY BUILDING (THIS WEEK vs PROJECT TILL DATE)', {
-      x: 0.4, y: 2.1, w: 12.5, h: 0.28,
-      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
-    });
-
-    var manTable = [
-      [
-        { text: 'Building', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-        { text: 'Manpower TW', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-        { text: 'Manpower PTD', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-        { text: 'Safe MH TW', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-        { text: 'Safe MH PTD', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
-      ]
-    ];
+    addHeaderBar(s2, 'MANPOWER & SAFE MANHOURS');
+    sectionLabel(s2, 0.35, 0.9, 12.5, 'MANPOWER STATUS');
+    kpiBox(s2, 0.35, 1.25, 3.05, 1.15, 'MANPOWER THIS WEEK', fmt(D.manpower.manTW), 'Headcount');
+    kpiBox(s2, 3.55, 1.25, 3.05, 1.15, 'MANPOWER TILL DATE', fmt(D.manpower.manPTD), 'PTD Cumulative');
+    kpiBox(s2, 6.75, 1.25, 3.05, 1.15, 'SAFE MANHOURS THIS WEEK', fmt(D.manpower.mhTW), 'Hours');
+    kpiBox(s2, 9.95, 1.25, 3.05, 1.15, 'SAFE MANHOURS TILL DATE', fmt(D.manpower.mhPTD), 'PTD Cumulative');
+    sectionLabel(s2, 0.35, 2.6, 12.5, 'MANPOWER BY BUILDING (THIS WEEK)');
+    var manTable = [[
+      { text: 'Building', options: thOpt },
+      { text: 'Manpower TW', options: thOpt },
+      { text: 'Manpower PTD', options: thOpt },
+      { text: 'Safe MH TW', options: thOpt },
+      { text: 'Safe MH PTD', options: thOpt }
+    ]];
     D.buildings.forEach(function(b){
       manTable.push([
-        b,
-        fmt(D.manpower.manByB[b]),
-        fmt(D.manpower.manPTDByB[b]),
-        fmt(D.manpower.mhByB[b]),
-        fmt(D.manpower.mhPTDByB[b])
+        { text: b, options: tdOpt },
+        { text: fmt(D.manpower.manByB[b]), options: tdOpt },
+        { text: fmt(D.manpower.manPTDByB[b]), options: tdOpt },
+        { text: fmt(D.manpower.mhByB[b]), options: tdOpt },
+        { text: fmt(D.manpower.mhPTDByB[b]), options: tdOpt }
       ]);
     });
     manTable.push([
-      { text: 'TOTAL', options: { bold: true } },
-      { text: fmt(D.manpower.manTW), options: { bold: true } },
-      { text: fmt(D.manpower.manPTD), options: { bold: true } },
-      { text: fmt(D.manpower.mhTW), options: { bold: true } },
-      { text: fmt(D.manpower.mhPTD), options: { bold: true } }
+      { text: 'TOTAL', options: totOpt },
+      { text: fmt(D.manpower.manTW), options: totOpt },
+      { text: fmt(D.manpower.manPTD), options: totOpt },
+      { text: fmt(D.manpower.mhTW), options: totOpt },
+      { text: fmt(D.manpower.mhPTD), options: totOpt }
     ]);
     s2.addTable(manTable, {
-      x: 0.35, y: 2.45, w: 12.6, colW: [2.6, 2.5, 2.5, 2.5, 2.5],
+      x: 0.35, y: 2.95, w: 12.6, colW: [2.6, 2.5, 2.5, 2.5, 2.5],
       border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
-      fontFace: 'Calibri', fontSize: 11, color: C.text,
-      align: 'center', valign: 'middle',
-      fill: { color: C.card }
+      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle'
     });
-    s2.addText('TW = This Week  |  PTD = Project Till Date (cumulative from project commencement)', {
-      x: 0.4, y: 5.5, w: 12.5, h: 0.25,
+    s2.addText('TW = This Week  |  PTD = Project Till Date', {
+      x: 0.35, y: 6.55, w: 12.5, h: 0.25,
       fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
     });
     addFooter(s2, 2, 7);
 
-    // ========== SLIDE 3: OBSERVATIONS ==========
+    // SLIDE 3: OBSERVATIONS
     var s3 = pptx.addSlide();
     s3.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
-    s3.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.55, fill: { color: C.card } });
-    s3.addText('HSE OBSERVATIONS', {
-      x: 0.4, y: 0.12, w: 12.5, h: 0.35,
-      fontSize: 16, fontFace: 'Calibri', color: C.accent, bold: true, margin: 0
-    });
-    kpiBox(s3, 0.35, 0.7, 3.05, 1.1, 'GOOD PRACTICES TW', fmt(D.observations.gpTW), 'Positive Observations', C.good);
-    kpiBox(s3, 3.55, 0.7, 3.05, 1.1, 'UNSAFE ACTS TW', fmt(D.observations.uaTW), 'UA Identified', C.warn);
-    kpiBox(s3, 6.75, 0.7, 3.05, 1.1, 'UNSAFE CONDITIONS TW', fmt(D.observations.ucTW), 'UC Identified', C.danger);
-    kpiBox(s3, 9.95, 0.7, 3.05, 1.1, 'TOTAL OBSERVATIONS TW', fmt(D.observations.totalTW), 'This Week', C.accent);
-
-    s3.addText('PROJECT TILL DATE (PTD) TOTALS', {
-      x: 0.4, y: 1.95, w: 12.5, h: 0.25,
-      fontSize: 11, fontFace: 'Calibri', color: C.ptd, bold: true, margin: 0
-    });
-    kpiBox(s3, 0.35, 2.25, 3.05, 0.95, 'GOOD PRACTICES PTD', fmt(D.observations.gpPTD), '', C.ptd);
-    kpiBox(s3, 3.55, 2.25, 3.05, 0.95, 'UNSAFE ACTS PTD', fmt(D.observations.uaPTD), '', C.ptd);
-    kpiBox(s3, 6.75, 2.25, 3.05, 0.95, 'UNSAFE CONDITIONS PTD', fmt(D.observations.ucPTD), '', C.ptd);
-    kpiBox(s3, 9.95, 2.25, 3.05, 0.95, 'TOTAL OBSERVATIONS PTD', fmt(D.observations.totalPTD), '', C.ptd);
-
-    s3.addText('OBSERVATIONS BY BUILDING (THIS WEEK)', {
-      x: 0.4, y: 3.4, w: 12.5, h: 0.25,
-      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
-    });
+    addHeaderBar(s3, 'HSE OBSERVATIONS');
+    sectionLabel(s3, 0.35, 0.9, 12.5, 'OBSERVATION SUMMARY');
+    kpiBox(s3, 0.35, 1.2, 3.05, 1.1, 'GOOD PRACTICES TW', fmt(D.observations.gpTW), 'Positive Observations');
+    kpiBox(s3, 3.55, 1.2, 3.05, 1.1, 'UNSAFE ACTS TW', fmt(D.observations.uaTW), 'UA Identified');
+    kpiBox(s3, 6.75, 1.2, 3.05, 1.1, 'UNSAFE CONDITIONS TW', fmt(D.observations.ucTW), 'UC Identified');
+    kpiBox(s3, 9.95, 1.2, 3.05, 1.1, 'TOTAL OBSERVATIONS', fmt(D.observations.totalTW), 'This Week');
+    sectionLabel(s3, 0.35, 2.5, 12.5, 'PROJECT TILL DATE (PTD) TOTALS');
+    kpiBox(s3, 0.35, 2.8, 3.05, 0.95, 'GOOD PRACTICES PTD', fmt(D.observations.gpPTD), '');
+    kpiBox(s3, 3.55, 2.8, 3.05, 0.95, 'UNSAFE ACTS PTD', fmt(D.observations.uaPTD), '');
+    kpiBox(s3, 6.75, 2.8, 3.05, 0.95, 'UNSAFE CONDITIONS PTD', fmt(D.observations.ucPTD), '');
+    kpiBox(s3, 9.95, 2.8, 3.05, 0.95, 'TOTAL OBSERVATIONS PTD', fmt(D.observations.totalPTD), '');
+    sectionLabel(s3, 0.35, 3.95, 12.5, 'OBSERVATIONS BY BUILDING (THIS WEEK)');
     var obsTable = [[
-      { text: 'Building', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Good Practice', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Unsafe Act', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Unsafe Cond.', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Critical', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Total', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
+      { text: 'Building', options: thOpt },
+      { text: 'Good Practice', options: thOpt },
+      { text: 'Unsafe Act', options: thOpt },
+      { text: 'Unsafe Cond.', options: thOpt },
+      { text: 'Critical', options: thOpt },
+      { text: 'Total', options: thOpt }
     ]];
     D.buildings.forEach(function(b){
       var o = D.observations.byB[b] || {gp:0,ua:0,uc:0,crit:0,total:0};
-      obsTable.push([b, pad2(o.gp), pad2(o.ua), pad2(o.uc), pad2(o.crit), String(o.total)]);
+      obsTable.push([
+        { text: b, options: tdOpt },
+        { text: pad2(o.gp), options: tdOpt },
+        { text: pad2(o.ua), options: tdOpt },
+        { text: pad2(o.uc), options: tdOpt },
+        { text: pad2(o.crit), options: tdOpt },
+        { text: String(o.total), options: tdOpt }
+      ]);
     });
     obsTable.push([
-      { text: 'TOTAL', options: { bold: true } },
-      { text: String(D.observations.gpTW), options: { bold: true } },
-      { text: String(D.observations.uaTW), options: { bold: true } },
-      { text: String(D.observations.ucTW), options: { bold: true } },
-      { text: String(D.observations.critTW), options: { bold: true } },
-      { text: String(D.observations.totalTW), options: { bold: true } }
+      { text: 'TOTAL', options: totOpt },
+      { text: String(D.observations.gpTW), options: totOpt },
+      { text: String(D.observations.uaTW), options: totOpt },
+      { text: String(D.observations.ucTW), options: totOpt },
+      { text: String(D.observations.critTW), options: totOpt },
+      { text: String(D.observations.totalTW), options: totOpt }
     ]);
     s3.addTable(obsTable, {
-      x: 0.35, y: 3.7, w: 12.6, colW: [2.4, 2.0, 2.0, 2.1, 2.0, 2.1],
+      x: 0.35, y: 4.25, w: 12.6, colW: [2.4, 2.0, 2.0, 2.1, 2.0, 2.1],
       border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
-      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle', fill: { color: C.card }
+      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle'
     });
     s3.addText('All observations closed / actioned as per HSE Observation Procedure  |  Critical items escalated to Project HSE Manager', {
-      x: 0.4, y: 6.55, w: 12.5, h: 0.25,
+      x: 0.35, y: 6.55, w: 12.5, h: 0.25,
       fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
     });
     addFooter(s3, 3, 7);
 
-    // ========== SLIDE 4: INCIDENTS ==========
+    // SLIDE 4: INCIDENTS
     var s4 = pptx.addSlide();
     s4.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
-    s4.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.55, fill: { color: C.card } });
-    s4.addText('INCIDENTS & NEAR MISSES', {
-      x: 0.4, y: 0.12, w: 12.5, h: 0.35,
-      fontSize: 16, fontFace: 'Calibri', color: C.accent, bold: true, margin: 0
-    });
-    kpiBox(s4, 0.35, 0.7, 3.05, 1.1, 'FIRST AID CASES TW', pad2(D.incidents.faTW), 'This Week', C.accent);
-    kpiBox(s4, 3.55, 0.7, 3.05, 1.1, 'PROPERTY DAMAGE TW', pad2(D.incidents.pdTW), 'This Week', C.accent);
-    kpiBox(s4, 6.75, 0.7, 3.05, 1.1, 'ENV. INCIDENTS TW', pad2(D.incidents.envTW), 'This Week', C.accent);
-    kpiBox(s4, 9.95, 0.7, 3.05, 1.1, 'NEAR MISSES TW', pad2(D.incidents.nmTW), 'This Week', C.accent);
-
-    s4.addText('YEAR TO DATE / PROJECT TILL DATE', {
-      x: 0.4, y: 2.0, w: 12.5, h: 0.25,
-      fontSize: 11, fontFace: 'Calibri', color: C.ptd, bold: true, margin: 0
-    });
-    kpiBox(s4, 0.35, 2.3, 3.05, 0.95, 'FIRST AID YTD', pad2(D.incidents.faYTD), '', C.ptd);
-    kpiBox(s4, 3.55, 2.3, 3.05, 0.95, 'PROPERTY DAMAGE YTD', pad2(D.incidents.pdYTD), '', C.ptd);
-    kpiBox(s4, 6.75, 2.3, 3.05, 0.95, 'ENV. INCIDENTS YTD', pad2(D.incidents.envYTD), '', C.ptd);
-    kpiBox(s4, 9.95, 2.3, 3.05, 0.95, 'NEAR MISSES YTD', pad2(D.incidents.nmYTD), '', C.ptd);
-
-    s4.addText('INCIDENT REGISTER SNAPSHOT', {
-      x: 0.4, y: 3.45, w: 12.5, h: 0.25,
-      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
-    });
+    addHeaderBar(s4, 'INCIDENTS & NEAR MISSES');
+    sectionLabel(s4, 0.35, 0.9, 12.5, 'INCIDENT PERFORMANCE SUMMARY');
+    kpiBox(s4, 0.35, 1.2, 3.05, 1.1, 'FIRST AID CASES TW', pad2(D.incidents.faTW), 'This Week');
+    kpiBox(s4, 3.55, 1.2, 3.05, 1.1, 'PROPERTY DAMAGE TW', pad2(D.incidents.pdTW), 'This Week');
+    kpiBox(s4, 6.75, 1.2, 3.05, 1.1, 'ENV. INCIDENTS TW', pad2(D.incidents.envTW), 'This Week');
+    kpiBox(s4, 9.95, 1.2, 3.05, 1.1, 'NEAR MISSES TW', pad2(D.incidents.nmTW), 'This Week');
+    sectionLabel(s4, 0.35, 2.5, 12.5, 'YEAR TO DATE / PROJECT TILL DATE');
+    kpiBox(s4, 0.35, 2.8, 3.05, 0.95, 'FIRST AID YTD', pad2(D.incidents.faYTD), '');
+    kpiBox(s4, 3.55, 2.8, 3.05, 0.95, 'PROPERTY DAMAGE YTD', pad2(D.incidents.pdYTD), '');
+    kpiBox(s4, 6.75, 2.8, 3.05, 0.95, 'ENV. INCIDENTS YTD', pad2(D.incidents.envYTD), '');
+    kpiBox(s4, 9.95, 2.8, 3.05, 0.95, 'NEAR MISSES YTD', pad2(D.incidents.nmYTD), '');
+    sectionLabel(s4, 0.35, 3.95, 12.5, 'INCIDENT REGISTER SNAPSHOT (THIS WEEK)');
     var incTable = [[
-      { text: 'Type', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Count This Week', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Count YTD / PTD', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
+      { text: 'Type', options: thOpt },
+      { text: 'Count TW', options: thOpt },
+      { text: 'Count YTD', options: thOpt }
     ]];
     [
       ['First Aid Case', D.incidents.faTW, D.incidents.faYTD],
@@ -4269,183 +4274,184 @@ function exportWeeklyKpiAsPptx(periodOpt){
       ['Near Miss', D.incidents.nmTW, D.incidents.nmYTD],
       ['LTI / RWC', D.incidents.ltiTW, D.incidents.ltiYTD]
     ].forEach(function(r){
-      incTable.push([r[0], pad2(r[1]), pad2(r[2])]);
+      incTable.push([
+        { text: r[0], options: tdOpt },
+        { text: pad2(r[1]), options: tdOpt },
+        { text: pad2(r[2]), options: tdOpt }
+      ]);
     });
     s4.addTable(incTable, {
-      x: 0.35, y: 3.8, w: 12.6, colW: [5.0, 3.8, 3.8],
+      x: 0.35, y: 4.3, w: 12.6, colW: [5.0, 3.8, 3.8],
       border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
-      fontFace: 'Calibri', fontSize: 12, color: C.text, align: 'center', valign: 'middle', fill: { color: C.card }
+      fontFace: 'Calibri', fontSize: 12, color: C.text, align: 'center', valign: 'middle'
     });
-    s4.addText('Zero LTI Target  |  All incidents reported within 24 hours  |  Investigation reports filed as per procedure', {
-      x: 0.4, y: 6.55, w: 12.5, h: 0.25,
+    s4.addText('Zero LTI Target  |  All incidents reported within 24 hrs  |  Investigation reports filed as per procedure', {
+      x: 0.35, y: 6.55, w: 12.5, h: 0.25,
       fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
     });
     addFooter(s4, 4, 7);
 
-    // ========== SLIDE 5: PTW ==========
+    // SLIDE 5: PTW
     var s5 = pptx.addSlide();
     s5.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
-    s5.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.55, fill: { color: C.card } });
-    s5.addText('PERMIT TO WORK (PTW) REGISTER', {
-      x: 0.4, y: 0.12, w: 12.5, h: 0.35,
-      fontSize: 16, fontFace: 'Calibri', color: C.accent, bold: true, margin: 0
-    });
-    kpiBox(s5, 0.35, 0.7, 3.05, 1.1, 'PERMITS THIS WEEK', fmt(D.ptw.totalTW), 'Total Issued', C.accent);
-    kpiBox(s5, 3.55, 0.7, 3.05, 1.1, 'PERMITS PROJECT TILL DATE', fmt(D.ptw.totalPTD), 'PTD Cumulative', C.ptd);
-    kpiBox(s5, 6.75, 0.7, 3.05, 1.1, 'DAY SHIFT PERMITS', fmt(D.ptw.day), 'This Week', C.accent);
-    kpiBox(s5, 9.95, 0.7, 3.05, 1.1, 'NIGHT SHIFT PERMITS', fmt(D.ptw.night), 'This Week', C.accent);
-
-    s5.addText('PERMITS BY BUILDING (THIS WEEK)', {
-      x: 0.4, y: 2.05, w: 12.5, h: 0.25,
-      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
-    });
+    addHeaderBar(s5, 'PERMIT TO WORK (PTW) REGISTER');
+    sectionLabel(s5, 0.35, 0.9, 12.5, 'PTW ISSUANCE SUMMARY');
+    kpiBox(s5, 0.35, 1.2, 3.05, 1.1, 'PERMITS THIS WEEK', fmt(D.ptw.totalTW), 'Total Issued');
+    kpiBox(s5, 3.55, 1.2, 3.05, 1.1, 'PERMITS TILL DATE', fmt(D.ptw.totalPTD), 'PTD Cumulative');
+    kpiBox(s5, 6.75, 1.2, 3.05, 1.1, 'DAY SHIFT PERMITS', fmt(D.ptw.day), 'This Week');
+    kpiBox(s5, 9.95, 1.2, 3.05, 1.1, 'NIGHT SHIFT PERMITS', fmt(D.ptw.night), 'This Week');
+    sectionLabel(s5, 0.35, 2.55, 12.5, 'PERMITS BY BUILDING (THIS WEEK)');
     var ptwTotDay = 0, ptwTotNight = 0, ptwTotHot = 0, ptwTotCs = 0, ptwTotOther = 0;
     var ptwTable = [[
-      { text: 'Building', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Total TW', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Day Shift', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Night Shift', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Hot Work', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Confined Space', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Other', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
+      { text: 'Building', options: thOpt },
+      { text: 'Total TW', options: thOpt },
+      { text: 'Day Shift', options: thOpt },
+      { text: 'Night Shift', options: thOpt },
+      { text: 'Hot Work', options: thOpt },
+      { text: 'Confined Space', options: thOpt },
+      { text: 'Other', options: thOpt }
     ]];
     D.buildings.forEach(function(b){
       var p = D.ptw.byB[b] || {total:0,day:0,night:0,hot:0,cs:0,other:0};
       ptwTotDay += p.day; ptwTotNight += p.night; ptwTotHot += p.hot; ptwTotCs += p.cs; ptwTotOther += p.other;
-      ptwTable.push([b, String(p.total), String(p.day), String(p.night), String(p.hot), String(p.cs), String(p.other)]);
+      ptwTable.push([
+        { text: b, options: tdOpt },
+        { text: String(p.total), options: tdOpt },
+        { text: String(p.day), options: tdOpt },
+        { text: String(p.night), options: tdOpt },
+        { text: String(p.hot), options: tdOpt },
+        { text: String(p.cs), options: tdOpt },
+        { text: String(p.other), options: tdOpt }
+      ]);
     });
     ptwTable.push([
-      { text: 'TOTAL', options: { bold: true } },
-      { text: String(D.ptw.totalTW), options: { bold: true } },
-      { text: String(ptwTotDay), options: { bold: true } },
-      { text: String(ptwTotNight), options: { bold: true } },
-      { text: String(ptwTotHot), options: { bold: true } },
-      { text: String(ptwTotCs), options: { bold: true } },
-      { text: String(ptwTotOther), options: { bold: true } }
+      { text: 'TOTAL', options: totOpt },
+      { text: String(D.ptw.totalTW), options: totOpt },
+      { text: String(ptwTotDay), options: totOpt },
+      { text: String(ptwTotNight), options: totOpt },
+      { text: String(ptwTotHot), options: totOpt },
+      { text: String(ptwTotCs), options: totOpt },
+      { text: String(ptwTotOther), options: totOpt }
     ]);
     s5.addTable(ptwTable, {
-      x: 0.35, y: 2.4, w: 12.6, colW: [2.2, 1.7, 1.7, 1.8, 1.7, 2.0, 1.5],
+      x: 0.35, y: 2.9, w: 12.6, colW: [2.2, 1.7, 1.7, 1.8, 1.7, 2.0, 1.5],
       border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
-      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle', fill: { color: C.card }
+      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle'
     });
-    s5.addText('Key Controls: All PTWs reviewed & authorized by competent persons. Hot Work & Confined Space permits subject to additional gas testing & fire watch. Permit audits conducted weekly.\nPTW system compliance monitored via daily checks and weekly HSE inspections.', {
-      x: 0.4, y: 5.7, w: 12.5, h: 0.7,
+    s5.addText('Key Controls: All PTWs reviewed & authorized by competent persons. Hot Work & Confined Space permits subject to additional gas testing & fire watch. Permit audits conducted weekly. Non-conformances raised and closed within defined timelines.\nPTW system compliance monitored via daily checks and weekly HSE inspections.', {
+      x: 0.35, y: 5.9, w: 12.5, h: 0.7,
       fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
     });
     addFooter(s5, 5, 7);
 
-    // ========== SLIDE 6: EQUIPMENT ==========
+    // SLIDE 6: EQUIPMENT
     var s6 = pptx.addSlide();
     s6.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
-    s6.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.55, fill: { color: C.card } });
-    s6.addText('EQUIPMENT DETAILS', {
-      x: 0.4, y: 0.12, w: 12.5, h: 0.35,
-      fontSize: 16, fontFace: 'Calibri', color: C.accent, bold: true, margin: 0
-    });
-    kpiBox(s6, 0.35, 0.7, 4.1, 1.1, 'TOTAL EQUIPMENT', fmt(D.equipment.total), 'Active on Site', C.accent);
-    kpiBox(s6, 4.6, 0.7, 4.1, 1.1, 'HIGHEST EQUIPMENT TYPE', D.equipment.highest, 'Most Deployed', C.accent2);
-    kpiBox(s6, 8.85, 0.7, 4.1, 1.1, 'CERTIFIED / INSPECTED', D.equipment.certPct + '%', 'Compliance Rate', C.good);
-
-    s6.addText('EQUIPMENT BY BUILDING', {
-      x: 0.4, y: 2.05, w: 12.5, h: 0.25,
-      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
-    });
-    var eqTable = [[
-      { text: 'Building', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Mobile Crane', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Excavator', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'MEWP / Boom', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Forklift', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Generator', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Total', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
-    ]];
+    addHeaderBar(s6, 'EQUIPMENT DETAILS');
+    sectionLabel(s6, 0.35, 0.9, 12.5, 'PLANT & EQUIPMENT STATUS');
+    kpiBox(s6, 0.35, 1.2, 4.1, 1.1, 'TOTAL EQUIPMENT THIS WEEK', fmt(D.equipment.total), 'Active on Site');
+    kpiBox(s6, 4.6, 1.2, 4.1, 1.1, 'HIGHEST EQUIPMENT TYPE', D.equipment.highest, 'Most Deployed');
+    kpiBox(s6, 8.85, 1.2, 4.1, 1.1, 'CERTIFIED / INSPECTED', D.equipment.certPct + '%', 'Compliance Rate');
+    sectionLabel(s6, 0.35, 2.55, 12.5, 'EQUIPMENT BY BUILDING (THIS WEEK)');
     var eqTypeTotals = D.equipment.types.map(function(t){ return D.equipment.typeTotals[t]||0; });
+    var eqTable = [[
+      { text: 'Building', options: thOpt },
+      { text: 'Mobile Crane', options: thOpt },
+      { text: 'Excavator', options: thOpt },
+      { text: 'MEWP / Boom', options: thOpt },
+      { text: 'Forklift', options: thOpt },
+      { text: 'Generator', options: thOpt },
+      { text: 'Total', options: thOpt }
+    ]];
     D.buildings.forEach(function(b){
       var e = D.equipment.byB[b] || {};
-      eqTable.push([b].concat(D.equipment.types.map(function(t){ return String(e[t]||0); })).concat([String(e.Total||0)]));
+      var row = [{ text: b, options: tdOpt }];
+      D.equipment.types.forEach(function(t){ row.push({ text: String(e[t]||0), options: tdOpt }); });
+      row.push({ text: String(e.Total||0), options: tdOpt });
+      eqTable.push(row);
     });
-    eqTable.push([
-      { text: 'TOTAL', options: { bold: true } }
-    ].concat(eqTypeTotals.map(function(v){ return { text: String(v), options: { bold: true } }; })).concat([
-      { text: String(D.equipment.total), options: { bold: true } }
-    ]));
+    var totRow = [{ text: 'TOTAL', options: totOpt }];
+    eqTypeTotals.forEach(function(v){ totRow.push({ text: String(v), options: totOpt }); });
+    totRow.push({ text: String(D.equipment.total), options: totOpt });
+    eqTable.push(totRow);
     s6.addTable(eqTable, {
-      x: 0.35, y: 2.4, w: 12.6, colW: [2.2, 1.7, 1.7, 1.9, 1.7, 1.7, 1.7],
+      x: 0.35, y: 2.9, w: 12.6, colW: [2.2, 1.7, 1.7, 1.9, 1.7, 1.7, 1.7],
       border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
-      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle', fill: { color: C.card }
+      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle'
     });
-    s6.addText('All lifting equipment and MEWPs hold valid LOLER / third-party certification. Daily pre-use checks completed and logged. Defects quarantined pending repair.\nEquipment register maintained and updated weekly  |  No unauthorized plant permitted on site. Highest volume: ' + D.equipment.highest + '.', {
-      x: 0.4, y: 5.7, w: 12.5, h: 0.7,
+    s6.addText('All lifting equipment and MEWPs hold valid LOLER / third-party certification. Daily pre-use checks completed and logged. Defects reported via equipment inspection checklist and quarantined pending repair. Highest volume equipment: ' + D.equipment.highest + '.\nEquipment register maintained and updated weekly  |  No unauthorized plant permitted on site.', {
+      x: 0.35, y: 5.9, w: 12.5, h: 0.7,
       fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
     });
     addFooter(s6, 6, 7);
 
-    // ========== SLIDE 7: DRILLS & TRAINING ==========
+    // SLIDE 7: DRILLS & TRAINING
     var s7 = pptx.addSlide();
     s7.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
-    s7.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.55, fill: { color: C.card } });
-    s7.addText('HSE DRILLS, CAMPAIGNS & TRAINING', {
-      x: 0.4, y: 0.12, w: 12.5, h: 0.35,
-      fontSize: 16, fontFace: 'Calibri', color: C.accent, bold: true, margin: 0
-    });
-
-    // Left column - Drills
-    s7.addText('DRILLS & CAMPAIGNS', {
-      x: 0.4, y: 0.7, w: 6.0, h: 0.25,
-      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
-    });
-    kpiBox(s7, 0.35, 1.0, 3.0, 0.95, 'DRILLS THIS WEEK', String(D.drills.drillTW), '', C.accent);
-    kpiBox(s7, 3.5, 1.0, 3.0, 0.95, 'DRILLS PTD', String(D.drills.drillPTD), '', C.ptd);
-    kpiBox(s7, 0.35, 2.1, 3.0, 0.95, 'CAMPAIGNS THIS WEEK', String(D.drills.campTW), '', C.accent);
-    kpiBox(s7, 3.5, 2.1, 3.0, 0.95, 'CAMPAIGNS PTD', String(D.drills.campPTD), '', C.ptd);
-
+    addHeaderBar(s7, 'HSE DRILLS, CAMPAIGNS & TRAINING');
+    sectionLabel(s7, 0.35, 0.9, 6.0, 'DRILLS & CAMPAIGNS');
+    kpiBox(s7, 0.35, 1.2, 3.0, 0.95, 'DRILLS THIS WEEK', String(D.drills.drillTW), '');
+    kpiBox(s7, 3.5, 1.2, 3.0, 0.95, 'DRILLS TILL DATE', String(D.drills.drillPTD), '');
+    kpiBox(s7, 0.35, 2.3, 3.0, 0.95, 'CAMPAIGNS THIS WEEK', String(D.drills.campTW), '');
+    kpiBox(s7, 3.5, 2.3, 3.0, 0.95, 'CAMPAIGNS TILL DATE', String(D.drills.campPTD), '');
     var drillTable = [[
-      { text: 'Building', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Drills', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Campaigns', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
+      { text: 'Building', options: thOpt },
+      { text: 'Drills', options: thOpt },
+      { text: 'Campaigns', options: thOpt }
     ]];
     D.buildings.forEach(function(b){
       var d = D.drills.byB[b] || {drills:0,campaigns:0};
-      drillTable.push([b, String(d.drills), String(d.campaigns)]);
+      drillTable.push([
+        { text: b, options: tdOpt },
+        { text: String(d.drills), options: tdOpt },
+        { text: String(d.campaigns), options: tdOpt }
+      ]);
     });
     s7.addTable(drillTable, {
-      x: 0.35, y: 3.25, w: 6.15, colW: [2.5, 1.8, 1.85],
+      x: 0.35, y: 3.45, w: 6.15, colW: [2.5, 1.8, 1.85],
       border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
-      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle', fill: { color: C.card }
+      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle'
     });
-
-    // Right column - Training
-    s7.addText('TRAINING & INDUCTIONS', {
-      x: 6.9, y: 0.7, w: 6.0, h: 0.25,
-      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
-    });
-    kpiBox(s7, 6.85, 1.0, 3.0, 0.95, 'TRAINING SESSIONS TW', String(D.training.sessTW), '', C.accent);
-    kpiBox(s7, 10.0, 1.0, 3.0, 0.95, 'TRAINING HOURS TW', fmt(D.training.hoursTW), '', C.accent);
-    kpiBox(s7, 6.85, 2.1, 3.0, 0.95, 'INDUCTIONS THIS WEEK', String(D.training.indTW), '', C.accent);
-    kpiBox(s7, 10.0, 2.1, 3.0, 0.95, 'INDUCTIONS PTD', fmt(D.training.indPTD), '', C.ptd);
-
+    sectionLabel(s7, 6.9, 0.9, 6.0, 'TRAINING & INDUCTIONS');
+    kpiBox(s7, 6.85, 1.2, 3.0, 0.95, 'TRAINING SESSIONS TW', String(D.training.sessTW), '');
+    kpiBox(s7, 10.0, 1.2, 3.0, 0.95, 'TRAINING HOURS TW', fmt(D.training.hoursTW), '');
+    kpiBox(s7, 6.85, 2.3, 3.0, 0.95, 'INDUCTIONS THIS WEEK', String(D.training.indTW), '');
+    kpiBox(s7, 10.0, 2.3, 3.0, 0.95, 'INDUCTIONS TILL DATE', fmt(D.training.indPTD), '');
+    sectionLabel(s7, 6.9, 3.4, 6.0, 'TRAINING PERFORMANCE (PTD)');
     var trainTable = [[
-      { text: 'Metric', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'This Week', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
-      { text: 'Project Till Date', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
+      { text: 'Metric', options: thOpt },
+      { text: 'This Week', options: thOpt },
+      { text: 'Till Date', options: thOpt }
     ]];
-    trainTable.push(['Sessions Conducted', String(D.training.sessTW), fmt(D.training.sessPTD)]);
-    trainTable.push(['Total Training Hours', fmt(D.training.hoursTW), fmt(D.training.hoursPTD)]);
-    trainTable.push(['Personnel Trained', fmt(D.training.persTW), fmt(D.training.persPTD)]);
-    trainTable.push(['Inductions Completed', String(D.training.indTW), fmt(D.training.indPTD)]);
-    s7.addTable(trainTable, {
-      x: 6.85, y: 3.25, w: 6.15, colW: [2.5, 1.7, 1.95],
-      border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
-      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle', fill: { color: C.card }
+    [
+      ['Sessions Conducted', D.training.sessTW, D.training.sessPTD],
+      ['Total Training Hours', D.training.hoursTW, D.training.hoursPTD],
+      ['Personnel Trained', D.training.persTW, D.training.persPTD],
+      ['Inductions Completed', D.training.indTW, D.training.indPTD]
+    ].forEach(function(r){
+      trainTable.push([
+        { text: r[0], options: tdOpt },
+        { text: fmt(r[1]), options: tdOpt },
+        { text: fmt(r[2]), options: tdOpt }
+      ]);
     });
-
-    s7.addText('All drills documented with attendance & lessons learned. Training matrix maintained current. New starters inducted prior to site access.', {
-      x: 0.4, y: 5.85, w: 12.5, h: 0.35,
+    s7.addTable(trainTable, {
+      x: 6.85, y: 3.75, w: 6.15, colW: [2.5, 1.7, 1.95],
+      border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
+      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle'
+    });
+    s7.addText('All drills documented with attendance & lessons learned. Training matrix maintained current. New starters inducted prior to site access. Campaign topics aligned to current site risks (e.g. lifting, working at height, vehicle-pedestrian interface).', {
+      x: 0.35, y: 5.85, w: 12.5, h: 0.4,
       fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
     });
+    s7.addShape(pptx.ShapeType.roundRect, {
+      x: 4.5, y: 6.35, w: 4.3, h: 0.55,
+      fill: { color: C.darkCard },
+      rectRadius: 0.06
+    });
     s7.addText('Thank You', {
-      x: 0.4, y: 6.35, w: 12.5, h: 0.4,
-      fontSize: 20, fontFace: 'Calibri', color: C.accent, bold: true, align: 'center', margin: 0
+      x: 4.5, y: 6.42, w: 4.3, h: 0.42,
+      fontSize: 18, fontFace: 'Calibri', color: C.white, bold: true, align: 'center', margin: 0
     });
     addFooter(s7, 7, 7);
 
