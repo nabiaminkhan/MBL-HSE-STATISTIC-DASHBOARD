@@ -2751,56 +2751,137 @@ body[data-theme="black"] #mblTechBgRoot .mbl-tech-bg{opacity:0.75;}
 .ot-del:hover { background: rgba(239,83,80,0.28); }
 
 
-/* ===== WEEKLY KPI PRESENTATION ===== */
-.wkpi-presentation{display:flex;flex-direction:column;height:100%;min-height:0;background:linear-gradient(160deg,#0d1b2a 0%,#1b2838 50%,#0f2027 100%);}
-.wkpi-toolbar{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:rgba(0,0,0,0.35);border-bottom:1px solid rgba(0,188,212,0.25);flex-shrink:0;}
-.wkpi-toolbar-left{font-size:13px;color:#b0bec5;}
-.wkpi-toolbar-left strong{color:#4dd0e1;}
-.wkpi-toolbar-right{display:flex;align-items:center;gap:8px;}
-.wkpi-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#e0f7fa;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;}
-.wkpi-btn:hover{background:rgba(0,188,212,0.2);border-color:rgba(0,188,212,0.4);}
-.wkpi-btn.accent{background:rgba(102,187,106,0.2);border-color:rgba(102,187,106,0.45);color:#a5d6a7;}
-.wkpi-page{font-size:12px;color:#90a4ae;min-width:48px;text-align:center;}
-.wkpi-stage{flex:1;overflow:auto;position:relative;padding:12px;}
-.wkpi-slide{display:none;animation:wkpiFade .35s ease;}
-.wkpi-slide.active{display:block;}
-@keyframes wkpiFade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
-.wkpi-cover{height:100%;min-height:520px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;}
-.wkpi-cover-badge{background:linear-gradient(135deg,#00bcd4,#00897b);color:#fff;font-size:12px;font-weight:700;letter-spacing:2px;padding:6px 18px;border-radius:20px;margin-bottom:28px;}
-.wkpi-cover h1{font-size:2.6rem;font-weight:800;line-height:1.2;color:#e0f7fa;margin:0 0 16px;letter-spacing:-0.5px;}
-.wkpi-cover-sub{font-size:1.15rem;color:#80cbc4;margin-bottom:24px;}
-.wkpi-cover-week{font-size:1.05rem;color:#b0bec5;background:rgba(0,188,212,0.1);padding:10px 22px;border-radius:10px;border:1px solid rgba(0,188,212,0.25);}
-.wkpi-cover-note{margin-top:32px;font-size:12px;color:#78909c;}
-.wkpi-slide-header{font-size:1.35rem;font-weight:700;color:#4dd0e1;margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid rgba(0,188,212,0.3);display:flex;align-items:center;gap:10px;}
-.wkpi-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
-.wkpi-kpi-row.secondary{grid-template-columns:repeat(4,1fr);margin-bottom:14px;}
-.wkpi-kpi-row.compact{grid-template-columns:repeat(2,1fr);}
-.wkpi-kpi{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 16px;text-align:center;}
-.wkpi-kpi.good{border-color:rgba(102,187,106,0.35);background:rgba(102,187,106,0.08);}
-.wkpi-kpi.warn{border-color:rgba(255,183,77,0.35);background:rgba(255,183,77,0.08);}
-.wkpi-kpi.danger{border-color:rgba(239,83,80,0.35);background:rgba(239,83,80,0.08);}
-.wkpi-kpi-label{font-size:10px;font-weight:700;letter-spacing:0.6px;color:#90a4ae;text-transform:uppercase;margin-bottom:6px;}
-.wkpi-kpi-val{font-size:1.85rem;font-weight:800;color:#e0f7fa;line-height:1.1;}
-.wkpi-kpi-sub{font-size:11px;color:#78909c;margin-top:4px;}
-.wkpi-kpi-sm{background:rgba(255,255,255,0.03);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#b0bec5;}
-.wkpi-kpi-sm strong{color:#4dd0e1;font-size:15px;}
-.wkpi-section-title{font-size:12px;font-weight:700;letter-spacing:0.8px;color:#80cbc4;margin:12px 0 8px;text-transform:uppercase;}
-.wkpi-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px;}
-.wkpi-table th{background:rgba(0,188,212,0.15);color:#4dd0e1;padding:8px 10px;text-align:left;font-weight:700;border-bottom:1px solid rgba(0,188,212,0.25);}
-.wkpi-table td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,0.05);color:#cfd8dc;}
-.wkpi-table tr.wkpi-total td{font-weight:700;background:rgba(0,188,212,0.08);color:#e0f7fa;}
-.wkpi-footnote{font-size:11px;color:#78909c;line-height:1.5;margin-top:8px;padding:8px 0;}
-.wkpi-chart-wrap{height:180px;margin-top:12px;position:relative;}
-.wkpi-two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-.wkpi-thankyou{text-align:center;font-size:1.6rem;font-weight:700;color:#4dd0e1;margin-top:28px;letter-spacing:1px;}
-.wkpi-dots{display:flex;justify-content:center;gap:8px;padding:12px;flex-shrink:0;}
-.wkpi-dot{width:10px;height:10px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);cursor:pointer;padding:0;transition:all .2s;}
-.wkpi-dot.active{background:#00bcd4;transform:scale(1.25);}
-@media(max-width:900px){
-  .wkpi-kpi-row{grid-template-columns:repeat(2,1fr);}
-  .wkpi-two-col{grid-template-columns:1fr;}
-  .wkpi-cover h1{font-size:1.8rem;}
+
+/* ===== WEEKLY KPI PRESENTATION — EXECUTIVE GRADE ===== */
+.wkpi-presentation{
+  display:flex;flex-direction:column;height:100%;min-height:0;
+  background:linear-gradient(165deg,#0a1628 0%,#122033 45%,#0d1a24 100%);
+  font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
+  color:#e8eef4;
+  letter-spacing:0.01em;
 }
+.wkpi-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 22px;flex-shrink:0;
+  background:rgba(6,14,24,0.85);
+  border-bottom:1px solid rgba(0,188,212,0.22);
+  backdrop-filter:blur(12px);
+}
+.wkpi-toolbar-left{font-size:13px;font-weight:500;color:#94a3b8;letter-spacing:0.02em;}
+.wkpi-toolbar-left strong{color:#22d3ee;font-weight:700;}
+.wkpi-toolbar-right{display:flex;align-items:center;gap:10px;}
+.wkpi-btn{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(148,163,184,0.25);
+  color:#e2e8f0;padding:8px 16px;border-radius:8px;cursor:pointer;
+  font-size:12px;font-weight:600;letter-spacing:0.03em;transition:all .2s;
+}
+.wkpi-btn:hover{background:rgba(34,211,238,0.12);border-color:rgba(34,211,238,0.4);color:#a5f3fc;}
+.wkpi-btn.accent{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.4);color:#6ee7b7;}
+.wkpi-btn.accent:hover{background:rgba(16,185,129,0.25);}
+.wkpi-page{font-size:12px;font-weight:600;color:#94a3b8;min-width:52px;text-align:center;}
+.wkpi-stage{flex:1;overflow:auto;position:relative;padding:20px 24px 16px;}
+.wkpi-slide{display:none;animation:wkpiFade .4s ease;max-width:1180px;margin:0 auto;}
+.wkpi-slide.active{display:block;}
+@keyframes wkpiFade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+/* Cover */
+.wkpi-cover{
+  min-height:560px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:48px 32px;
+  background:radial-gradient(ellipse at 50% 30%,rgba(34,211,238,0.08) 0%,transparent 60%);
+}
+.wkpi-cover-badge{
+  background:linear-gradient(135deg,#0891b2,#0d9488);color:#fff;
+  font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  padding:7px 20px;border-radius:24px;margin-bottom:32px;
+  box-shadow:0 4px 20px rgba(8,145,178,0.35);
+}
+.wkpi-cover h1{
+  font-size:2.75rem;font-weight:800;line-height:1.15;color:#f1f5f9;
+  margin:0 0 18px;letter-spacing:-0.4px;
+}
+.wkpi-cover-sub{font-size:1.2rem;font-weight:500;color:#5eead4;margin-bottom:28px;letter-spacing:0.03em;}
+.wkpi-cover-week{
+  font-size:1.05rem;color:#cbd5e1;background:rgba(15,23,42,0.6);
+  padding:12px 28px;border-radius:10px;border:1px solid rgba(34,211,238,0.28);
+}
+.wkpi-cover-week strong{color:#22d3ee;font-weight:700;}
+.wkpi-cover-note{margin-top:36px;font-size:12px;font-weight:500;color:#64748b;letter-spacing:0.04em;}
+
+/* Headers & sections */
+.wkpi-slide-header{
+  font-size:1.4rem;font-weight:700;color:#22d3ee;margin-bottom:22px;
+  padding-bottom:12px;border-bottom:2px solid rgba(34,211,238,0.28);
+  display:flex;align-items:center;gap:12px;letter-spacing:0.02em;
+}
+.wkpi-section-title{
+  font-size:11px;font-weight:700;letter-spacing:1.2px;color:#5eead4;
+  margin:18px 0 10px;text-transform:uppercase;
+}
+.wkpi-section-title.ptd{color:#a78bfa;margin-top:22px;}
+
+/* KPI cards */
+.wkpi-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:8px;}
+.wkpi-kpi-row.secondary{grid-template-columns:repeat(4,1fr);margin:14px 0 6px;}
+.wkpi-kpi-row.compact{grid-template-columns:repeat(2,1fr);gap:12px;}
+.wkpi-kpi{
+  background:linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015));
+  border:1px solid rgba(148,163,184,0.12);border-radius:14px;
+  padding:16px 14px;text-align:center;
+  box-shadow:0 2px 12px rgba(0,0,0,0.15);
+}
+.wkpi-kpi.good{border-color:rgba(16,185,129,0.35);background:linear-gradient(145deg,rgba(16,185,129,0.1),rgba(16,185,129,0.03));}
+.wkpi-kpi.warn{border-color:rgba(245,158,11,0.35);background:linear-gradient(145deg,rgba(245,158,11,0.1),rgba(245,158,11,0.03));}
+.wkpi-kpi.danger{border-color:rgba(239,68,68,0.35);background:linear-gradient(145deg,rgba(239,68,68,0.1),rgba(239,68,68,0.03));}
+.wkpi-kpi.ptd-card{border-color:rgba(167,139,250,0.3);background:linear-gradient(145deg,rgba(167,139,250,0.08),rgba(167,139,250,0.02));}
+.wkpi-kpi-label{font-size:10px;font-weight:700;letter-spacing:0.8px;color:#94a3b8;text-transform:uppercase;margin-bottom:8px;}
+.wkpi-kpi-val{font-size:1.9rem;font-weight:800;color:#f8fafc;line-height:1.1;font-variant-numeric:tabular-nums;}
+.wkpi-kpi-sub{font-size:11px;font-weight:500;color:#64748b;margin-top:5px;}
+.wkpi-kpi-sm{
+  background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.1);border-radius:10px;
+  padding:12px 14px;display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;font-weight:500;color:#94a3b8;
+}
+.wkpi-kpi-sm strong{color:#c4b5fd;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;}
+
+/* Tables */
+.wkpi-table{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;margin-bottom:8px;border-radius:10px;overflow:hidden;}
+.wkpi-table th{
+  background:rgba(8,145,178,0.18);color:#67e8f9;padding:10px 12px;text-align:left;
+  font-weight:700;font-size:11px;letter-spacing:0.5px;text-transform:uppercase;
+  border-bottom:1px solid rgba(34,211,238,0.2);
+}
+.wkpi-table td{padding:9px 12px;border-bottom:1px solid rgba(148,163,184,0.07);color:#cbd5e1;font-weight:500;font-variant-numeric:tabular-nums;}
+.wkpi-table tr:last-child td{border-bottom:none;}
+.wkpi-table tr.wkpi-total td{font-weight:700;background:rgba(8,145,178,0.1);color:#f1f5f9;}
+.wkpi-table tr:hover td{background:rgba(255,255,255,0.02);}
+
+.wkpi-footnote{font-size:11px;font-weight:500;color:#64748b;line-height:1.55;margin-top:10px;padding:8px 0;}
+.wkpi-chart-wrap{
+  height:240px;margin-top:18px;position:relative;
+  background:rgba(15,23,42,0.4);border:1px solid rgba(148,163,184,0.1);
+  border-radius:12px;padding:12px 16px 8px;
+}
+.wkpi-chart-wrap.tall{height:280px;}
+.wkpi-two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+.wkpi-thankyou{text-align:center;font-size:1.7rem;font-weight:700;color:#22d3ee;margin-top:32px;letter-spacing:1.5px;}
+.wkpi-dots{display:flex;justify-content:center;gap:9px;padding:14px;flex-shrink:0;}
+.wkpi-dot{width:9px;height:9px;border-radius:50%;border:none;background:rgba(148,163,184,0.3);cursor:pointer;padding:0;transition:all .2s;}
+.wkpi-dot.active{background:#22d3ee;transform:scale(1.3);box-shadow:0 0 10px rgba(34,211,238,0.5);}
+.wkpi-ptd-banner{
+  display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:1px;
+  color:#a78bfa;text-transform:uppercase;margin:16px 0 8px;
+  padding:6px 0;border-bottom:1px solid rgba(167,139,250,0.2);
+}
+.wkpi-ptd-banner i{font-size:12px;}
+
+@media(max-width:960px){
+  .wkpi-kpi-row,.wkpi-kpi-row.secondary{grid-template-columns:repeat(2,1fr);}
+  .wkpi-two-col{grid-template-columns:1fr;}
+  .wkpi-cover h1{font-size:1.9rem;}
+  .wkpi-chart-wrap{height:220px;}
+}
+
 </style>
 </head>
 <body data-morphism="glass">
@@ -3571,6 +3652,7 @@ function mblComputeWeeklyKpiData(){
   };
 }
 
+
 function renderWeeklyKpiPresentation(){
   var area = document.getElementById('contentArea');
   if(!area) return;
@@ -3578,61 +3660,64 @@ function renderWeeklyKpiPresentation(){
 
   var D = mblComputeWeeklyKpiData();
   var fmt = function(n){ return (n==null||isNaN(n)) ? '0' : Number(n).toLocaleString('en-US'); };
-  var pad2 = function(n){ return (n<10?'0':'')+n; };
+  var pad2 = function(n){ n = Number(n)||0; return (n<10?'0':'')+n; };
 
   var slidesHtml = '';
 
-  // SLIDE 1 - Cover
+  // SLIDE 1 — Cover
   slidesHtml += '<div class="wkpi-slide active" data-slide="0">' +
     '<div class="wkpi-cover">' +
-      '<div class="wkpi-cover-badge">MBL · ASP</div>' +
+      '<div class="wkpi-cover-badge">MBL · Automotive Supplier Park</div>' +
       '<h1>WEEKLY HSE STATISTICS<br>&amp; KPI REPORT</h1>' +
-      '<div class="wkpi-cover-sub">Automotive Supplier Park | MBL</div>' +
+      '<div class="wkpi-cover-sub">Health, Safety &amp; Environment Directorate</div>' +
       '<div class="wkpi-cover-week">Week Ending: <strong>'+D.weekEndLabel+'</strong></div>' +
-      '<div class="wkpi-cover-note">Live data · Auto-calculated from HSE registers · Zero LTI Target</div>' +
+      '<div class="wkpi-cover-note">Live operational data · Automatically calculated from HSE registers · Zero LTI Target</div>' +
     '</div></div>';
 
-  // SLIDE 2 - Manpower
+  // SLIDE 2 — Manpower (TW + PTD clearly separated)
   var manRows = D.buildings.map(function(b){
     return '<tr><td>'+b+'</td><td>'+fmt(D.manpower.manByB[b])+'</td><td>'+fmt(D.manpower.manPTDByB[b])+'</td><td>'+fmt(D.manpower.mhByB[b])+'</td><td>'+fmt(D.manpower.mhPTDByB[b])+'</td></tr>';
   }).join('');
   slidesHtml += '<div class="wkpi-slide" data-slide="1">' +
     '<div class="wkpi-slide-header"><i class="fas fa-users"></i> MANPOWER &amp; SAFE MANHOURS</div>' +
+    '<div class="wkpi-section-title">This Week Performance</div>' +
     '<div class="wkpi-kpi-row">' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">MANPOWER THIS WEEK</div><div class="wkpi-kpi-val">'+fmt(D.manpower.manTW)+'</div><div class="wkpi-kpi-sub">Headcount</div></div>' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">MANPOWER TILL DATE</div><div class="wkpi-kpi-val">'+fmt(D.manpower.manPTD)+'</div><div class="wkpi-kpi-sub">PTD Cumulative</div></div>' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">SAFE MANHOURS THIS WEEK</div><div class="wkpi-kpi-val">'+fmt(D.manpower.mhTW)+'</div><div class="wkpi-kpi-sub">Hours</div></div>' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">SAFE MANHOURS TILL DATE</div><div class="wkpi-kpi-val">'+fmt(D.manpower.mhPTD)+'</div><div class="wkpi-kpi-sub">PTD Cumulative</div></div>' +
+      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Manpower This Week</div><div class="wkpi-kpi-val">'+fmt(D.manpower.manTW)+'</div><div class="wkpi-kpi-sub">Headcount</div></div>' +
+      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Safe Manhours This Week</div><div class="wkpi-kpi-val">'+fmt(D.manpower.mhTW)+'</div><div class="wkpi-kpi-sub">Hours</div></div>' +
+      '<div class="wkpi-kpi ptd-card"><div class="wkpi-kpi-label">Manpower Project Till Date</div><div class="wkpi-kpi-val">'+fmt(D.manpower.manPTD)+'</div><div class="wkpi-kpi-sub">PTD Cumulative</div></div>' +
+      '<div class="wkpi-kpi ptd-card"><div class="wkpi-kpi-label">Safe Manhours Project Till Date</div><div class="wkpi-kpi-val">'+fmt(D.manpower.mhPTD)+'</div><div class="wkpi-kpi-sub">PTD Cumulative</div></div>' +
     '</div>' +
-    '<div class="wkpi-section-title">MANPOWER BY BUILDING (THIS WEEK)</div>' +
+    '<div class="wkpi-section-title">Manpower by Building — This Week vs Project Till Date</div>' +
     '<table class="wkpi-table"><thead><tr><th>Building</th><th>Manpower TW</th><th>Manpower PTD</th><th>Safe MH TW</th><th>Safe MH PTD</th></tr></thead><tbody>' +
     manRows +
     '<tr class="wkpi-total"><td>TOTAL</td><td>'+fmt(D.manpower.manTW)+'</td><td>'+fmt(D.manpower.manPTD)+'</td><td>'+fmt(D.manpower.mhTW)+'</td><td>'+fmt(D.manpower.mhPTD)+'</td></tr>' +
     '</tbody></table>' +
-    '<div class="wkpi-footnote">TW = This Week &nbsp;|&nbsp; PTD = Project Till Date</div>' +
-    '<div class="wkpi-chart-wrap"><canvas id="wkpiChartManpower"></canvas></div>' +
+    '<div class="wkpi-footnote">TW = This Week &nbsp;|&nbsp; PTD = Project Till Date (cumulative from project commencement)</div>' +
+    '<div class="wkpi-chart-wrap tall"><canvas id="wkpiChartManpower"></canvas></div>' +
     '</div>';
 
-  // SLIDE 3 - Observations
+  // SLIDE 3 — Observations
   var obsRows = D.buildings.map(function(b){
     var o = D.observations.byB[b] || {gp:0,ua:0,uc:0,crit:0,total:0};
     return '<tr><td>'+b+'</td><td>'+pad2(o.gp)+'</td><td>'+pad2(o.ua)+'</td><td>'+pad2(o.uc)+'</td><td>'+pad2(o.crit)+'</td><td>'+o.total+'</td></tr>';
   }).join('');
   slidesHtml += '<div class="wkpi-slide" data-slide="2">' +
     '<div class="wkpi-slide-header"><i class="fas fa-eye"></i> HSE OBSERVATIONS</div>' +
+    '<div class="wkpi-section-title">This Week Summary</div>' +
     '<div class="wkpi-kpi-row">' +
-      '<div class="wkpi-kpi good"><div class="wkpi-kpi-label">GOOD PRACTICES TW</div><div class="wkpi-kpi-val">'+fmt(D.observations.gpTW)+'</div><div class="wkpi-kpi-sub">Positive Observations</div></div>' +
-      '<div class="wkpi-kpi warn"><div class="wkpi-kpi-label">UNSAFE ACTS TW</div><div class="wkpi-kpi-val">'+fmt(D.observations.uaTW)+'</div><div class="wkpi-kpi-sub">UA Identified</div></div>' +
-      '<div class="wkpi-kpi danger"><div class="wkpi-kpi-label">UNSAFE CONDITIONS TW</div><div class="wkpi-kpi-val">'+fmt(D.observations.ucTW)+'</div><div class="wkpi-kpi-sub">UC Identified</div></div>' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Total Observations</div><div class="wkpi-kpi-val">'+fmt(D.observations.totalTW)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
+      '<div class="wkpi-kpi good"><div class="wkpi-kpi-label">Good Practices TW</div><div class="wkpi-kpi-val">'+fmt(D.observations.gpTW)+'</div><div class="wkpi-kpi-sub">Positive Observations</div></div>' +
+      '<div class="wkpi-kpi warn"><div class="wkpi-kpi-label">Unsafe Acts TW</div><div class="wkpi-kpi-val">'+fmt(D.observations.uaTW)+'</div><div class="wkpi-kpi-sub">UA Identified</div></div>' +
+      '<div class="wkpi-kpi danger"><div class="wkpi-kpi-label">Unsafe Conditions TW</div><div class="wkpi-kpi-val">'+fmt(D.observations.ucTW)+'</div><div class="wkpi-kpi-sub">UC Identified</div></div>' +
+      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Total Observations TW</div><div class="wkpi-kpi-val">'+fmt(D.observations.totalTW)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
     '</div>' +
+    '<div class="wkpi-ptd-banner"><i class="fas fa-calendar-check"></i> Project Till Date (PTD) Totals</div>' +
     '<div class="wkpi-kpi-row secondary">' +
-      '<div class="wkpi-kpi-sm"><span>GOOD PRACTICES PTD</span><strong>'+fmt(D.observations.gpPTD)+'</strong></div>' +
-      '<div class="wkpi-kpi-sm"><span>UNSAFE ACTS PTD</span><strong>'+fmt(D.observations.uaPTD)+'</strong></div>' +
-      '<div class="wkpi-kpi-sm"><span>UNSAFE CONDITIONS PTD</span><strong>'+fmt(D.observations.ucPTD)+'</strong></div>' +
+      '<div class="wkpi-kpi-sm"><span>Good Practices PTD</span><strong>'+fmt(D.observations.gpPTD)+'</strong></div>' +
+      '<div class="wkpi-kpi-sm"><span>Unsafe Acts PTD</span><strong>'+fmt(D.observations.uaPTD)+'</strong></div>' +
+      '<div class="wkpi-kpi-sm"><span>Unsafe Conditions PTD</span><strong>'+fmt(D.observations.ucPTD)+'</strong></div>' +
       '<div class="wkpi-kpi-sm"><span>Total Observations PTD</span><strong>'+fmt(D.observations.totalPTD)+'</strong></div>' +
     '</div>' +
-    '<div class="wkpi-section-title">OBSERVATIONS BY BUILDING (THIS WEEK)</div>' +
+    '<div class="wkpi-section-title">Observations by Building (This Week)</div>' +
     '<table class="wkpi-table"><thead><tr><th>Building</th><th>Good Practice</th><th>Unsafe Act</th><th>Unsafe Cond.</th><th>Critical</th><th>Total</th></tr></thead><tbody>' +
     obsRows +
     '<tr class="wkpi-total"><td>TOTAL</td><td>'+D.observations.gpTW+'</td><td>'+D.observations.uaTW+'</td><td>'+D.observations.ucTW+'</td><td>'+D.observations.critTW+'</td><td><strong>'+D.observations.totalTW+'</strong></td></tr>' +
@@ -3641,34 +3726,36 @@ function renderWeeklyKpiPresentation(){
     '<div class="wkpi-chart-wrap"><canvas id="wkpiChartObs"></canvas></div>' +
     '</div>';
 
-  // SLIDE 4 - Incidents
+  // SLIDE 4 — Incidents
   slidesHtml += '<div class="wkpi-slide" data-slide="3">' +
     '<div class="wkpi-slide-header"><i class="fas fa-exclamation-circle"></i> INCIDENTS &amp; NEAR MISSES</div>' +
+    '<div class="wkpi-section-title">This Week Performance</div>' +
     '<div class="wkpi-kpi-row">' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">FIRST AID CASES TW</div><div class="wkpi-kpi-val">'+pad2(D.incidents.faTW)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">PROPERTY DAMAGE TW</div><div class="wkpi-kpi-val">'+pad2(D.incidents.pdTW)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">ENV. INCIDENTS TW</div><div class="wkpi-kpi-val">'+pad2(D.incidents.envTW)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">NEAR MISSES TW</div><div class="wkpi-kpi-val">'+pad2(D.incidents.nmTW)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
+      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">First Aid Cases TW</div><div class="wkpi-kpi-val">'+pad2(D.incidents.faTW)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
+      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Property Damage TW</div><div class="wkpi-kpi-val">'+pad2(D.incidents.pdTW)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
+      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Env. Incidents TW</div><div class="wkpi-kpi-val">'+pad2(D.incidents.envTW)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
+      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Near Misses TW</div><div class="wkpi-kpi-val">'+pad2(D.incidents.nmTW)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
     '</div>' +
+    '<div class="wkpi-ptd-banner"><i class="fas fa-calendar-check"></i> Year to Date / Project Till Date</div>' +
     '<div class="wkpi-kpi-row secondary">' +
-      '<div class="wkpi-kpi-sm"><span>FIRST AID YTD</span><strong>'+pad2(D.incidents.faYTD)+'</strong></div>' +
-      '<div class="wkpi-kpi-sm"><span>PROPERTY DAMAGE YTD</span><strong>'+pad2(D.incidents.pdYTD)+'</strong></div>' +
-      '<div class="wkpi-kpi-sm"><span>ENV. INCIDENTS YTD</span><strong>'+pad2(D.incidents.envYTD)+'</strong></div>' +
-      '<div class="wkpi-kpi-sm"><span>NEAR MISSES YTD</span><strong>'+pad2(D.incidents.nmYTD)+'</strong></div>' +
+      '<div class="wkpi-kpi-sm"><span>First Aid YTD</span><strong>'+pad2(D.incidents.faYTD)+'</strong></div>' +
+      '<div class="wkpi-kpi-sm"><span>Property Damage YTD</span><strong>'+pad2(D.incidents.pdYTD)+'</strong></div>' +
+      '<div class="wkpi-kpi-sm"><span>Env. Incidents YTD</span><strong>'+pad2(D.incidents.envYTD)+'</strong></div>' +
+      '<div class="wkpi-kpi-sm"><span>Near Misses YTD</span><strong>'+pad2(D.incidents.nmYTD)+'</strong></div>' +
     '</div>' +
-    '<div class="wkpi-section-title">INCIDENT REGISTER SNAPSHOT (THIS WEEK)</div>' +
-    '<table class="wkpi-table"><thead><tr><th>Type</th><th>Count TW</th><th>Count YTD</th></tr></thead><tbody>' +
+    '<div class="wkpi-section-title">Incident Register Snapshot</div>' +
+    '<table class="wkpi-table"><thead><tr><th>Type</th><th>Count This Week</th><th>Count YTD / PTD</th></tr></thead><tbody>' +
     '<tr><td>First Aid Case</td><td>'+pad2(D.incidents.faTW)+'</td><td>'+pad2(D.incidents.faYTD)+'</td></tr>' +
     '<tr><td>Property Damage</td><td>'+pad2(D.incidents.pdTW)+'</td><td>'+pad2(D.incidents.pdYTD)+'</td></tr>' +
     '<tr><td>Environmental</td><td>'+pad2(D.incidents.envTW)+'</td><td>'+pad2(D.incidents.envYTD)+'</td></tr>' +
     '<tr><td>Near Miss</td><td>'+pad2(D.incidents.nmTW)+'</td><td>'+pad2(D.incidents.nmYTD)+'</td></tr>' +
     '<tr><td>LTI / RWC</td><td>'+pad2(D.incidents.ltiTW)+'</td><td>'+pad2(D.incidents.ltiYTD)+'</td></tr>' +
     '</tbody></table>' +
-    '<div class="wkpi-footnote">Zero LTI Target &nbsp;|&nbsp; All incidents reported within 24 hrs &nbsp;|&nbsp; Investigation reports filed as per procedure</div>' +
-    '<div class="wkpi-chart-wrap"><canvas id="wkpiChartInc"></canvas></div>' +
+    '<div class="wkpi-footnote">Zero LTI Target &nbsp;|&nbsp; All incidents reported within 24 hours &nbsp;|&nbsp; Investigation reports filed as per procedure</div>' +
+    '<div class="wkpi-chart-wrap tall"><canvas id="wkpiChartInc"></canvas></div>' +
     '</div>';
 
-  // SLIDE 5 - PTW
+  // SLIDE 5 — PTW
   var ptwRows = D.buildings.map(function(b){
     var p = D.ptw.byB[b] || {total:0,day:0,night:0,hot:0,cs:0,other:0};
     return '<tr><td>'+b+'</td><td>'+p.total+'</td><td>'+p.day+'</td><td>'+p.night+'</td><td>'+p.hot+'</td><td>'+p.cs+'</td><td>'+p.other+'</td></tr>';
@@ -3680,21 +3767,22 @@ function renderWeeklyKpiPresentation(){
   var ptwTotOther = D.buildings.reduce(function(s,b){return s+(D.ptw.byB[b]?D.ptw.byB[b].other:0);},0);
   slidesHtml += '<div class="wkpi-slide" data-slide="4">' +
     '<div class="wkpi-slide-header"><i class="fas fa-file-signature"></i> PERMIT TO WORK (PTW) REGISTER</div>' +
+    '<div class="wkpi-section-title">This Week Issuance</div>' +
     '<div class="wkpi-kpi-row">' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">PERMITS THIS WEEK</div><div class="wkpi-kpi-val">'+fmt(D.ptw.totalTW)+'</div><div class="wkpi-kpi-sub">Total Issued</div></div>' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">PERMITS TILL DATE</div><div class="wkpi-kpi-val">'+fmt(D.ptw.totalPTD)+'</div><div class="wkpi-kpi-sub">PTD Cumulative</div></div>' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">DAY SHIFT PERMITS</div><div class="wkpi-kpi-val">'+fmt(D.ptw.day)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">NIGHT SHIFT PERMITS</div><div class="wkpi-kpi-val">'+fmt(D.ptw.night)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
+      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Permits This Week</div><div class="wkpi-kpi-val">'+fmt(D.ptw.totalTW)+'</div><div class="wkpi-kpi-sub">Total Issued</div></div>' +
+      '<div class="wkpi-kpi ptd-card"><div class="wkpi-kpi-label">Permits Project Till Date</div><div class="wkpi-kpi-val">'+fmt(D.ptw.totalPTD)+'</div><div class="wkpi-kpi-sub">PTD Cumulative</div></div>' +
+      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Day Shift Permits</div><div class="wkpi-kpi-val">'+fmt(D.ptw.day)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
+      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Night Shift Permits</div><div class="wkpi-kpi-val">'+fmt(D.ptw.night)+'</div><div class="wkpi-kpi-sub">This Week</div></div>' +
     '</div>' +
-    '<div class="wkpi-section-title">PERMITS BY BUILDING (THIS WEEK)</div>' +
+    '<div class="wkpi-section-title">Permits by Building (This Week)</div>' +
     '<table class="wkpi-table"><thead><tr><th>Building</th><th>Total TW</th><th>Day Shift</th><th>Night Shift</th><th>Hot Work</th><th>Confined Space</th><th>Other</th></tr></thead><tbody>' +
     ptwRows +
     '<tr class="wkpi-total"><td>TOTAL</td><td>'+D.ptw.totalTW+'</td><td>'+ptwTotDay+'</td><td>'+ptwTotNight+'</td><td>'+ptwTotHot+'</td><td>'+ptwTotCs+'</td><td>'+ptwTotOther+'</td></tr>' +
     '</tbody></table>' +
-    '<div class="wkpi-footnote">Key Controls: All PTWs reviewed &amp; authorized by competent persons. Hot Work &amp; Confined Space permits subject to additional gas testing &amp; fire watch. Permit audits conducted weekly. Non-conformances raised and closed within defined timelines.<br>PTW system compliance monitored via daily checks and weekly HSE inspections</div>' +
+    '<div class="wkpi-footnote">Key Controls: All PTWs reviewed &amp; authorized by competent persons. Hot Work &amp; Confined Space permits subject to additional gas testing &amp; fire watch. Permit audits conducted weekly. Non-conformances raised and closed within defined timelines.<br>PTW system compliance monitored via daily checks and weekly HSE inspections.</div>' +
     '</div>';
 
-  // SLIDE 6 - Equipment
+  // SLIDE 6 — Equipment
   var eqRows = D.buildings.map(function(b){
     var e = D.equipment.byB[b] || {};
     return '<tr><td>'+b+'</td>'+D.equipment.types.map(function(t){return '<td>'+(e[t]||0)+'</td>';}).join('')+'<td>'+(e.Total||0)+'</td></tr>';
@@ -3702,21 +3790,22 @@ function renderWeeklyKpiPresentation(){
   var eqTotals = D.equipment.types.map(function(t){ return D.equipment.typeTotals[t]||0; });
   slidesHtml += '<div class="wkpi-slide" data-slide="5">' +
     '<div class="wkpi-slide-header"><i class="fas fa-truck"></i> EQUIPMENT DETAILS</div>' +
+    '<div class="wkpi-section-title">Plant &amp; Equipment Status</div>' +
     '<div class="wkpi-kpi-row">' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">TOTAL EQUIPMENT THIS WEEK</div><div class="wkpi-kpi-val">'+fmt(D.equipment.total)+'</div><div class="wkpi-kpi-sub">Active on Site</div></div>' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">HIGHEST EQUIPMENT TYPE</div><div class="wkpi-kpi-val" style="font-size:1.4rem">'+D.equipment.highest+'</div><div class="wkpi-kpi-sub">Most Deployed</div></div>' +
-      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">CERTIFIED / INSPECTED</div><div class="wkpi-kpi-val">'+D.equipment.certPct+'%</div><div class="wkpi-kpi-sub">Compliance Rate</div></div>' +
+      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Total Equipment</div><div class="wkpi-kpi-val">'+fmt(D.equipment.total)+'</div><div class="wkpi-kpi-sub">Active on Site</div></div>' +
+      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Highest Equipment Type</div><div class="wkpi-kpi-val" style="font-size:1.35rem">'+D.equipment.highest+'</div><div class="wkpi-kpi-sub">Most Deployed</div></div>' +
+      '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Certified / Inspected</div><div class="wkpi-kpi-val">'+D.equipment.certPct+'%</div><div class="wkpi-kpi-sub">Compliance Rate</div></div>' +
     '</div>' +
-    '<div class="wkpi-section-title">EQUIPMENT BY BUILDING (THIS WEEK)</div>' +
+    '<div class="wkpi-section-title">Equipment by Building</div>' +
     '<table class="wkpi-table"><thead><tr><th>Building</th><th>Mobile Crane</th><th>Excavator</th><th>MEWP / Boom</th><th>Forklift</th><th>Generator</th><th>Total</th></tr></thead><tbody>' +
     eqRows +
     '<tr class="wkpi-total"><td>TOTAL</td>'+eqTotals.map(function(v){return '<td>'+v+'</td>';}).join('')+'<td>'+D.equipment.total+'</td></tr>' +
     '</tbody></table>' +
-    '<div class="wkpi-footnote">All lifting equipment and MEWPs hold valid LOLER / third-party certification. Daily pre-use checks completed and logged. Defects reported via equipment inspection checklist and quarantined pending repair. Highest volume equipment: <strong>'+D.equipment.highest+'</strong> supporting site activities.<br>Equipment register maintained and updated weekly &nbsp;|&nbsp; No unauthorized plant permitted on site</div>' +
-    '<div class="wkpi-chart-wrap"><canvas id="wkpiChartEq"></canvas></div>' +
+    '<div class="wkpi-footnote">All lifting equipment and MEWPs hold valid LOLER / third-party certification. Daily pre-use checks completed and logged. Defects reported via equipment inspection checklist and quarantined pending repair. Highest volume equipment: <strong>'+D.equipment.highest+'</strong>.<br>Equipment register maintained and updated weekly &nbsp;|&nbsp; No unauthorized plant permitted on site.</div>' +
+    '<div class="wkpi-chart-wrap tall"><canvas id="wkpiChartEq"></canvas></div>' +
     '</div>';
 
-  // SLIDE 7 - Drills & Training
+  // SLIDE 7 — Drills & Training
   var drillRows = D.buildings.map(function(b){
     var d = D.drills.byB[b] || {drills:0,campaigns:0};
     return '<tr><td>'+b+'</td><td>'+d.drills+'</td><td>'+d.campaigns+'</td></tr>';
@@ -3725,24 +3814,25 @@ function renderWeeklyKpiPresentation(){
     '<div class="wkpi-slide-header"><i class="fas fa-bullhorn"></i> HSE DRILLS, CAMPAIGNS &amp; TRAINING</div>' +
     '<div class="wkpi-two-col">' +
       '<div>' +
-        '<div class="wkpi-section-title">DRILLS &amp; CAMPAIGNS</div>' +
+        '<div class="wkpi-section-title">Drills &amp; Campaigns</div>' +
         '<div class="wkpi-kpi-row compact">' +
-          '<div class="wkpi-kpi"><div class="wkpi-kpi-label">DRILLS THIS WEEK</div><div class="wkpi-kpi-val">'+D.drills.drillTW+'</div></div>' +
-          '<div class="wkpi-kpi"><div class="wkpi-kpi-label">DRILLS TILL DATE</div><div class="wkpi-kpi-val">'+D.drills.drillPTD+'</div></div>' +
-          '<div class="wkpi-kpi"><div class="wkpi-kpi-label">CAMPAIGNS THIS WEEK</div><div class="wkpi-kpi-val">'+D.drills.campTW+'</div></div>' +
-          '<div class="wkpi-kpi"><div class="wkpi-kpi-label">CAMPAIGNS TILL DATE</div><div class="wkpi-kpi-val">'+D.drills.campPTD+'</div></div>' +
+          '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Drills This Week</div><div class="wkpi-kpi-val">'+D.drills.drillTW+'</div></div>' +
+          '<div class="wkpi-kpi ptd-card"><div class="wkpi-kpi-label">Drills Project Till Date</div><div class="wkpi-kpi-val">'+D.drills.drillPTD+'</div></div>' +
+          '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Campaigns This Week</div><div class="wkpi-kpi-val">'+D.drills.campTW+'</div></div>' +
+          '<div class="wkpi-kpi ptd-card"><div class="wkpi-kpi-label">Campaigns Project Till Date</div><div class="wkpi-kpi-val">'+D.drills.campPTD+'</div></div>' +
         '</div>' +
         '<table class="wkpi-table"><thead><tr><th>Building</th><th>Drills</th><th>Campaigns</th></tr></thead><tbody>'+drillRows+'</tbody></table>' +
       '</div>' +
       '<div>' +
-        '<div class="wkpi-section-title">TRAINING &amp; INDUCTIONS</div>' +
+        '<div class="wkpi-section-title">Training &amp; Inductions</div>' +
         '<div class="wkpi-kpi-row compact">' +
-          '<div class="wkpi-kpi"><div class="wkpi-kpi-label">TRAINING SESSIONS TW</div><div class="wkpi-kpi-val">'+D.training.sessTW+'</div></div>' +
-          '<div class="wkpi-kpi"><div class="wkpi-kpi-label">TRAINING HOURS TW</div><div class="wkpi-kpi-val">'+fmt(D.training.hoursTW)+'</div></div>' +
-          '<div class="wkpi-kpi"><div class="wkpi-kpi-label">INDUCTIONS THIS WEEK</div><div class="wkpi-kpi-val">'+D.training.indTW+'</div></div>' +
-          '<div class="wkpi-kpi"><div class="wkpi-kpi-label">INDUCTIONS TILL DATE</div><div class="wkpi-kpi-val">'+fmt(D.training.indPTD)+'</div></div>' +
+          '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Training Sessions TW</div><div class="wkpi-kpi-val">'+D.training.sessTW+'</div></div>' +
+          '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Training Hours TW</div><div class="wkpi-kpi-val">'+fmt(D.training.hoursTW)+'</div></div>' +
+          '<div class="wkpi-kpi"><div class="wkpi-kpi-label">Inductions This Week</div><div class="wkpi-kpi-val">'+D.training.indTW+'</div></div>' +
+          '<div class="wkpi-kpi ptd-card"><div class="wkpi-kpi-label">Inductions Project Till Date</div><div class="wkpi-kpi-val">'+fmt(D.training.indPTD)+'</div></div>' +
         '</div>' +
-        '<table class="wkpi-table"><thead><tr><th>Metric</th><th>This Week</th><th>Till Date</th></tr></thead><tbody>' +
+        '<div class="wkpi-ptd-banner"><i class="fas fa-calendar-check"></i> Training Performance — This Week vs Project Till Date</div>' +
+        '<table class="wkpi-table"><thead><tr><th>Metric</th><th>This Week</th><th>Project Till Date</th></tr></thead><tbody>' +
         '<tr><td>Sessions Conducted</td><td>'+D.training.sessTW+'</td><td>'+fmt(D.training.sessPTD)+'</td></tr>' +
         '<tr><td>Total Training Hours</td><td>'+fmt(D.training.hoursTW)+'</td><td>'+fmt(D.training.hoursPTD)+'</td></tr>' +
         '<tr><td>Personnel Trained</td><td>'+fmt(D.training.persTW)+'</td><td>'+fmt(D.training.persPTD)+'</td></tr>' +
@@ -3750,7 +3840,7 @@ function renderWeeklyKpiPresentation(){
         '</tbody></table>' +
       '</div>' +
     '</div>' +
-    '<div class="wkpi-footnote">All drills documented with attendance &amp; lessons learned. Training matrix maintained current. New starters inducted prior to site access. Campaign topics aligned to current site risks (e.g. lifting, working at height, vehicle-pedestrian interface).</div>' +
+    '<div class="wkpi-footnote">All drills documented with attendance &amp; lessons learned. Training matrix maintained current. New starters inducted prior to site access. Campaign topics aligned to current site risks (lifting, working at height, vehicle-pedestrian interface).</div>' +
     '<div class="wkpi-thankyou">Thank You</div>' +
     '</div>';
 
@@ -3760,7 +3850,7 @@ function renderWeeklyKpiPresentation(){
     +   '<div class="wkpi-toolbar">'
     +     '<div class="wkpi-toolbar-left"><i class="fas fa-chalkboard"></i> Weekly HSE Statistics &amp; KPI Report &nbsp;·&nbsp; Week Ending <strong>'+D.weekEndLabel+'</strong></div>'
     +     '<div class="wkpi-toolbar-right">'
-    +       '<button class="wkpi-btn" onclick="wkpiPrev()"><i class="fas fa-chevron-left"></i> Prev</button>'
+    +       '<button class="wkpi-btn" onclick="wkpiPrev()"><i class="fas fa-chevron-left"></i> Previous</button>'
     +       '<span class="wkpi-page" id="wkpiPageLabel">1 / 7</span>'
     +       '<button class="wkpi-btn" onclick="wkpiNext()">Next <i class="fas fa-chevron-right"></i></button>'
     +       '<button class="wkpi-btn accent" onclick="wkpiExportPptx()"><i class="fas fa-file-powerpoint"></i> Export PPTX</button>'
@@ -3772,51 +3862,133 @@ function renderWeeklyKpiPresentation(){
     +   '</div>'
     + '</div>';
 
-  // Charts after DOM ready
+  // Professional chart configuration
+  var chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          color: '#cbd5e1',
+          font: { family: "'Inter','Segoe UI',system-ui,sans-serif", size: 12, weight: '600' },
+          padding: 16,
+          usePointStyle: true,
+          pointStyleWidth: 10
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(15,23,42,0.95)',
+        titleFont: { size: 13, weight: '700' },
+        bodyFont: { size: 12 },
+        padding: 12,
+        cornerRadius: 8,
+        borderColor: 'rgba(34,211,238,0.3)',
+        borderWidth: 1
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: '#94a3b8', font: { size: 11, weight: '500' } },
+        grid: { color: 'rgba(148,163,184,0.08)', drawBorder: false }
+      },
+      y: {
+        ticks: { color: '#94a3b8', font: { size: 11, weight: '500' } },
+        grid: { color: 'rgba(148,163,184,0.08)', drawBorder: false },
+        beginAtZero: true
+      }
+    }
+  };
+
   setTimeout(function(){
     try{
       if(typeof Chart === 'undefined') return;
       var ctx1 = document.getElementById('wkpiChartManpower');
       if(ctx1){
         charts.wkpiMan = new Chart(ctx1, {
-          type:'bar',
-          data:{ labels: D.buildings, datasets:[
-            {label:'Manpower TW', data: D.buildings.map(function(b){return D.manpower.manByB[b];}), backgroundColor:'rgba(0,188,212,0.7)'},
-            {label:'Safe MH TW', data: D.buildings.map(function(b){return D.manpower.mhByB[b];}), backgroundColor:'rgba(102,187,106,0.7)'}
-          ]},
-          options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#cfd8dc'}}}, scales:{x:{ticks:{color:'#90a4ae'}}, y:{ticks:{color:'#90a4ae'}, grid:{color:'rgba(255,255,255,0.06)'}}}}
+          type: 'bar',
+          data: {
+            labels: D.buildings,
+            datasets: [
+              { label: 'Manpower TW', data: D.buildings.map(function(b){return D.manpower.manByB[b];}), backgroundColor: 'rgba(34,211,238,0.75)', borderRadius: 6, barPercentage: 0.7 },
+              { label: 'Manpower PTD', data: D.buildings.map(function(b){return D.manpower.manPTDByB[b];}), backgroundColor: 'rgba(167,139,250,0.65)', borderRadius: 6, barPercentage: 0.7 },
+              { label: 'Safe MH TW', data: D.buildings.map(function(b){return D.manpower.mhByB[b];}), backgroundColor: 'rgba(16,185,129,0.7)', borderRadius: 6, barPercentage: 0.7 }
+            ]
+          },
+          options: Object.assign({}, chartDefaults, {
+            plugins: Object.assign({}, chartDefaults.plugins, {
+              title: { display: true, text: 'Manpower & Safe Manhours by Building (This Week vs PTD)', color: '#e2e8f0', font: { size: 13, weight: '600' }, padding: { bottom: 12 } }
+            })
+          })
         });
       }
       var ctx2 = document.getElementById('wkpiChartObs');
       if(ctx2){
         charts.wkpiObs = new Chart(ctx2, {
-          type:'doughnut',
-          data:{ labels:['Good Practice','Unsafe Act','Unsafe Condition'], datasets:[{data:[D.observations.gpTW, D.observations.uaTW, D.observations.ucTW], backgroundColor:['#66bb6a','#ffb74d','#ef5350']}] },
-          options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right', labels:{color:'#cfd8dc'}}}}
+          type: 'doughnut',
+          data: {
+            labels: ['Good Practice', 'Unsafe Act', 'Unsafe Condition'],
+            datasets: [{
+              data: [D.observations.gpTW, D.observations.uaTW, D.observations.ucTW],
+              backgroundColor: ['rgba(16,185,129,0.85)', 'rgba(245,158,11,0.85)', 'rgba(239,68,68,0.85)'],
+              borderWidth: 0,
+              hoverOffset: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '58%',
+            plugins: {
+              legend: { position: 'right', labels: { color: '#cbd5e1', font: { size: 12, weight: '600' }, padding: 18, usePointStyle: true } },
+              title: { display: true, text: 'Observation Mix — This Week', color: '#e2e8f0', font: { size: 13, weight: '600' }, padding: { bottom: 8 } },
+              tooltip: chartDefaults.plugins.tooltip
+            }
+          }
         });
       }
       var ctx3 = document.getElementById('wkpiChartInc');
       if(ctx3){
         charts.wkpiInc = new Chart(ctx3, {
-          type:'bar',
-          data:{ labels:['First Aid','Property Damage','Environmental','Near Miss','LTI/RWC'],
-            datasets:[
-              {label:'This Week', data:[D.incidents.faTW,D.incidents.pdTW,D.incidents.envTW,D.incidents.nmTW,D.incidents.ltiTW], backgroundColor:'rgba(0,188,212,0.75)'},
-              {label:'YTD', data:[D.incidents.faYTD,D.incidents.pdYTD,D.incidents.envYTD,D.incidents.nmYTD,D.incidents.ltiYTD], backgroundColor:'rgba(171,71,188,0.65)'}
-            ]},
-          options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#cfd8dc'}}}, scales:{x:{ticks:{color:'#90a4ae'}}, y:{ticks:{color:'#90a4ae'}, grid:{color:'rgba(255,255,255,0.06)'}}}}
+          type: 'bar',
+          data: {
+            labels: ['First Aid', 'Property Damage', 'Environmental', 'Near Miss', 'LTI / RWC'],
+            datasets: [
+              { label: 'This Week', data: [D.incidents.faTW, D.incidents.pdTW, D.incidents.envTW, D.incidents.nmTW, D.incidents.ltiTW], backgroundColor: 'rgba(34,211,238,0.8)', borderRadius: 6, barPercentage: 0.65 },
+              { label: 'YTD / PTD', data: [D.incidents.faYTD, D.incidents.pdYTD, D.incidents.envYTD, D.incidents.nmYTD, D.incidents.ltiYTD], backgroundColor: 'rgba(167,139,250,0.7)', borderRadius: 6, barPercentage: 0.65 }
+            ]
+          },
+          options: Object.assign({}, chartDefaults, {
+            plugins: Object.assign({}, chartDefaults.plugins, {
+              title: { display: true, text: 'Incidents — This Week vs Year to Date / Project Till Date', color: '#e2e8f0', font: { size: 13, weight: '600' }, padding: { bottom: 12 } }
+            })
+          })
         });
       }
       var ctx4 = document.getElementById('wkpiChartEq');
       if(ctx4){
         charts.wkpiEq = new Chart(ctx4, {
-          type:'bar',
-          data:{ labels: D.equipment.types, datasets:[{label:'Count', data: D.equipment.types.map(function(t){return D.equipment.typeTotals[t]||0;}), backgroundColor:['#42a5f5','#26a69a','#ab47bc','#ff7043','#78909c']}] },
-          options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{ticks:{color:'#90a4ae'}}, y:{ticks:{color:'#90a4ae'}, grid:{color:'rgba(255,255,255,0.06)'}}}}
+          type: 'bar',
+          data: {
+            labels: D.equipment.types,
+            datasets: [{
+              label: 'Equipment Count',
+              data: D.equipment.types.map(function(t){ return D.equipment.typeTotals[t]||0; }),
+              backgroundColor: ['rgba(56,189,248,0.8)','rgba(45,212,191,0.8)','rgba(167,139,250,0.8)','rgba(251,146,60,0.8)','rgba(148,163,184,0.8)'],
+              borderRadius: 6,
+              barPercentage: 0.6
+            }]
+          },
+          options: Object.assign({}, chartDefaults, {
+            plugins: Object.assign({}, chartDefaults.plugins, {
+              legend: { display: false },
+              title: { display: true, text: 'Equipment Distribution by Type', color: '#e2e8f0', font: { size: 13, weight: '600' }, padding: { bottom: 12 } }
+            })
+          })
         });
       }
-    }catch(e){ console.warn('WKPI charts', e); }
-  }, 120);
+    }catch(err){ console.warn('WKPI charts', err); }
+  }, 150);
 
   window.__wkpiSlide = 0;
   window.__wkpiTotal = 7;
@@ -3833,16 +4005,473 @@ function wkpiGo(i){
 function wkpiNext(){ wkpiGo((window.__wkpiSlide||0)+1); }
 function wkpiPrev(){ wkpiGo((window.__wkpiSlide||0)-1); }
 
-function wkpiExportPptx(){
-  showToast('Generating official Weekly KPI PPTX from live data…','info');
-  // Re-use existing period export if available for the last week; otherwise notify
+
+// ===== OFFICIAL WEEKLY KPI PPTX (7-slide template matching attached report) =====
+function exportWeeklyKpiAsPptx(periodOpt){
+  if(!pptxEnsureLib()){
+    showToast('PowerPoint library (PptxGenJS) is not loaded. Please refresh the page and try again.','error');
+    return;
+  }
+  if(typeof PDF_BUSY !== 'undefined' && PDF_BUSY){
+    showToast('Another export is already running…','info');
+    return;
+  }
+  PDF_BUSY = true;
+  showToast('Building official Weekly HSE Statistics & KPI PowerPoint…','info');
+
   try{
-    if(typeof showPeriodExportPicker === 'function'){
-      showPeriodExportPicker('weekly');
-      return;
+    // Optionally override week range from period picker
+    var origGet = mblGetLastWeekRange;
+    if(periodOpt && periodOpt.start && periodOpt.end){
+      mblGetLastWeekRange = function(){ return { start: periodOpt.start, end: periodOpt.end }; };
     }
-  }catch(e){}
-  showToast('Use the header Weekly Report button to export the matching PPTX for the selected week.','info');
+    var D = mblComputeWeeklyKpiData();
+    mblGetLastWeekRange = origGet;
+
+    var fmt = function(n){ return (n==null||isNaN(n)) ? '0' : Number(n).toLocaleString('en-US'); };
+    var pad2 = function(n){ n = Number(n)||0; return (n<10?'0':'')+n; };
+
+    var pptx = pptxCreate();
+    pptx.defineLayout({ name: 'MBL_WIDE', width: 13.333, height: 7.5 });
+    pptx.layout = 'MBL_WIDE';
+    pptx.author = 'MBL HSE Directorate';
+    pptx.title = 'Weekly HSE Statistics & KPI Report — ' + D.weekEndLabel;
+    pptx.subject = 'Automotive Supplier Park | MBL';
+
+    var C = {
+      bg: '0B1520',
+      card: '132030',
+      accent: '0891B2',
+      accent2: '0D9488',
+      text: 'F1F5F9',
+      muted: '94A3B8',
+      good: '10B981',
+      warn: 'F59E0B',
+      danger: 'EF4444',
+      ptd: '8B5CF6',
+      white: 'FFFFFF',
+      line: '1E3A4A'
+    };
+
+    function addFooter(slide, page, total){
+      slide.addText('MBL · Automotive Supplier Park  |  Confidential HSE Report  |  Week Ending ' + D.weekEndLabel, {
+        x: 0.4, y: 7.15, w: 10.5, h: 0.25,
+        fontSize: 9, color: C.muted, fontFace: 'Calibri'
+      });
+      slide.addText(page + ' / ' + total, {
+        x: 11.5, y: 7.15, w: 1.4, h: 0.25,
+        fontSize: 9, color: C.muted, fontFace: 'Calibri', align: 'right'
+      });
+    }
+
+    function kpiBox(slide, x, y, w, h, label, value, sub, accentHex){
+      slide.addShape(pptx.ShapeType.roundRect, {
+        x: x, y: y, w: w, h: h,
+        fill: { color: C.card },
+        rectRadius: 0.08,
+        line: { color: accentHex || C.line, width: 1 }
+      });
+      slide.addText(label, {
+        x: x + 0.12, y: y + 0.1, w: w - 0.24, h: 0.28,
+        fontSize: 9, fontFace: 'Calibri', color: C.muted, bold: true, margin: 0
+      });
+      slide.addText(String(value), {
+        x: x + 0.12, y: y + 0.35, w: w - 0.24, h: 0.45,
+        fontSize: 22, fontFace: 'Calibri', color: C.text, bold: true, margin: 0
+      });
+      if(sub){
+        slide.addText(sub, {
+          x: x + 0.12, y: y + 0.82, w: w - 0.24, h: 0.22,
+          fontSize: 9, fontFace: 'Calibri', color: C.muted, margin: 0
+        });
+      }
+    }
+
+    // ========== SLIDE 1: COVER ==========
+    var s1 = pptx.addSlide();
+    s1.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
+    s1.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 0.12, h: 7.5, fill: { color: C.accent } });
+    s1.addText('MBL  ·  AUTOMOTIVE SUPPLIER PARK', {
+      x: 0.8, y: 1.8, w: 11.5, h: 0.35,
+      fontSize: 12, fontFace: 'Calibri', color: C.accent, bold: true, align: 'center', margin: 0
+    });
+    s1.addText('WEEKLY HSE STATISTICS\n& KPI REPORT', {
+      x: 0.8, y: 2.3, w: 11.5, h: 1.4,
+      fontSize: 36, fontFace: 'Calibri', color: C.text, bold: true, align: 'center', margin: 0
+    });
+    s1.addText('Health, Safety & Environment Directorate', {
+      x: 0.8, y: 3.85, w: 11.5, h: 0.35,
+      fontSize: 14, fontFace: 'Calibri', color: C.accent2, align: 'center', margin: 0
+    });
+    s1.addShape(pptx.ShapeType.roundRect, {
+      x: 4.0, y: 4.5, w: 5.333, h: 0.7,
+      fill: { color: C.card }, rectRadius: 0.08,
+      line: { color: C.accent, width: 1 }
+    });
+    s1.addText('Week Ending:  ' + D.weekEndLabel, {
+      x: 4.0, y: 4.6, w: 5.333, h: 0.5,
+      fontSize: 14, fontFace: 'Calibri', color: C.text, bold: true, align: 'center', margin: 0
+    });
+    s1.addText('Live operational data  ·  Automatically calculated from HSE registers  ·  Zero LTI Target', {
+      x: 0.8, y: 5.6, w: 11.5, h: 0.3,
+      fontSize: 11, fontFace: 'Calibri', color: C.muted, align: 'center', margin: 0
+    });
+    addFooter(s1, 1, 7);
+
+    // ========== SLIDE 2: MANPOWER ==========
+    var s2 = pptx.addSlide();
+    s2.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
+    s2.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.55, fill: { color: C.card } });
+    s2.addText('MANPOWER & SAFE MANHOURS', {
+      x: 0.4, y: 0.12, w: 12.5, h: 0.35,
+      fontSize: 16, fontFace: 'Calibri', color: C.accent, bold: true, margin: 0
+    });
+    kpiBox(s2, 0.35, 0.75, 3.05, 1.15, 'MANPOWER THIS WEEK', fmt(D.manpower.manTW), 'Headcount', C.accent);
+    kpiBox(s2, 3.55, 0.75, 3.05, 1.15, 'SAFE MANHOURS THIS WEEK', fmt(D.manpower.mhTW), 'Hours', C.accent2);
+    kpiBox(s2, 6.75, 0.75, 3.05, 1.15, 'MANPOWER PROJECT TILL DATE', fmt(D.manpower.manPTD), 'PTD Cumulative', C.ptd);
+    kpiBox(s2, 9.95, 0.75, 3.05, 1.15, 'SAFE MANHOURS PROJECT TILL DATE', fmt(D.manpower.mhPTD), 'PTD Cumulative', C.ptd);
+
+    s2.addText('MANPOWER BY BUILDING (THIS WEEK vs PROJECT TILL DATE)', {
+      x: 0.4, y: 2.1, w: 12.5, h: 0.28,
+      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
+    });
+
+    var manTable = [
+      [
+        { text: 'Building', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+        { text: 'Manpower TW', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+        { text: 'Manpower PTD', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+        { text: 'Safe MH TW', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+        { text: 'Safe MH PTD', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
+      ]
+    ];
+    D.buildings.forEach(function(b){
+      manTable.push([
+        b,
+        fmt(D.manpower.manByB[b]),
+        fmt(D.manpower.manPTDByB[b]),
+        fmt(D.manpower.mhByB[b]),
+        fmt(D.manpower.mhPTDByB[b])
+      ]);
+    });
+    manTable.push([
+      { text: 'TOTAL', options: { bold: true } },
+      { text: fmt(D.manpower.manTW), options: { bold: true } },
+      { text: fmt(D.manpower.manPTD), options: { bold: true } },
+      { text: fmt(D.manpower.mhTW), options: { bold: true } },
+      { text: fmt(D.manpower.mhPTD), options: { bold: true } }
+    ]);
+    s2.addTable(manTable, {
+      x: 0.35, y: 2.45, w: 12.6, colW: [2.6, 2.5, 2.5, 2.5, 2.5],
+      border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
+      fontFace: 'Calibri', fontSize: 11, color: C.text,
+      align: 'center', valign: 'middle',
+      fill: { color: C.card }
+    });
+    s2.addText('TW = This Week  |  PTD = Project Till Date (cumulative from project commencement)', {
+      x: 0.4, y: 5.5, w: 12.5, h: 0.25,
+      fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
+    });
+    addFooter(s2, 2, 7);
+
+    // ========== SLIDE 3: OBSERVATIONS ==========
+    var s3 = pptx.addSlide();
+    s3.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
+    s3.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.55, fill: { color: C.card } });
+    s3.addText('HSE OBSERVATIONS', {
+      x: 0.4, y: 0.12, w: 12.5, h: 0.35,
+      fontSize: 16, fontFace: 'Calibri', color: C.accent, bold: true, margin: 0
+    });
+    kpiBox(s3, 0.35, 0.7, 3.05, 1.1, 'GOOD PRACTICES TW', fmt(D.observations.gpTW), 'Positive Observations', C.good);
+    kpiBox(s3, 3.55, 0.7, 3.05, 1.1, 'UNSAFE ACTS TW', fmt(D.observations.uaTW), 'UA Identified', C.warn);
+    kpiBox(s3, 6.75, 0.7, 3.05, 1.1, 'UNSAFE CONDITIONS TW', fmt(D.observations.ucTW), 'UC Identified', C.danger);
+    kpiBox(s3, 9.95, 0.7, 3.05, 1.1, 'TOTAL OBSERVATIONS TW', fmt(D.observations.totalTW), 'This Week', C.accent);
+
+    s3.addText('PROJECT TILL DATE (PTD) TOTALS', {
+      x: 0.4, y: 1.95, w: 12.5, h: 0.25,
+      fontSize: 11, fontFace: 'Calibri', color: C.ptd, bold: true, margin: 0
+    });
+    kpiBox(s3, 0.35, 2.25, 3.05, 0.95, 'GOOD PRACTICES PTD', fmt(D.observations.gpPTD), '', C.ptd);
+    kpiBox(s3, 3.55, 2.25, 3.05, 0.95, 'UNSAFE ACTS PTD', fmt(D.observations.uaPTD), '', C.ptd);
+    kpiBox(s3, 6.75, 2.25, 3.05, 0.95, 'UNSAFE CONDITIONS PTD', fmt(D.observations.ucPTD), '', C.ptd);
+    kpiBox(s3, 9.95, 2.25, 3.05, 0.95, 'TOTAL OBSERVATIONS PTD', fmt(D.observations.totalPTD), '', C.ptd);
+
+    s3.addText('OBSERVATIONS BY BUILDING (THIS WEEK)', {
+      x: 0.4, y: 3.4, w: 12.5, h: 0.25,
+      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
+    });
+    var obsTable = [[
+      { text: 'Building', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Good Practice', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Unsafe Act', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Unsafe Cond.', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Critical', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Total', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
+    ]];
+    D.buildings.forEach(function(b){
+      var o = D.observations.byB[b] || {gp:0,ua:0,uc:0,crit:0,total:0};
+      obsTable.push([b, pad2(o.gp), pad2(o.ua), pad2(o.uc), pad2(o.crit), String(o.total)]);
+    });
+    obsTable.push([
+      { text: 'TOTAL', options: { bold: true } },
+      { text: String(D.observations.gpTW), options: { bold: true } },
+      { text: String(D.observations.uaTW), options: { bold: true } },
+      { text: String(D.observations.ucTW), options: { bold: true } },
+      { text: String(D.observations.critTW), options: { bold: true } },
+      { text: String(D.observations.totalTW), options: { bold: true } }
+    ]);
+    s3.addTable(obsTable, {
+      x: 0.35, y: 3.7, w: 12.6, colW: [2.4, 2.0, 2.0, 2.1, 2.0, 2.1],
+      border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
+      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle', fill: { color: C.card }
+    });
+    s3.addText('All observations closed / actioned as per HSE Observation Procedure  |  Critical items escalated to Project HSE Manager', {
+      x: 0.4, y: 6.55, w: 12.5, h: 0.25,
+      fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
+    });
+    addFooter(s3, 3, 7);
+
+    // ========== SLIDE 4: INCIDENTS ==========
+    var s4 = pptx.addSlide();
+    s4.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
+    s4.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.55, fill: { color: C.card } });
+    s4.addText('INCIDENTS & NEAR MISSES', {
+      x: 0.4, y: 0.12, w: 12.5, h: 0.35,
+      fontSize: 16, fontFace: 'Calibri', color: C.accent, bold: true, margin: 0
+    });
+    kpiBox(s4, 0.35, 0.7, 3.05, 1.1, 'FIRST AID CASES TW', pad2(D.incidents.faTW), 'This Week', C.accent);
+    kpiBox(s4, 3.55, 0.7, 3.05, 1.1, 'PROPERTY DAMAGE TW', pad2(D.incidents.pdTW), 'This Week', C.accent);
+    kpiBox(s4, 6.75, 0.7, 3.05, 1.1, 'ENV. INCIDENTS TW', pad2(D.incidents.envTW), 'This Week', C.accent);
+    kpiBox(s4, 9.95, 0.7, 3.05, 1.1, 'NEAR MISSES TW', pad2(D.incidents.nmTW), 'This Week', C.accent);
+
+    s4.addText('YEAR TO DATE / PROJECT TILL DATE', {
+      x: 0.4, y: 2.0, w: 12.5, h: 0.25,
+      fontSize: 11, fontFace: 'Calibri', color: C.ptd, bold: true, margin: 0
+    });
+    kpiBox(s4, 0.35, 2.3, 3.05, 0.95, 'FIRST AID YTD', pad2(D.incidents.faYTD), '', C.ptd);
+    kpiBox(s4, 3.55, 2.3, 3.05, 0.95, 'PROPERTY DAMAGE YTD', pad2(D.incidents.pdYTD), '', C.ptd);
+    kpiBox(s4, 6.75, 2.3, 3.05, 0.95, 'ENV. INCIDENTS YTD', pad2(D.incidents.envYTD), '', C.ptd);
+    kpiBox(s4, 9.95, 2.3, 3.05, 0.95, 'NEAR MISSES YTD', pad2(D.incidents.nmYTD), '', C.ptd);
+
+    s4.addText('INCIDENT REGISTER SNAPSHOT', {
+      x: 0.4, y: 3.45, w: 12.5, h: 0.25,
+      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
+    });
+    var incTable = [[
+      { text: 'Type', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Count This Week', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Count YTD / PTD', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
+    ]];
+    [
+      ['First Aid Case', D.incidents.faTW, D.incidents.faYTD],
+      ['Property Damage', D.incidents.pdTW, D.incidents.pdYTD],
+      ['Environmental', D.incidents.envTW, D.incidents.envYTD],
+      ['Near Miss', D.incidents.nmTW, D.incidents.nmYTD],
+      ['LTI / RWC', D.incidents.ltiTW, D.incidents.ltiYTD]
+    ].forEach(function(r){
+      incTable.push([r[0], pad2(r[1]), pad2(r[2])]);
+    });
+    s4.addTable(incTable, {
+      x: 0.35, y: 3.8, w: 12.6, colW: [5.0, 3.8, 3.8],
+      border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
+      fontFace: 'Calibri', fontSize: 12, color: C.text, align: 'center', valign: 'middle', fill: { color: C.card }
+    });
+    s4.addText('Zero LTI Target  |  All incidents reported within 24 hours  |  Investigation reports filed as per procedure', {
+      x: 0.4, y: 6.55, w: 12.5, h: 0.25,
+      fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
+    });
+    addFooter(s4, 4, 7);
+
+    // ========== SLIDE 5: PTW ==========
+    var s5 = pptx.addSlide();
+    s5.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
+    s5.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.55, fill: { color: C.card } });
+    s5.addText('PERMIT TO WORK (PTW) REGISTER', {
+      x: 0.4, y: 0.12, w: 12.5, h: 0.35,
+      fontSize: 16, fontFace: 'Calibri', color: C.accent, bold: true, margin: 0
+    });
+    kpiBox(s5, 0.35, 0.7, 3.05, 1.1, 'PERMITS THIS WEEK', fmt(D.ptw.totalTW), 'Total Issued', C.accent);
+    kpiBox(s5, 3.55, 0.7, 3.05, 1.1, 'PERMITS PROJECT TILL DATE', fmt(D.ptw.totalPTD), 'PTD Cumulative', C.ptd);
+    kpiBox(s5, 6.75, 0.7, 3.05, 1.1, 'DAY SHIFT PERMITS', fmt(D.ptw.day), 'This Week', C.accent);
+    kpiBox(s5, 9.95, 0.7, 3.05, 1.1, 'NIGHT SHIFT PERMITS', fmt(D.ptw.night), 'This Week', C.accent);
+
+    s5.addText('PERMITS BY BUILDING (THIS WEEK)', {
+      x: 0.4, y: 2.05, w: 12.5, h: 0.25,
+      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
+    });
+    var ptwTotDay = 0, ptwTotNight = 0, ptwTotHot = 0, ptwTotCs = 0, ptwTotOther = 0;
+    var ptwTable = [[
+      { text: 'Building', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Total TW', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Day Shift', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Night Shift', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Hot Work', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Confined Space', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Other', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
+    ]];
+    D.buildings.forEach(function(b){
+      var p = D.ptw.byB[b] || {total:0,day:0,night:0,hot:0,cs:0,other:0};
+      ptwTotDay += p.day; ptwTotNight += p.night; ptwTotHot += p.hot; ptwTotCs += p.cs; ptwTotOther += p.other;
+      ptwTable.push([b, String(p.total), String(p.day), String(p.night), String(p.hot), String(p.cs), String(p.other)]);
+    });
+    ptwTable.push([
+      { text: 'TOTAL', options: { bold: true } },
+      { text: String(D.ptw.totalTW), options: { bold: true } },
+      { text: String(ptwTotDay), options: { bold: true } },
+      { text: String(ptwTotNight), options: { bold: true } },
+      { text: String(ptwTotHot), options: { bold: true } },
+      { text: String(ptwTotCs), options: { bold: true } },
+      { text: String(ptwTotOther), options: { bold: true } }
+    ]);
+    s5.addTable(ptwTable, {
+      x: 0.35, y: 2.4, w: 12.6, colW: [2.2, 1.7, 1.7, 1.8, 1.7, 2.0, 1.5],
+      border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
+      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle', fill: { color: C.card }
+    });
+    s5.addText('Key Controls: All PTWs reviewed & authorized by competent persons. Hot Work & Confined Space permits subject to additional gas testing & fire watch. Permit audits conducted weekly.\nPTW system compliance monitored via daily checks and weekly HSE inspections.', {
+      x: 0.4, y: 5.7, w: 12.5, h: 0.7,
+      fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
+    });
+    addFooter(s5, 5, 7);
+
+    // ========== SLIDE 6: EQUIPMENT ==========
+    var s6 = pptx.addSlide();
+    s6.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
+    s6.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.55, fill: { color: C.card } });
+    s6.addText('EQUIPMENT DETAILS', {
+      x: 0.4, y: 0.12, w: 12.5, h: 0.35,
+      fontSize: 16, fontFace: 'Calibri', color: C.accent, bold: true, margin: 0
+    });
+    kpiBox(s6, 0.35, 0.7, 4.1, 1.1, 'TOTAL EQUIPMENT', fmt(D.equipment.total), 'Active on Site', C.accent);
+    kpiBox(s6, 4.6, 0.7, 4.1, 1.1, 'HIGHEST EQUIPMENT TYPE', D.equipment.highest, 'Most Deployed', C.accent2);
+    kpiBox(s6, 8.85, 0.7, 4.1, 1.1, 'CERTIFIED / INSPECTED', D.equipment.certPct + '%', 'Compliance Rate', C.good);
+
+    s6.addText('EQUIPMENT BY BUILDING', {
+      x: 0.4, y: 2.05, w: 12.5, h: 0.25,
+      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
+    });
+    var eqTable = [[
+      { text: 'Building', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Mobile Crane', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Excavator', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'MEWP / Boom', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Forklift', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Generator', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Total', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
+    ]];
+    var eqTypeTotals = D.equipment.types.map(function(t){ return D.equipment.typeTotals[t]||0; });
+    D.buildings.forEach(function(b){
+      var e = D.equipment.byB[b] || {};
+      eqTable.push([b].concat(D.equipment.types.map(function(t){ return String(e[t]||0); })).concat([String(e.Total||0)]));
+    });
+    eqTable.push([
+      { text: 'TOTAL', options: { bold: true } }
+    ].concat(eqTypeTotals.map(function(v){ return { text: String(v), options: { bold: true } }; })).concat([
+      { text: String(D.equipment.total), options: { bold: true } }
+    ]));
+    s6.addTable(eqTable, {
+      x: 0.35, y: 2.4, w: 12.6, colW: [2.2, 1.7, 1.7, 1.9, 1.7, 1.7, 1.7],
+      border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
+      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle', fill: { color: C.card }
+    });
+    s6.addText('All lifting equipment and MEWPs hold valid LOLER / third-party certification. Daily pre-use checks completed and logged. Defects quarantined pending repair.\nEquipment register maintained and updated weekly  |  No unauthorized plant permitted on site. Highest volume: ' + D.equipment.highest + '.', {
+      x: 0.4, y: 5.7, w: 12.5, h: 0.7,
+      fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
+    });
+    addFooter(s6, 6, 7);
+
+    // ========== SLIDE 7: DRILLS & TRAINING ==========
+    var s7 = pptx.addSlide();
+    s7.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
+    s7.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.55, fill: { color: C.card } });
+    s7.addText('HSE DRILLS, CAMPAIGNS & TRAINING', {
+      x: 0.4, y: 0.12, w: 12.5, h: 0.35,
+      fontSize: 16, fontFace: 'Calibri', color: C.accent, bold: true, margin: 0
+    });
+
+    // Left column - Drills
+    s7.addText('DRILLS & CAMPAIGNS', {
+      x: 0.4, y: 0.7, w: 6.0, h: 0.25,
+      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
+    });
+    kpiBox(s7, 0.35, 1.0, 3.0, 0.95, 'DRILLS THIS WEEK', String(D.drills.drillTW), '', C.accent);
+    kpiBox(s7, 3.5, 1.0, 3.0, 0.95, 'DRILLS PTD', String(D.drills.drillPTD), '', C.ptd);
+    kpiBox(s7, 0.35, 2.1, 3.0, 0.95, 'CAMPAIGNS THIS WEEK', String(D.drills.campTW), '', C.accent);
+    kpiBox(s7, 3.5, 2.1, 3.0, 0.95, 'CAMPAIGNS PTD', String(D.drills.campPTD), '', C.ptd);
+
+    var drillTable = [[
+      { text: 'Building', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Drills', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Campaigns', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
+    ]];
+    D.buildings.forEach(function(b){
+      var d = D.drills.byB[b] || {drills:0,campaigns:0};
+      drillTable.push([b, String(d.drills), String(d.campaigns)]);
+    });
+    s7.addTable(drillTable, {
+      x: 0.35, y: 3.25, w: 6.15, colW: [2.5, 1.8, 1.85],
+      border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
+      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle', fill: { color: C.card }
+    });
+
+    // Right column - Training
+    s7.addText('TRAINING & INDUCTIONS', {
+      x: 6.9, y: 0.7, w: 6.0, h: 0.25,
+      fontSize: 11, fontFace: 'Calibri', color: C.accent2, bold: true, margin: 0
+    });
+    kpiBox(s7, 6.85, 1.0, 3.0, 0.95, 'TRAINING SESSIONS TW', String(D.training.sessTW), '', C.accent);
+    kpiBox(s7, 10.0, 1.0, 3.0, 0.95, 'TRAINING HOURS TW', fmt(D.training.hoursTW), '', C.accent);
+    kpiBox(s7, 6.85, 2.1, 3.0, 0.95, 'INDUCTIONS THIS WEEK', String(D.training.indTW), '', C.accent);
+    kpiBox(s7, 10.0, 2.1, 3.0, 0.95, 'INDUCTIONS PTD', fmt(D.training.indPTD), '', C.ptd);
+
+    var trainTable = [[
+      { text: 'Metric', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'This Week', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } },
+      { text: 'Project Till Date', options: { bold: true, color: C.accent, fill: { color: '0F2433' } } }
+    ]];
+    trainTable.push(['Sessions Conducted', String(D.training.sessTW), fmt(D.training.sessPTD)]);
+    trainTable.push(['Total Training Hours', fmt(D.training.hoursTW), fmt(D.training.hoursPTD)]);
+    trainTable.push(['Personnel Trained', fmt(D.training.persTW), fmt(D.training.persPTD)]);
+    trainTable.push(['Inductions Completed', String(D.training.indTW), fmt(D.training.indPTD)]);
+    s7.addTable(trainTable, {
+      x: 6.85, y: 3.25, w: 6.15, colW: [2.5, 1.7, 1.95],
+      border: [{ pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }, { pt: 0.5, color: C.line }],
+      fontFace: 'Calibri', fontSize: 11, color: C.text, align: 'center', valign: 'middle', fill: { color: C.card }
+    });
+
+    s7.addText('All drills documented with attendance & lessons learned. Training matrix maintained current. New starters inducted prior to site access.', {
+      x: 0.4, y: 5.85, w: 12.5, h: 0.35,
+      fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
+    });
+    s7.addText('Thank You', {
+      x: 0.4, y: 6.35, w: 12.5, h: 0.4,
+      fontSize: 20, fontFace: 'Calibri', color: C.accent, bold: true, align: 'center', margin: 0
+    });
+    addFooter(s7, 7, 7);
+
+    var fname = 'MBL_HSE_Weekly_KPI_Report_' + D.weekEndLabel.replace(/\s+/g, '_') + '.pptx';
+    pptx.writeFile({ fileName: fname }).then(function(){
+      PDF_BUSY = false;
+      showToast('Weekly KPI PowerPoint exported successfully.','success');
+    }).catch(function(err){
+      PDF_BUSY = false;
+      console.error(err);
+      showToast('PPTX export failed: ' + ((err && err.message) || err), 'error');
+    });
+  }catch(err){
+    PDF_BUSY = false;
+    console.error(err);
+    showToast('PPTX export failed: ' + ((err && err.message) || err), 'error');
+  }
+}
+
+
+function wkpiExportPptx(){
+  if(typeof exportWeeklyKpiAsPptx === 'function'){
+    exportWeeklyKpiAsPptx(null);
+  } else {
+    showToast('Weekly KPI PPTX export is not available in this build.','error');
+  }
 }
 
 
@@ -6963,6 +7592,7 @@ function runExportByKind(kind, format){
     else { showToast('PPTX for HSE Team uses dashboard-style export','info'); exportPPTX(); }
   } else if(kind === 'weekly'){
     if(format === 'pdf') generateWeeklyReport(window._mblExportPeriod);
+    else if(typeof exportWeeklyKpiAsPptx === 'function') exportWeeklyKpiAsPptx(window._mblExportPeriod);
     else exportPeriodAsPptx('weekly');
   } else if(kind === 'monthly'){
     if(format === 'pdf') generateMonthlyReport(window._mblExportPeriod);
