@@ -2790,6 +2790,10 @@ body[data-theme="black"] #mblTechBgRoot .mbl-tech-bg{opacity:0.75;}
   text-align:center;padding:48px 32px;
   background:radial-gradient(ellipse at 50% 30%,rgba(34,211,238,0.08) 0%,transparent 60%);
 }
+.wkpi-cover-logo{
+  max-width:min(320px,70vw);height:auto;margin:0 auto 28px;display:block;
+  filter:drop-shadow(0 6px 24px rgba(34,211,238,0.25));
+}
 .wkpi-cover-badge{
   background:linear-gradient(135deg,#0891b2,#0d9488);color:#fff;
   font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
@@ -3498,9 +3502,16 @@ function mblComputeWeeklyKpiData(){
   }
   var gpTW=0, uaTW=0, ucTW=0, critTW=0;
   var obsByB = {}; buildings.forEach(function(b){ obsByB[b]={gp:0,ua:0,uc:0,crit:0,total:0}; });
+  var obsByCompany = {};
+  function normCompany(c){
+    c = String(c||'').trim();
+    if(!c) return 'Unknown';
+    return c;
+  }
   obsTW.forEach(function(r){
     var cls = classObs(r);
     var b = mblNormBuilding(r['Area/Building']||r['Building']||r['Location']||r['Area']||'');
+    var co = normCompany(r['Observation belongs to which company?']||r['Company']||r['Contractor']||r['Company Name']||'');
     if(cls==='gp') gpTW++;
     else if(cls==='ua') uaTW++;
     else if(cls==='crit'){ critTW++; ucTW++; }
@@ -3512,6 +3523,12 @@ function mblComputeWeeklyKpiData(){
       else obsByB[b].uc++;
       obsByB[b].total++;
     }
+    if(!obsByCompany[co]) obsByCompany[co]={gp:0,ua:0,uc:0,crit:0,total:0};
+    if(cls==='gp') obsByCompany[co].gp++;
+    else if(cls==='ua') obsByCompany[co].ua++;
+    else if(cls==='crit'){ obsByCompany[co].crit++; obsByCompany[co].uc++; }
+    else obsByCompany[co].uc++;
+    obsByCompany[co].total++;
   });
   var gpPTD=0, uaPTD=0, ucPTD=0;
   obsAll.forEach(function(r){
@@ -3522,6 +3539,7 @@ function mblComputeWeeklyKpiData(){
   });
   var totalObsTW = obsTW.length;
   var totalObsPTD = obsAll.length;
+  var companiesObs = Object.keys(obsByCompany).sort(function(a,b){ return (obsByCompany[b].total||0)-(obsByCompany[a].total||0); });
 
   // --- INCIDENTS ---
   var incAll = (APP_DATA.incidents && APP_DATA.incidents.rows) ? APP_DATA.incidents.rows : [];
@@ -3536,13 +3554,39 @@ function mblComputeWeeklyKpiData(){
     return 'other';
   }
   var faTW=0, pdTW=0, envTW=0, nmTW=0, ltiTW=0;
+  var incByB = {}; buildings.forEach(function(b){ incByB[b]={fa:0,pd:0,env:0,nm:0,lti:0,other:0,total:0}; });
+  var incByCompany = {};
+  function normCompanyInc(c){
+    c = String(c||'').trim();
+    if(!c) return 'Unknown';
+    return c;
+  }
   incTW.forEach(function(r){
     var t = incType(r);
+    var b = mblNormBuilding(r['Building']||r['Location']||r['Area']||r['Area/Building']||'');
+    var co = normCompanyInc(r['Company']||r['Contractor']||r['Company Name']||r['Organization']||'');
     if(t==='fa') faTW++;
     else if(t==='pd') pdTW++;
     else if(t==='env') envTW++;
     else if(t==='nm') nmTW++;
     else if(t==='lti') ltiTW++;
+    if(incByB[b]){
+      if(t==='fa') incByB[b].fa++;
+      else if(t==='pd') incByB[b].pd++;
+      else if(t==='env') incByB[b].env++;
+      else if(t==='nm') incByB[b].nm++;
+      else if(t==='lti') incByB[b].lti++;
+      else incByB[b].other++;
+      incByB[b].total++;
+    }
+    if(!incByCompany[co]) incByCompany[co]={fa:0,pd:0,env:0,nm:0,lti:0,other:0,total:0};
+    if(t==='fa') incByCompany[co].fa++;
+    else if(t==='pd') incByCompany[co].pd++;
+    else if(t==='env') incByCompany[co].env++;
+    else if(t==='nm') incByCompany[co].nm++;
+    else if(t==='lti') incByCompany[co].lti++;
+    else incByCompany[co].other++;
+    incByCompany[co].total++;
   });
   var faYTD=0, pdYTD=0, envYTD=0, nmYTD=0, ltiYTD=0;
   incAll.forEach(function(r){
@@ -3553,6 +3597,7 @@ function mblComputeWeeklyKpiData(){
     else if(t==='nm') nmYTD++;
     else if(t==='lti') ltiYTD++;
   });
+  var companiesInc = Object.keys(incByCompany).sort(function(a,b){ return (incByCompany[b].total||0)-(incByCompany[a].total||0); });
 
   // --- PTW ---
   var ptwAll = (APP_DATA.ptw && APP_DATA.ptw.rows) ? APP_DATA.ptw.rows : [];
@@ -3643,8 +3688,8 @@ function mblComputeWeeklyKpiData(){
     weekEndLabel: weekEndLabel,
     buildings: buildings,
     manpower: { manTW:manTW, manPTD:manPTD, mhTW:mhTW, mhPTD:mhPTD, manByB:manByB, mhByB:mhByB, manPTDByB:manPTDByB, mhPTDByB:mhPTDByB },
-    observations: { gpTW:gpTW, uaTW:uaTW, ucTW:ucTW, critTW:critTW, totalTW:totalObsTW, gpPTD:gpPTD, uaPTD:uaPTD, ucPTD:ucPTD, totalPTD:totalObsPTD, byB:obsByB },
-    incidents: { faTW:faTW, pdTW:pdTW, envTW:envTW, nmTW:nmTW, ltiTW:ltiTW, faYTD:faYTD, pdYTD:pdYTD, envYTD:envYTD, nmYTD:nmYTD, ltiYTD:ltiYTD },
+    observations: { gpTW:gpTW, uaTW:uaTW, ucTW:ucTW, critTW:critTW, totalTW:totalObsTW, gpPTD:gpPTD, uaPTD:uaPTD, ucPTD:ucPTD, totalPTD:totalObsPTD, byB:obsByB, byCompany:obsByCompany, companies:companiesObs },
+    incidents: { faTW:faTW, pdTW:pdTW, envTW:envTW, nmTW:nmTW, ltiTW:ltiTW, faYTD:faYTD, pdYTD:pdYTD, envYTD:envYTD, nmYTD:nmYTD, ltiYTD:ltiYTD, byB:incByB, byCompany:incByCompany, companies:companiesInc },
     ptw: { totalTW:ptwTotalTW, totalPTD:ptwTotalPTD, day:dayShift, night:nightShift, byB:ptwByB },
     equipment: { total:eqTotal, highest:highestType, certPct:certPct, byB:eqByB, types:eqTypes, typeTotals:eqTypeTotals },
     drills: { drillTW:drillCntTW, campTW:campCntTW, drillPTD:drillCntPTD, campPTD:campCntPTD, byB:drillByB },
@@ -3664,9 +3709,10 @@ function renderWeeklyKpiPresentation(){
 
   var slidesHtml = '';
 
-  // SLIDE 1 — Cover
+  // SLIDE 1 — Cover (official MBL logo required)
   slidesHtml += '<div class="wkpi-slide active" data-slide="0">' +
     '<div class="wkpi-cover">' +
+      '<img src="logo.png" alt="MBL — Modern Building Leaders" class="wkpi-cover-logo" onerror="this.onerror=null;this.src=(document.querySelector(\'.logo-img\')||{}).src||\'logo.png\'">' +
       '<div class="wkpi-cover-badge">MBL · Automotive Supplier Park</div>' +
       '<h1>WEEKLY HSE STATISTICS<br>&amp; KPI REPORT</h1>' +
       '<div class="wkpi-cover-sub">Health, Safety &amp; Environment Directorate</div>' +
@@ -3726,8 +3772,20 @@ function renderWeeklyKpiPresentation(){
     '<div class="wkpi-chart-wrap"><canvas id="wkpiChartObs"></canvas></div>' +
     '</div>';
 
-  // SLIDE 4 — Incidents
+  // SLIDE 3b — Observations Comparison Charts
   slidesHtml += '<div class="wkpi-slide" data-slide="3">' +
+    '<div class="wkpi-slide-header"><i class="fas fa-chart-pie"></i> HSE OBSERVATIONS — COMPARISON CHARTS</div>' +
+    '<div class="wkpi-section-title">Observations by Building · by Company · by Category</div>' +
+    '<div class="wkpi-chart-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px;">' +
+      '<div class="wkpi-chart-wrap tall" style="min-height:260px;"><canvas id="wkpiChartObsByB"></canvas></div>' +
+      '<div class="wkpi-chart-wrap tall" style="min-height:260px;"><canvas id="wkpiChartObsByCo"></canvas></div>' +
+      '<div class="wkpi-chart-wrap tall" style="min-height:260px;grid-column:1/-1;"><canvas id="wkpiChartObsCats"></canvas></div>' +
+    '</div>' +
+    '<div class="wkpi-footnote">Comparison of Good Practices, Unsafe Acts and Unsafe Conditions across buildings and companies for the reporting week. Critical findings are escalated immediately.</div>' +
+    '</div>';
+
+  // SLIDE 4 — Incidents
+  slidesHtml += '<div class="wkpi-slide" data-slide="4">' +
     '<div class="wkpi-slide-header"><i class="fas fa-exclamation-circle"></i> INCIDENTS &amp; NEAR MISSES</div>' +
     '<div class="wkpi-section-title">This Week Performance</div>' +
     '<div class="wkpi-kpi-row">' +
@@ -3755,6 +3813,17 @@ function renderWeeklyKpiPresentation(){
     '<div class="wkpi-chart-wrap tall"><canvas id="wkpiChartInc"></canvas></div>' +
     '</div>';
 
+  // SLIDE 4b — Incidents & Near Misses Comparison
+  slidesHtml += '<div class="wkpi-slide" data-slide="5">' +
+    '<div class="wkpi-slide-header"><i class="fas fa-chart-bar"></i> INCIDENTS &amp; NEAR MISSES — COMPARISON</div>' +
+    '<div class="wkpi-section-title">Incidents &amp; Near Misses by Building and Company</div>' +
+    '<div class="wkpi-chart-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px;">' +
+      '<div class="wkpi-chart-wrap tall" style="min-height:280px;"><canvas id="wkpiChartIncByB"></canvas></div>' +
+      '<div class="wkpi-chart-wrap tall" style="min-height:280px;"><canvas id="wkpiChartIncByCo"></canvas></div>' +
+    '</div>' +
+    '<div class="wkpi-footnote">Stacked comparison of First Aid, Property Damage, Environmental, Near Miss and LTI/RWC events by building and company for the reporting week. Zero LTI target remains in force.</div>' +
+    '</div>';
+
   // SLIDE 5 — PTW
   var ptwRows = D.buildings.map(function(b){
     var p = D.ptw.byB[b] || {total:0,day:0,night:0,hot:0,cs:0,other:0};
@@ -3765,7 +3834,7 @@ function renderWeeklyKpiPresentation(){
   var ptwTotHot = D.buildings.reduce(function(s,b){return s+(D.ptw.byB[b]?D.ptw.byB[b].hot:0);},0);
   var ptwTotCs = D.buildings.reduce(function(s,b){return s+(D.ptw.byB[b]?D.ptw.byB[b].cs:0);},0);
   var ptwTotOther = D.buildings.reduce(function(s,b){return s+(D.ptw.byB[b]?D.ptw.byB[b].other:0);},0);
-  slidesHtml += '<div class="wkpi-slide" data-slide="4">' +
+  slidesHtml += '<div class="wkpi-slide" data-slide="6">' +
     '<div class="wkpi-slide-header"><i class="fas fa-file-signature"></i> PERMIT TO WORK (PTW) REGISTER</div>' +
     '<div class="wkpi-section-title">This Week Issuance</div>' +
     '<div class="wkpi-kpi-row">' +
@@ -3782,13 +3851,24 @@ function renderWeeklyKpiPresentation(){
     '<div class="wkpi-footnote">Key Controls: All PTWs reviewed &amp; authorized by competent persons. Hot Work &amp; Confined Space permits subject to additional gas testing &amp; fire watch. Permit audits conducted weekly. Non-conformances raised and closed within defined timelines.<br>PTW system compliance monitored via daily checks and weekly HSE inspections.</div>' +
     '</div>';
 
+  // SLIDE 5b — PTW Comparison Charts
+  slidesHtml += '<div class="wkpi-slide" data-slide="7">' +
+    '<div class="wkpi-slide-header"><i class="fas fa-chart-area"></i> PERMIT TO WORK — VISUAL COMPARISON</div>' +
+    '<div class="wkpi-section-title">PTW by Building · Shift · Permit Type</div>' +
+    '<div class="wkpi-chart-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px;">' +
+      '<div class="wkpi-chart-wrap tall" style="min-height:280px;"><canvas id="wkpiChartPtwByB"></canvas></div>' +
+      '<div class="wkpi-chart-wrap tall" style="min-height:280px;"><canvas id="wkpiChartPtwType"></canvas></div>' +
+    '</div>' +
+    '<div class="wkpi-footnote">Visual comparison of Permit to Work volume by building, day vs night shift, and permit type (Hot Work, Confined Space, Other). All permits authorised by competent persons.</div>' +
+    '</div>';
+
   // SLIDE 6 — Equipment
   var eqRows = D.buildings.map(function(b){
     var e = D.equipment.byB[b] || {};
     return '<tr><td>'+b+'</td>'+D.equipment.types.map(function(t){return '<td>'+(e[t]||0)+'</td>';}).join('')+'<td>'+(e.Total||0)+'</td></tr>';
   }).join('');
   var eqTotals = D.equipment.types.map(function(t){ return D.equipment.typeTotals[t]||0; });
-  slidesHtml += '<div class="wkpi-slide" data-slide="5">' +
+  slidesHtml += '<div class="wkpi-slide" data-slide="8">' +
     '<div class="wkpi-slide-header"><i class="fas fa-truck"></i> EQUIPMENT DETAILS</div>' +
     '<div class="wkpi-section-title">Plant &amp; Equipment Status</div>' +
     '<div class="wkpi-kpi-row">' +
@@ -3810,7 +3890,7 @@ function renderWeeklyKpiPresentation(){
     var d = D.drills.byB[b] || {drills:0,campaigns:0};
     return '<tr><td>'+b+'</td><td>'+d.drills+'</td><td>'+d.campaigns+'</td></tr>';
   }).join('');
-  slidesHtml += '<div class="wkpi-slide" data-slide="6">' +
+  slidesHtml += '<div class="wkpi-slide" data-slide="9">' +
     '<div class="wkpi-slide-header"><i class="fas fa-bullhorn"></i> HSE DRILLS, CAMPAIGNS &amp; TRAINING</div>' +
     '<div class="wkpi-two-col">' +
       '<div>' +
@@ -3841,6 +3921,17 @@ function renderWeeklyKpiPresentation(){
       '</div>' +
     '</div>' +
     '<div class="wkpi-footnote">All drills documented with attendance &amp; lessons learned. Training matrix maintained current. New starters inducted prior to site access. Campaign topics aligned to current site risks (lifting, working at height, vehicle-pedestrian interface).</div>' +
+    '</div>';
+
+  // SLIDE 7b — Drills & Training Comparison
+  slidesHtml += '<div class="wkpi-slide" data-slide="10">' +
+    '<div class="wkpi-slide-header"><i class="fas fa-chart-line"></i> HSE DRILLS, CAMPAIGNS &amp; TRAINING — EFFECTIVENESS</div>' +
+    '<div class="wkpi-section-title">Drills &amp; Campaigns by Building · Training Performance</div>' +
+    '<div class="wkpi-chart-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px;">' +
+      '<div class="wkpi-chart-wrap tall" style="min-height:280px;"><canvas id="wkpiChartDrillByB"></canvas></div>' +
+      '<div class="wkpi-chart-wrap tall" style="min-height:280px;"><canvas id="wkpiChartTrainPerf"></canvas></div>' +
+    '</div>' +
+    '<div class="wkpi-footnote">Building-level comparison of drills and campaigns this week. Training sessions, hours and inductions visualised for effectiveness tracking. Highest participation buildings highlighted for best practice sharing.</div>' +
     '<div class="wkpi-thankyou">Thank You</div>' +
     '</div>';
 
@@ -3987,11 +4078,220 @@ function renderWeeklyKpiPresentation(){
           })
         });
       }
+
+      // Observations by Building (stacked)
+      var ctxObsB = document.getElementById('wkpiChartObsByB');
+      if(ctxObsB){
+        charts.wkpiObsByB = new Chart(ctxObsB, {
+          type: 'bar',
+          data: {
+            labels: D.buildings,
+            datasets: [
+              { label: 'Good Practice', data: D.buildings.map(function(b){ var o=D.observations.byB[b]||{}; return o.gp||0; }), backgroundColor: 'rgba(16,185,129,0.85)', borderRadius: 4, stack: 's' },
+              { label: 'Unsafe Act', data: D.buildings.map(function(b){ var o=D.observations.byB[b]||{}; return o.ua||0; }), backgroundColor: 'rgba(245,158,11,0.85)', borderRadius: 4, stack: 's' },
+              { label: 'Unsafe Condition', data: D.buildings.map(function(b){ var o=D.observations.byB[b]||{}; return o.uc||0; }), backgroundColor: 'rgba(239,68,68,0.85)', borderRadius: 4, stack: 's' }
+            ]
+          },
+          options: Object.assign({}, chartDefaults, {
+            plugins: Object.assign({}, chartDefaults.plugins, {
+              title: { display: true, text: 'Observations by Building (This Week)', color: '#e2e8f0', font: { size: 13, weight: '600' }, padding: { bottom: 10 } }
+            }),
+            scales: { x: Object.assign({}, chartDefaults.scales.x, { stacked: true }), y: Object.assign({}, chartDefaults.scales.y, { stacked: true }) }
+          })
+        });
+      }
+      // Observations by Company
+      var coLabels = (D.observations.companies && D.observations.companies.length) ? D.observations.companies.slice(0,8) : [];
+      var ctxObsCo = document.getElementById('wkpiChartObsByCo');
+      if(ctxObsCo && coLabels.length){
+        charts.wkpiObsByCo = new Chart(ctxObsCo, {
+          type: 'bar',
+          data: {
+            labels: coLabels,
+            datasets: [
+              { label: 'Good Practice', data: coLabels.map(function(c){ var o=D.observations.byCompany[c]||{}; return o.gp||0; }), backgroundColor: 'rgba(16,185,129,0.85)', borderRadius: 4, stack: 's' },
+              { label: 'Unsafe Act', data: coLabels.map(function(c){ var o=D.observations.byCompany[c]||{}; return o.ua||0; }), backgroundColor: 'rgba(245,158,11,0.85)', borderRadius: 4, stack: 's' },
+              { label: 'Unsafe Condition', data: coLabels.map(function(c){ var o=D.observations.byCompany[c]||{}; return o.uc||0; }), backgroundColor: 'rgba(239,68,68,0.85)', borderRadius: 4, stack: 's' }
+            ]
+          },
+          options: Object.assign({}, chartDefaults, {
+            plugins: Object.assign({}, chartDefaults.plugins, {
+              title: { display: true, text: 'Observations by Company (This Week)', color: '#e2e8f0', font: { size: 13, weight: '600' }, padding: { bottom: 10 } }
+            }),
+            scales: { x: Object.assign({}, chartDefaults.scales.x, { stacked: true }), y: Object.assign({}, chartDefaults.scales.y, { stacked: true }) }
+          })
+        });
+      } else if(ctxObsCo){
+        charts.wkpiObsByCo = new Chart(ctxObsCo, {
+          type: 'doughnut',
+          data: { labels: ['Good Practice','Unsafe Act','Unsafe Condition'], datasets: [{ data: [D.observations.gpTW, D.observations.uaTW, D.observations.ucTW], backgroundColor: ['rgba(16,185,129,0.85)','rgba(245,158,11,0.85)','rgba(239,68,68,0.85)'], borderWidth: 0 }] },
+          options: { responsive: true, maintainAspectRatio: false, cutout: '55%', plugins: { legend: { position: 'right', labels: { color: '#cbd5e1', font: { size: 12, weight: '600' } } }, title: { display: true, text: 'Observation Categories (This Week)', color: '#e2e8f0', font: { size: 13, weight: '600' } } } }
+        });
+      }
+      // Category comparison bar
+      var ctxObsCat = document.getElementById('wkpiChartObsCats');
+      if(ctxObsCat){
+        charts.wkpiObsCats = new Chart(ctxObsCat, {
+          type: 'bar',
+          data: {
+            labels: ['Good Practice','Unsafe Act','Unsafe Condition','Critical'],
+            datasets: [{
+              label: 'This Week',
+              data: [D.observations.gpTW, D.observations.uaTW, D.observations.ucTW, D.observations.critTW],
+              backgroundColor: ['rgba(16,185,129,0.85)','rgba(245,158,11,0.85)','rgba(239,68,68,0.85)','rgba(124,58,237,0.85)'],
+              borderRadius: 6, barPercentage: 0.55
+            }]
+          },
+          options: Object.assign({}, chartDefaults, {
+            plugins: Object.assign({}, chartDefaults.plugins, {
+              legend: { display: false },
+              title: { display: true, text: 'Observation Categories — Volume Comparison (This Week)', color: '#e2e8f0', font: { size: 13, weight: '600' }, padding: { bottom: 10 } }
+            })
+          })
+        });
+      }
+      // Incidents by Building
+      var ctxIncB = document.getElementById('wkpiChartIncByB');
+      if(ctxIncB){
+        charts.wkpiIncByB = new Chart(ctxIncB, {
+          type: 'bar',
+          data: {
+            labels: D.buildings,
+            datasets: [
+              { label: 'First Aid', data: D.buildings.map(function(b){ var o=(D.incidents.byB&&D.incidents.byB[b])||{}; return o.fa||0; }), backgroundColor: 'rgba(56,189,248,0.85)', borderRadius: 4, stack: 's' },
+              { label: 'Near Miss', data: D.buildings.map(function(b){ var o=(D.incidents.byB&&D.incidents.byB[b])||{}; return o.nm||0; }), backgroundColor: 'rgba(251,146,60,0.85)', borderRadius: 4, stack: 's' },
+              { label: 'Property Damage', data: D.buildings.map(function(b){ var o=(D.incidents.byB&&D.incidents.byB[b])||{}; return o.pd||0; }), backgroundColor: 'rgba(167,139,250,0.85)', borderRadius: 4, stack: 's' },
+              { label: 'LTI / RWC', data: D.buildings.map(function(b){ var o=(D.incidents.byB&&D.incidents.byB[b])||{}; return o.lti||0; }), backgroundColor: 'rgba(239,68,68,0.9)', borderRadius: 4, stack: 's' }
+            ]
+          },
+          options: Object.assign({}, chartDefaults, {
+            plugins: Object.assign({}, chartDefaults.plugins, {
+              title: { display: true, text: 'Incidents & Near Misses by Building', color: '#e2e8f0', font: { size: 13, weight: '600' }, padding: { bottom: 10 } }
+            }),
+            scales: { x: Object.assign({}, chartDefaults.scales.x, { stacked: true }), y: Object.assign({}, chartDefaults.scales.y, { stacked: true }) }
+          })
+        });
+      }
+      // Incidents by Company
+      var incCoLabels = (D.incidents.companies && D.incidents.companies.length) ? D.incidents.companies.slice(0,8) : [];
+      var ctxIncCo = document.getElementById('wkpiChartIncByCo');
+      if(ctxIncCo && incCoLabels.length){
+        charts.wkpiIncByCo = new Chart(ctxIncCo, {
+          type: 'bar',
+          data: {
+            labels: incCoLabels,
+            datasets: [
+              { label: 'First Aid', data: incCoLabels.map(function(c){ var o=D.incidents.byCompany[c]||{}; return o.fa||0; }), backgroundColor: 'rgba(56,189,248,0.85)', borderRadius: 4, stack: 's' },
+              { label: 'Near Miss', data: incCoLabels.map(function(c){ var o=D.incidents.byCompany[c]||{}; return o.nm||0; }), backgroundColor: 'rgba(251,146,60,0.85)', borderRadius: 4, stack: 's' },
+              { label: 'Property Damage', data: incCoLabels.map(function(c){ var o=D.incidents.byCompany[c]||{}; return o.pd||0; }), backgroundColor: 'rgba(167,139,250,0.85)', borderRadius: 4, stack: 's' },
+              { label: 'LTI / RWC', data: incCoLabels.map(function(c){ var o=D.incidents.byCompany[c]||{}; return o.lti||0; }), backgroundColor: 'rgba(239,68,68,0.9)', borderRadius: 4, stack: 's' }
+            ]
+          },
+          options: Object.assign({}, chartDefaults, {
+            plugins: Object.assign({}, chartDefaults.plugins, {
+              title: { display: true, text: 'Incidents & Near Misses by Company', color: '#e2e8f0', font: { size: 13, weight: '600' }, padding: { bottom: 10 } }
+            }),
+            scales: { x: Object.assign({}, chartDefaults.scales.x, { stacked: true }), y: Object.assign({}, chartDefaults.scales.y, { stacked: true }) }
+          })
+        });
+      } else if(ctxIncCo){
+        charts.wkpiIncByCo = new Chart(ctxIncCo, {
+          type: 'bar',
+          data: {
+            labels: ['First Aid','Near Miss','Property Damage','Environmental','LTI/RWC'],
+            datasets: [{ label: 'This Week', data: [D.incidents.faTW, D.incidents.nmTW, D.incidents.pdTW, D.incidents.envTW, D.incidents.ltiTW], backgroundColor: 'rgba(34,211,238,0.8)', borderRadius: 6 }]
+          },
+          options: Object.assign({}, chartDefaults, {
+            plugins: Object.assign({}, chartDefaults.plugins, {
+              legend: { display: false },
+              title: { display: true, text: 'Incident Types — This Week', color: '#e2e8f0', font: { size: 13, weight: '600' } }
+            })
+          })
+        });
+      }
+      // PTW by Building
+      var ctxPtwB = document.getElementById('wkpiChartPtwByB');
+      if(ctxPtwB){
+        charts.wkpiPtwByB = new Chart(ctxPtwB, {
+          type: 'bar',
+          data: {
+            labels: D.buildings,
+            datasets: [
+              { label: 'Day Shift', data: D.buildings.map(function(b){ var p=D.ptw.byB[b]||{}; return p.day||0; }), backgroundColor: 'rgba(56,189,248,0.85)', borderRadius: 4 },
+              { label: 'Night Shift', data: D.buildings.map(function(b){ var p=D.ptw.byB[b]||{}; return p.night||0; }), backgroundColor: 'rgba(167,139,250,0.85)', borderRadius: 4 }
+            ]
+          },
+          options: Object.assign({}, chartDefaults, {
+            plugins: Object.assign({}, chartDefaults.plugins, {
+              title: { display: true, text: 'PTW by Building — Day vs Night Shift', color: '#e2e8f0', font: { size: 13, weight: '600' }, padding: { bottom: 10 } }
+            })
+          })
+        });
+      }
+      // PTW by type
+      var ctxPtwT = document.getElementById('wkpiChartPtwType');
+      if(ctxPtwT){
+        var hot=0,cs=0,oth=0;
+        D.buildings.forEach(function(b){ var p=D.ptw.byB[b]||{}; hot+=p.hot||0; cs+=p.cs||0; oth+=p.other||0; });
+        charts.wkpiPtwType = new Chart(ctxPtwT, {
+          type: 'doughnut',
+          data: {
+            labels: ['Hot Work','Confined Space','Other'],
+            datasets: [{ data: [hot, cs, oth], backgroundColor: ['rgba(239,68,68,0.85)','rgba(251,146,60,0.85)','rgba(56,189,248,0.85)'], borderWidth: 0, hoverOffset: 8 }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, cutout: '55%',
+            plugins: {
+              legend: { position: 'right', labels: { color: '#cbd5e1', font: { size: 12, weight: '600' }, padding: 16, usePointStyle: true } },
+              title: { display: true, text: 'PTW by Permit Type (This Week)', color: '#e2e8f0', font: { size: 13, weight: '600' } },
+              tooltip: chartDefaults.plugins.tooltip
+            }
+          }
+        });
+      }
+      // Drills by Building
+      var ctxDrillB = document.getElementById('wkpiChartDrillByB');
+      if(ctxDrillB){
+        charts.wkpiDrillByB = new Chart(ctxDrillB, {
+          type: 'bar',
+          data: {
+            labels: D.buildings,
+            datasets: [
+              { label: 'Drills TW', data: D.buildings.map(function(b){ var d=(D.drills.byB&&D.drills.byB[b])||{}; return d.drills||0; }), backgroundColor: 'rgba(34,211,238,0.85)', borderRadius: 6 },
+              { label: 'Campaigns TW', data: D.buildings.map(function(b){ var d=(D.drills.byB&&D.drills.byB[b])||{}; return d.campaigns||0; }), backgroundColor: 'rgba(251,146,60,0.85)', borderRadius: 6 }
+            ]
+          },
+          options: Object.assign({}, chartDefaults, {
+            plugins: Object.assign({}, chartDefaults.plugins, {
+              title: { display: true, text: 'Drills & Campaigns by Building (This Week)', color: '#e2e8f0', font: { size: 13, weight: '600' }, padding: { bottom: 10 } }
+            })
+          })
+        });
+      }
+      // Training performance
+      var ctxTrain = document.getElementById('wkpiChartTrainPerf');
+      if(ctxTrain){
+        charts.wkpiTrainPerf = new Chart(ctxTrain, {
+          type: 'bar',
+          data: {
+            labels: ['Sessions','Training Hours','Personnel Trained','Inductions'],
+            datasets: [
+              { label: 'This Week', data: [D.training.sessTW, D.training.hoursTW, D.training.persTW, D.training.indTW], backgroundColor: 'rgba(34,211,238,0.85)', borderRadius: 6 },
+              { label: 'Project Till Date', data: [D.training.sessPTD, D.training.hoursPTD, D.training.persPTD, D.training.indPTD], backgroundColor: 'rgba(167,139,250,0.7)', borderRadius: 6 }
+            ]
+          },
+          options: Object.assign({}, chartDefaults, {
+            plugins: Object.assign({}, chartDefaults.plugins, {
+              title: { display: true, text: 'Training & Induction — TW vs PTD', color: '#e2e8f0', font: { size: 13, weight: '600' }, padding: { bottom: 10 } }
+            })
+          })
+        });
+      }
     }catch(err){ console.warn('WKPI charts', err); }
   }, 150);
 
   window.__wkpiSlide = 0;
-  window.__wkpiTotal = 7;
+  window.__wkpiTotal = 11;
 }
 
 function wkpiGo(i){
@@ -4019,6 +4319,8 @@ function exportWeeklyKpiAsPptx(periodOpt){
   PDF_BUSY = true;
   showToast('Building official Weekly HSE Statistics & KPI PowerPoint…','info');
 
+  var logoPromise = (typeof mblEnsureLogo === 'function') ? mblEnsureLogo() : Promise.resolve(null);
+  logoPromise.then(function(logoDataUrl){
   try{
     var origGet = mblGetLastWeekRange;
     if(periodOpt && periodOpt.start && periodOpt.end){
@@ -4026,6 +4328,8 @@ function exportWeeklyKpiAsPptx(periodOpt){
     }
     var D = mblComputeWeeklyKpiData();
     mblGetLastWeekRange = origGet;
+    // Official MBL logo (required on all Weekly KPI presentation exports)
+    var MBL_LOGO = logoDataUrl || (typeof pdfLogo === 'function' ? pdfLogo() : null) || null;
 
     var fmt = function(n){ return (n==null||isNaN(n)) ? '0' : Number(n).toLocaleString('en-US'); };
     var pad2 = function(n){ n = Number(n)||0; return (n<10?'0':'')+n; };
@@ -4067,18 +4371,27 @@ function exportWeeklyKpiAsPptx(periodOpt){
     pptx.subject = 'Automotive Supplier Park | MBL';
 
     function addHeaderBar(slide, title){
+      // Full-width header bar; title left; official MBL logo upper-right
       slide.addShape(pptx.ShapeType.rect, {
-        x: 0, y: 0, w: 11.7, h: 0.72,
+        x: 0, y: 0, w: 13.333, h: 0.72,
         fill: { color: C.headerBar }
       });
-      slide.addText(title, {
-        x: 0.35, y: 0.16, w: 11.0, h: 0.42,
-        fontSize: 18, fontFace: 'Calibri', color: C.headerText, bold: true, margin: 0
-      });
       slide.addShape(pptx.ShapeType.rect, {
-        x: 11.7, y: 0, w: 1.633, h: 0.72,
+        x: 11.55, y: 0, w: 1.783, h: 0.72,
         fill: { color: C.accent }
       });
+      slide.addText(title, {
+        x: 0.35, y: 0.16, w: 10.9, h: 0.42,
+        fontSize: 18, fontFace: 'Calibri', color: C.headerText, bold: true, margin: 0
+      });
+      if(MBL_LOGO){
+        try{
+          // Upper-right corner wordmark (wide aspect, fits accent panel)
+          slide.addImage({ data: MBL_LOGO, x: 11.62, y: 0.10, w: 1.55, h: 0.52 });
+        }catch(eLogoHdr){
+          try{ slide.addImage({ data: MBL_LOGO, x: 11.75, y: 0.14, w: 1.35, h: 0.44 }); }catch(e2){}
+        }
+      }
     }
 
     function addFooter(slide, page, total){
@@ -4126,11 +4439,29 @@ function exportWeeklyKpiAsPptx(periodOpt){
     var tdOpt = { color: C.text, align: 'center', valign: 'middle' };
     var totOpt = { bold: true, color: C.text, fill: { color: C.totalRow }, align: 'center', valign: 'middle' };
 
-    // SLIDE 1: COVER
+    // SLIDE 1: COVER — MBL logo mandatory
     var s1 = pptx.addSlide();
     s1.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
     s1.addShape(pptx.ShapeType.rect, { x: 3.6, y: 0, w: 9.733, h: 7.5, fill: { color: C.cardAlt } });
     s1.addShape(pptx.ShapeType.rect, { x: 3.6, y: 0, w: 0.12, h: 7.5, fill: { color: C.accent } });
+    s1.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.08, fill: { color: C.headerBar } });
+    // Official MBL wordmark (Modern Building Leaders)
+    if(MBL_LOGO){
+      try{
+        s1.addImage({ data: MBL_LOGO, x: 4.55, y: 1.15, w: 4.2, h: 1.75 });
+      }catch(eCoverLogo){
+        try{ s1.addImage({ data: MBL_LOGO, x: 5.15, y: 1.35, w: 3.0, h: 1.25 }); }catch(e2){}
+      }
+    } else {
+      s1.addText('MBL', {
+        x: 1.5, y: 1.55, w: 10.3, h: 0.7,
+        fontSize: 42, fontFace: 'Calibri', color: C.headerBar, bold: true, align: 'center', margin: 0
+      });
+      s1.addText('Modern Building Leaders', {
+        x: 1.5, y: 2.25, w: 10.3, h: 0.35,
+        fontSize: 14, fontFace: 'Calibri', color: C.label, align: 'center', margin: 0
+      });
+    }
     s1.addShape(pptx.ShapeType.rect, { x: 1.5, y: 3.55, w: 10.3, h: 1.55, fill: { color: C.bg } });
     s1.addText('WEEKLY HSE STATISTICS\n& KPI REPORT', {
       x: 1.5, y: 3.6, w: 10.3, h: 0.95,
@@ -4144,7 +4475,6 @@ function exportWeeklyKpiAsPptx(periodOpt){
       x: 1.5, y: 4.85, w: 10.3, h: 0.25,
       fontSize: 13, fontFace: 'Calibri', color: C.muted, align: 'center', margin: 0
     });
-    s1.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 0.08, fill: { color: C.headerBar } });
     s1.addText('MBL HSE Directorate  ·  Live data from site registers  ·  Zero LTI Target', {
       x: 0.5, y: 6.9, w: 12.3, h: 0.28,
       fontSize: 11, fontFace: 'Calibri', color: C.muted, align: 'center', margin: 0
@@ -4192,7 +4522,7 @@ function exportWeeklyKpiAsPptx(periodOpt){
       x: 0.35, y: 6.55, w: 12.5, h: 0.25,
       fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
     });
-    addFooter(s2, 2, 7);
+    addFooter(s2, 2, 11);
 
     // SLIDE 3: OBSERVATIONS
     var s3 = pptx.addSlide();
@@ -4245,7 +4575,60 @@ function exportWeeklyKpiAsPptx(periodOpt){
       x: 0.35, y: 6.55, w: 12.5, h: 0.25,
       fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
     });
-    addFooter(s3, 3, 7);
+    addFooter(s3, 3, 11);
+
+    // SLIDE 3b: OBSERVATIONS COMPARISON CHARTS
+    var s3b = pptx.addSlide();
+    s3b.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
+    addHeaderBar(s3b, 'HSE OBSERVATIONS — COMPARISON CHARTS');
+    sectionLabel(s3b, 0.35, 0.9, 12.5, 'BY BUILDING · BY COMPANY · BY CATEGORY');
+    // Stacked bar by building
+    var obsBLabels = D.buildings.slice();
+    var obsGp = obsBLabels.map(function(b){ var o=D.observations.byB[b]||{}; return o.gp||0; });
+    var obsUa = obsBLabels.map(function(b){ var o=D.observations.byB[b]||{}; return o.ua||0; });
+    var obsUc = obsBLabels.map(function(b){ var o=D.observations.byB[b]||{}; return o.uc||0; });
+    s3b.addChart(pptx.charts.bar, {
+      x: 0.3, y: 1.25, w: 6.3, h: 2.9,
+      barGrouping: 'stacked',
+      showTitle: true, title: 'Observations by Building (TW)', titleFontSize: 12, titleColor: C.text, titleBold: true,
+      showLegend: true, legendPos: 'b',
+      chartColors: [C.good, C.warn, C.danger],
+      chartData: [
+        { name: 'Good Practice', labels: obsBLabels, values: obsGp },
+        { name: 'Unsafe Act', labels: obsBLabels, values: obsUa },
+        { name: 'Unsafe Condition', labels: obsBLabels, values: obsUc }
+      ]
+    });
+    // By company
+    var coLabs = (D.observations.companies && D.observations.companies.length) ? D.observations.companies.slice(0,6) : obsBLabels;
+    var coGp = coLabs.map(function(c){ var o=(D.observations.byCompany&&D.observations.byCompany[c])||(D.observations.byB&&D.observations.byB[c])||{}; return o.gp||0; });
+    var coUa = coLabs.map(function(c){ var o=(D.observations.byCompany&&D.observations.byCompany[c])||(D.observations.byB&&D.observations.byB[c])||{}; return o.ua||0; });
+    var coUc = coLabs.map(function(c){ var o=(D.observations.byCompany&&D.observations.byCompany[c])||(D.observations.byB&&D.observations.byB[c])||{}; return o.uc||0; });
+    s3b.addChart(pptx.charts.bar, {
+      x: 6.8, y: 1.25, w: 6.2, h: 2.9,
+      barGrouping: 'stacked',
+      showTitle: true, title: 'Observations by Company (TW)', titleFontSize: 12, titleColor: C.text, titleBold: true,
+      showLegend: true, legendPos: 'b',
+      chartColors: [C.good, C.warn, C.danger],
+      chartData: [
+        { name: 'Good Practice', labels: coLabs, values: coGp },
+        { name: 'Unsafe Act', labels: coLabs, values: coUa },
+        { name: 'Unsafe Condition', labels: coLabs, values: coUc }
+      ]
+    });
+    // Category comparison
+    s3b.addChart(pptx.charts.bar, {
+      x: 2.5, y: 4.35, w: 8.3, h: 2.4,
+      showTitle: true, title: 'Observation Categories — Volume (This Week)', titleFontSize: 12, titleColor: C.text, titleBold: true,
+      showLegend: false,
+      chartColors: [C.good, C.warn, C.danger, C.ptd],
+      chartData: [{
+        name: 'Count',
+        labels: ['Good Practice','Unsafe Act','Unsafe Condition','Critical'],
+        values: [D.observations.gpTW, D.observations.uaTW, D.observations.ucTW, D.observations.critTW]
+      }]
+    });
+    addFooter(s3b, 4, 11);
 
     // SLIDE 4: INCIDENTS
     var s4 = pptx.addSlide();
@@ -4289,7 +4672,50 @@ function exportWeeklyKpiAsPptx(periodOpt){
       x: 0.35, y: 6.55, w: 12.5, h: 0.25,
       fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
     });
-    addFooter(s4, 4, 7);
+    addFooter(s4, 5, 11);
+
+    // SLIDE 4b: INCIDENTS COMPARISON
+    var s4b = pptx.addSlide();
+    s4b.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
+    addHeaderBar(s4b, 'INCIDENTS & NEAR MISSES — COMPARISON');
+    sectionLabel(s4b, 0.35, 0.9, 12.5, 'BY BUILDING AND COMPANY');
+    var ibLabels = D.buildings.slice();
+    var ibFa = ibLabels.map(function(b){ var o=(D.incidents.byB&&D.incidents.byB[b])||{}; return o.fa||0; });
+    var ibNm = ibLabels.map(function(b){ var o=(D.incidents.byB&&D.incidents.byB[b])||{}; return o.nm||0; });
+    var ibPd = ibLabels.map(function(b){ var o=(D.incidents.byB&&D.incidents.byB[b])||{}; return o.pd||0; });
+    var ibLti = ibLabels.map(function(b){ var o=(D.incidents.byB&&D.incidents.byB[b])||{}; return o.lti||0; });
+    s4b.addChart(pptx.charts.bar, {
+      x: 0.3, y: 1.25, w: 6.3, h: 5.2,
+      barGrouping: 'stacked',
+      showTitle: true, title: 'Incidents & Near Misses by Building', titleFontSize: 13, titleColor: C.text, titleBold: true,
+      showLegend: true, legendPos: 'b',
+      chartColors: [C.accent, C.warn, C.ptd, C.danger],
+      chartData: [
+        { name: 'First Aid', labels: ibLabels, values: ibFa },
+        { name: 'Near Miss', labels: ibLabels, values: ibNm },
+        { name: 'Property Damage', labels: ibLabels, values: ibPd },
+        { name: 'LTI / RWC', labels: ibLabels, values: ibLti }
+      ]
+    });
+    var icLabs = (D.incidents.companies && D.incidents.companies.length) ? D.incidents.companies.slice(0,6) : ibLabels;
+    var icFa = icLabs.map(function(c){ var o=(D.incidents.byCompany&&D.incidents.byCompany[c])||{}; return o.fa||0; });
+    var icNm = icLabs.map(function(c){ var o=(D.incidents.byCompany&&D.incidents.byCompany[c])||{}; return o.nm||0; });
+    var icPd = icLabs.map(function(c){ var o=(D.incidents.byCompany&&D.incidents.byCompany[c])||{}; return o.pd||0; });
+    var icLti = icLabs.map(function(c){ var o=(D.incidents.byCompany&&D.incidents.byCompany[c])||{}; return o.lti||0; });
+    s4b.addChart(pptx.charts.bar, {
+      x: 6.8, y: 1.25, w: 6.2, h: 5.2,
+      barGrouping: 'stacked',
+      showTitle: true, title: 'Incidents & Near Misses by Company', titleFontSize: 13, titleColor: C.text, titleBold: true,
+      showLegend: true, legendPos: 'b',
+      chartColors: [C.accent, C.warn, C.ptd, C.danger],
+      chartData: [
+        { name: 'First Aid', labels: icLabs, values: icFa },
+        { name: 'Near Miss', labels: icLabs, values: icNm },
+        { name: 'Property Damage', labels: icLabs, values: icPd },
+        { name: 'LTI / RWC', labels: icLabs, values: icLti }
+      ]
+    });
+    addFooter(s4b, 6, 11);
 
     // SLIDE 5: PTW
     var s5 = pptx.addSlide();
@@ -4342,7 +4768,40 @@ function exportWeeklyKpiAsPptx(periodOpt){
       x: 0.35, y: 5.9, w: 12.5, h: 0.7,
       fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
     });
-    addFooter(s5, 5, 7);
+    addFooter(s5, 7, 11);
+
+    // SLIDE 5b: PTW VISUAL COMPARISON
+    var s5b = pptx.addSlide();
+    s5b.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
+    addHeaderBar(s5b, 'PERMIT TO WORK — VISUAL COMPARISON');
+    sectionLabel(s5b, 0.35, 0.9, 12.5, 'BY BUILDING · SHIFT · PERMIT TYPE');
+    var pbLabels = D.buildings.slice();
+    var pbDay = pbLabels.map(function(b){ var p=D.ptw.byB[b]||{}; return p.day||0; });
+    var pbNight = pbLabels.map(function(b){ var p=D.ptw.byB[b]||{}; return p.night||0; });
+    s5b.addChart(pptx.charts.bar, {
+      x: 0.3, y: 1.25, w: 6.5, h: 5.2,
+      showTitle: true, title: 'PTW by Building — Day vs Night', titleFontSize: 13, titleColor: C.text, titleBold: true,
+      showLegend: true, legendPos: 'b',
+      chartColors: [C.accent, C.ptd],
+      chartData: [
+        { name: 'Day Shift', labels: pbLabels, values: pbDay },
+        { name: 'Night Shift', labels: pbLabels, values: pbNight }
+      ]
+    });
+    var hotT=0, csT=0, othT=0;
+    D.buildings.forEach(function(b){ var p=D.ptw.byB[b]||{}; hotT+=p.hot||0; csT+=p.cs||0; othT+=p.other||0; });
+    s5b.addChart(pptx.charts.doughnut, {
+      x: 7.2, y: 1.5, w: 5.5, h: 4.5,
+      showTitle: true, title: 'PTW by Permit Type (This Week)', titleFontSize: 13, titleColor: C.text, titleBold: true,
+      showLegend: true, legendPos: 'b',
+      chartColors: [C.danger, C.warn, C.accent],
+      chartData: [{
+        name: 'Type',
+        labels: ['Hot Work','Confined Space','Other'],
+        values: [hotT, csT, othT]
+      }]
+    });
+    addFooter(s5b, 8, 11);
 
     // SLIDE 6: EQUIPMENT
     var s6 = pptx.addSlide();
@@ -4383,7 +4842,7 @@ function exportWeeklyKpiAsPptx(periodOpt){
       x: 0.35, y: 5.9, w: 12.5, h: 0.7,
       fontSize: 10, fontFace: 'Calibri', color: C.muted, margin: 0
     });
-    addFooter(s6, 6, 7);
+    addFooter(s6, 9, 11);
 
     // SLIDE 7: DRILLS & TRAINING
     var s7 = pptx.addSlide();
@@ -4453,12 +4912,51 @@ function exportWeeklyKpiAsPptx(periodOpt){
       x: 4.5, y: 6.42, w: 4.3, h: 0.42,
       fontSize: 18, fontFace: 'Calibri', color: C.white, bold: true, align: 'center', margin: 0
     });
-    addFooter(s7, 7, 7);
+    addFooter(s7, 10, 11);
+
+    // SLIDE 7b: DRILLS & TRAINING EFFECTIVENESS
+    var s7b = pptx.addSlide();
+    s7b.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.333, h: 7.5, fill: { color: C.bg } });
+    addHeaderBar(s7b, 'HSE DRILLS, CAMPAIGNS & TRAINING — EFFECTIVENESS');
+    sectionLabel(s7b, 0.35, 0.9, 12.5, 'BY BUILDING · TRAINING PERFORMANCE');
+    var dbLabels = D.buildings.slice();
+    var dbDr = dbLabels.map(function(b){ var d=(D.drills.byB&&D.drills.byB[b])||{}; return d.drills||0; });
+    var dbCa = dbLabels.map(function(b){ var d=(D.drills.byB&&D.drills.byB[b])||{}; return d.campaigns||0; });
+    s7b.addChart(pptx.charts.bar, {
+      x: 0.3, y: 1.25, w: 6.3, h: 4.8,
+      showTitle: true, title: 'Drills & Campaigns by Building (TW)', titleFontSize: 13, titleColor: C.text, titleBold: true,
+      showLegend: true, legendPos: 'b',
+      chartColors: [C.accent, C.warn],
+      chartData: [
+        { name: 'Drills', labels: dbLabels, values: dbDr },
+        { name: 'Campaigns', labels: dbLabels, values: dbCa }
+      ]
+    });
+    s7b.addChart(pptx.charts.bar, {
+      x: 6.8, y: 1.25, w: 6.2, h: 4.8,
+      showTitle: true, title: 'Training & Induction — TW vs PTD', titleFontSize: 13, titleColor: C.text, titleBold: true,
+      showLegend: true, legendPos: 'b',
+      chartColors: [C.accent, C.ptd],
+      chartData: [
+        { name: 'This Week', labels: ['Sessions','Hours','Personnel','Inductions'], values: [D.training.sessTW, D.training.hoursTW, D.training.persTW, D.training.indTW] },
+        { name: 'Project Till Date', labels: ['Sessions','Hours','Personnel','Inductions'], values: [D.training.sessPTD, D.training.hoursPTD, D.training.persPTD, D.training.indPTD] }
+      ]
+    });
+    s7b.addShape(pptx.ShapeType.roundRect, {
+      x: 4.5, y: 6.35, w: 4.3, h: 0.55,
+      fill: { color: C.darkCard },
+      rectRadius: 0.06
+    });
+    s7b.addText('Thank You', {
+      x: 4.5, y: 6.42, w: 4.3, h: 0.42,
+      fontSize: 18, fontFace: 'Calibri', color: C.white, bold: true, align: 'center', margin: 0
+    });
+    addFooter(s7b, 11, 11);
 
     var fname = 'MBL_HSE_Weekly_KPI_Report_' + D.weekEndLabel.replace(/\s+/g, '_') + '.pptx';
     pptx.writeFile({ fileName: fname }).then(function(){
       PDF_BUSY = false;
-      showToast('Weekly KPI PowerPoint exported successfully.','success');
+      showToast('Weekly KPI PowerPoint exported successfully (MBL logo included).','success');
     }).catch(function(err){
       PDF_BUSY = false;
       console.error(err);
@@ -4469,6 +4967,11 @@ function exportWeeklyKpiAsPptx(periodOpt){
     console.error(err);
     showToast('PPTX export failed: ' + ((err && err.message) || err), 'error');
   }
+  }).catch(function(errLogo){
+    PDF_BUSY = false;
+    console.error(errLogo);
+    showToast('PPTX export failed while loading MBL logo: ' + ((errLogo && errLogo.message) || errLogo), 'error');
+  });
 }
 
 
