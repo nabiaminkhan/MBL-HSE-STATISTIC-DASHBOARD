@@ -2407,6 +2407,108 @@ body[data-morphism="embroidery"] .data-table thead th{
 /* ===== PDF EXPORT HELPERS ===== */
 #pdfStageHost{position:fixed;left:-10000px;top:0;width:1400px;z-index:-1;opacity:0;pointer-events:none;}
 
+
+/* ===== WELCOME VIDEO SPLASH (highest priority) ===== */
+#welcomeOverlay[data-welcome-video="1"]{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:9999 !important;
+  display:block !important;
+  background:#000 !important;
+  overflow:hidden !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+#welcomeOverlay[data-welcome-video="1"].fade-out{
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  transition:opacity 1.0s ease, visibility 1.0s !important;
+}
+/* Kill conflicting welcome decorations when video splash is active */
+#welcomeOverlay[data-welcome-video="1"] .mbl-tech-bg,
+#welcomeOverlay[data-welcome-video="1"] .welcome-arch-bg,
+#welcomeOverlay[data-welcome-video="1"] .welcome-arch-overlay,
+#welcomeOverlay[data-welcome-video="1"] .welcome-logo,
+#welcomeOverlay[data-welcome-video="1"] .welcome-msg,
+#welcomeOverlay[data-welcome-video="1"] .welcome-thanks,
+#welcomeOverlay[data-welcome-video="1"] .ecg-wrap{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+#welcomeOverlay[data-welcome-video="1"]::before,
+#welcomeOverlay[data-welcome-video="1"]::after{
+  display:none !important;
+  content:none !important;
+}
+#welcomeOverlay[data-welcome-video="1"] .welcome-video{
+  position:absolute !important;
+  top:0 !important;
+  left:0 !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:100% !important;
+  min-height:100% !important;
+  object-fit:cover !important;
+  object-position:center center !important;
+  z-index:2 !important;
+  background:#000 !important;
+  display:block !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:none !important;
+}
+#welcomeOverlay[data-welcome-video="1"] .welcome-video-shade{
+  position:absolute !important;
+  inset:0 !important;
+  z-index:3 !important;
+  pointer-events:none !important;
+  background:linear-gradient(to top, rgba(0,0,0,0.28) 0%, transparent 35%, transparent 75%, rgba(0,0,0,0.18) 100%) !important;
+}
+#welcomeOverlay[data-welcome-video="1"] .welcome-skip-btn{
+  position:absolute !important;
+  bottom:28px !important;
+  right:28px !important;
+  z-index:10 !important;
+  padding:10px 18px !important;
+  border-radius:999px !important;
+  border:1px solid rgba(255,255,255,0.35) !important;
+  background:rgba(0,0,0,0.55) !important;
+  color:rgba(255,255,255,0.95) !important;
+  font-family:inherit !important;
+  font-size:13px !important;
+  font-weight:600 !important;
+  letter-spacing:0.4px !important;
+  cursor:pointer !important;
+  backdrop-filter:blur(10px) !important;
+  -webkit-backdrop-filter:blur(10px) !important;
+  transition:background .2s, border-color .2s, transform .2s !important;
+  display:inline-block !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+#welcomeOverlay[data-welcome-video="1"] .welcome-skip-btn:hover{
+  background:rgba(0,188,212,0.40) !important;
+  border-color:rgba(0,188,212,0.65) !important;
+  transform:translateY(-1px) !important;
+}
+@media (max-width:640px){
+  #welcomeOverlay[data-welcome-video="1"] .welcome-skip-btn{
+    bottom:18px !important;
+    right:16px !important;
+    padding:8px 14px !important;
+    font-size:12px !important;
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  #welcomeOverlay[data-welcome-video="1"] .welcome-video{ display:none !important; }
+  #welcomeOverlay[data-welcome-video="1"]{
+    background:radial-gradient(ellipse at center, #0a1628 0%, #050b14 100%) !important;
+  }
+}
+
 /* ===== WELCOME / LOGIN / ADMIN ===== */
 #welcomeOverlay{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:linear-gradient(135deg,var(--bg-dark,#001a14) 0%,var(--bg-purple,#003d33) 50%,var(--bg-deep,#004d40) 100%);
@@ -3548,17 +3650,17 @@ body[data-density="compact"] .card-title{font-size:13px;}
 })();
 </script>
 
-<!-- WELCOME SPLASH -->
-<div id="welcomeOverlay">
-  <div class="arch-bg-image welcome-arch-bg" aria-hidden="true"></div>
-  <div class="arch-bg-overlay welcome-arch-overlay" aria-hidden="true"></div>
-  <img src="logo.png" alt="MBL" class="welcome-logo" onerror="this.src=document.querySelector('.logo-img')?.src||''">
-  <div class="welcome-msg">
-    <span class="ecg-wrap"><svg class="ecg-line" viewBox="0 0 80 28"><polyline points="0,14 12,14 16,6 22,22 28,10 34,18 40,14 80,14"/></svg></span>
-    Safety First — Every Task, Every Time
-    <span class="ecg-wrap"><svg class="ecg-line" viewBox="0 0 80 28"><polyline points="0,14 12,14 16,6 22,22 28,10 34,18 40,14 80,14"/></svg></span>
-  </div>
-  <p class="welcome-thanks"><strong>THANK YOU HSE TEAM</strong></p>
+<!-- WELCOME SPLASH — VIDEO -->
+<div id="welcomeOverlay" data-welcome-video="1">
+  <video id="welcomeVideo" class="welcome-video"
+    autoplay muted playsinline webkit-playsinline preload="auto"
+    poster="welcome-poster.jpg"
+    aria-label="MBL HSE Welcome">
+    <source src="welcome-video.mp4" type="video/mp4">
+    <source src="/welcome-video.mp4" type="video/mp4">
+  </video>
+  <div class="welcome-video-shade" aria-hidden="true"></div>
+  <button type="button" id="welcomeSkipBtn" class="welcome-skip-btn" aria-label="Skip welcome video">Skip intro</button>
 </div>
 
 <!-- LOGIN -->
@@ -13538,7 +13640,10 @@ window.mblSyncPaletteFromTheme = mblSyncPaletteFromTheme;
 
   function mount(){
     var wel = document.getElementById('welcomeOverlay');
-    if(wel) createLayer(wel, 'welcome');
+    // Do not inject animated tech canvas over the welcome video splash
+    if(wel && wel.getAttribute('data-welcome-video') !== '1'){
+      createLayer(wel, 'welcome');
+    }
 
     var root = document.getElementById('mblTechBgRoot');
     if(!root){
@@ -13948,42 +14053,87 @@ otLoad();
 
 function startWelcomeThenLogin(){
   const wel = document.getElementById('welcomeOverlay');
-  // Calm splash: short enough on mobile, still readable on desktop
-  var holdMs = 3800;
-  var fadeMs = 1400;
-  try{
-    if(window.matchMedia && window.matchMedia('(max-width: 900px)').matches){
-      holdMs = 2800;
-      fadeMs = 1000;
-    }
-    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-      holdMs = 1200;
-      fadeMs = 350;
-    }
-  }catch(e){}
-  setTimeout(function(){
+  const vid = document.getElementById('welcomeVideo');
+  const skipBtn = document.getElementById('welcomeSkipBtn');
+  var fadeMs = 1000;
+  var finished = false;
+  var safetyTimer = null;
+
+  function finishWelcome(){
+    if(finished) return;
+    finished = true;
+    if(safetyTimer){ try{ clearTimeout(safetyTimer); }catch(e){} }
+    try{ if(vid){ vid.pause(); vid.removeAttribute('src'); vid.load(); } }catch(e){}
     if(wel) wel.classList.add('fade-out');
     setTimeout(function(){
-      if(wel) wel.style.display = 'none';
-      // Stop welcome canvas work after splash (saves mobile CPU)
-      try{
-        var wc = wel && wel.querySelector && wel.querySelector('.mbl-tech-bg canvas');
-        if(wc){
-          var wctx = wc.getContext && wc.getContext('2d');
-          if(wctx) wctx.clearRect(0,0,wc.width,wc.height);
-          if(wc.parentNode) wc.parentNode.remove();
-        }
-      }catch(e){}
+      if(wel){ wel.style.display = 'none'; }
       try{
         const s = mblSS.getItem(MBL_AUTH_KEY);
-        // Only restore admin mode when the server-issued token is still present
         if(s === 'admin' && mblGetAdminToken()){ enterApp(true); return; }
         if(s === 'admin') mblSS.removeItem(MBL_AUTH_KEY);
       }catch(e){}
-      // Always open dashboard as viewer after welcome — Admin Login is a header button
       enterApp(false);
     }, fadeMs);
-  }, holdMs);
+  }
+
+  try{
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      finishWelcome();
+      return;
+    }
+  }catch(e){}
+
+  if(skipBtn){
+    skipBtn.addEventListener('click', function(e){
+      try{ e.preventDefault(); e.stopPropagation(); }catch(err){}
+      finishWelcome();
+    });
+  }
+
+  if(!vid){
+    setTimeout(finishWelcome, 2500);
+    return;
+  }
+
+  // Hard-set autoplay-friendly attributes (some browsers ignore HTML attrs on dynamic context)
+  try{
+    vid.muted = true;
+    vid.defaultMuted = true;
+    vid.volume = 0;
+    vid.setAttribute('muted', '');
+    vid.setAttribute('playsinline', '');
+    vid.setAttribute('webkit-playsinline', '');
+    vid.playsInline = true;
+    vid.preload = 'auto';
+  }catch(e){}
+
+  function tryPlay(){
+    try{
+      var p = vid.play();
+      if(p && typeof p.then === 'function'){
+        p.then(function(){ /* playing */ }).catch(function(){
+          // Autoplay blocked: keep poster visible; user can Skip or wait for safety timeout
+        });
+      }
+    }catch(e){}
+  }
+
+  vid.addEventListener('ended', function(){ finishWelcome(); });
+  vid.addEventListener('error', function(){
+    // If media fails to load, do not leave user on black screen
+    setTimeout(finishWelcome, 800);
+  });
+  vid.addEventListener('loadeddata', function(){ tryPlay(); });
+  vid.addEventListener('canplay', function(){ tryPlay(); });
+
+  // Immediate attempt + retries (handles slow first paint / late source bind)
+  tryPlay();
+  setTimeout(tryPlay, 200);
+  setTimeout(tryPlay, 600);
+  setTimeout(tryPlay, 1200);
+
+  // Hard safety: never longer than ~11.5s on splash
+  safetyTimer = setTimeout(function(){ finishWelcome(); }, 11500);
 }
 function openAdminLoginModal(){
   const login = document.getElementById('loginOverlay');
