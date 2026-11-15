@@ -20,7 +20,6 @@ four settings.
 | `sw.js` | Offline support (works with no signal) |
 | `manifest.json`, `icons/` | "Add to Home Screen" app name and icons |
 | `logo.png` | MBL logo used on screen and in reports |
-| `welcome-video.mp4` | Full-screen welcome splash video (autoplays muted, skippable) |
 | `vercel.json`, `package.json` | Hosting configuration |
 
 ---
