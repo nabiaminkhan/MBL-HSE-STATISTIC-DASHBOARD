@@ -7,7 +7,7 @@
  *  - cross-origin CDN  : runtime cache only after a real successful fetch
  *                        (never precached, so a CDN hiccup cannot break install)
  */
-const CACHE = 'mbl-hse-v21-welcome-video';
+const CACHE = 'mbl-hse-v22-welcome-video';
 
 /* Only local, guaranteed-present files are precached. Precaching opaque
    cross-origin CDN responses used to poison the cache with broken entries. */
