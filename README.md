@@ -13,6 +13,10 @@ four settings.
 | File / folder | What it is |
 |---|---|
 | `index.html` | The whole dashboard (all pages, charts, reports) |
+| `bodymap.js` | The interactive 3D body map (Incident Tracker + Our Clinic) |
+| `bodymap-model.json` | Describes the 3D human model and the position of every body part (edit to move a pin) |
+| `models/human_body.glb` | The realistic human 3D model (credits and licence note in `models/CREDITS.md`) |
+| `vendor/` | three.js, OrbitControls and GLTFLoader used by the body map |
 | `api/login.js` | Checks the admin password on the server |
 | `api/publish.js` | Saves the admin's data so everyone can see it |
 | `api/data.js` | Gives every visitor the latest published data |
@@ -284,12 +288,3 @@ offline tool — the data simply stays on the device where you entered it.
 ## 13. Login still failing?
 
 Almost always environment variables or cache — follow section 7 in order (self-check → ADMIN_PASSWORD → redeploy → hard refresh). The password is never inside `index.html`.
-
----
-
-## 3D body map model
-
-The Incident Tracker and Our Clinic body maps now draw a smooth human body mesh from
-`models/human-body.json` (settings in `models/human-config.json`). A realistic scanned GLB can be
-dropped in at `models/human-realistic.glb` - see `models/README.md`. `bodymap.js` falls back to the
-old simple body if no model file can be loaded.
