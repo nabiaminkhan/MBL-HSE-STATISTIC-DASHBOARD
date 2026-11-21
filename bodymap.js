@@ -8,10 +8,7 @@
  * that spot and the pin pulses; click a pin (or any body area) and the
  * matching reports are selected / filtered.
  *
- * The body is a real, photo-scanned human model (models/human_body.glb, A-pose,
- * 1.82 m, +Z front, anatomical LEFT = +X) described by bodymap-model.json, which
- * also holds the anchor for every body region. Three.js, OrbitControls and
- * GLTFLoader are loaded lazily from /vendor (same-origin, cached by sw.js).
+ * Three.js is loaded lazily from /vendor (same-origin, cached by sw.js).
  * Nothing is stored or published by this module - it only reads the rows
  * already held in APP_DATA.
  */
@@ -42,77 +39,41 @@ function loadThree(){
 }
 
 /* ------------------------------------------------------------------ */
-/* Human model: manifest (bodymap-model.json) + GLB (models/)          */
-/* The manifest names the .glb and can fine-tune every body region     */
-/* anchor (pos / dir / zoom / off / nrm) without touching this file.   */
-/* The binary is fetched once and parsed per widget, so closing a      */
-/* widget can free its GPU memory without breaking the next one.       */
-/* ------------------------------------------------------------------ */
-var MODEL_MANIFEST = 'bodymap-model.json';
-var modelPromise = null;
-function loadModelData(){
-  if(modelPromise) return modelPromise;
-  modelPromise = fetch(MODEL_MANIFEST, {cache:'no-cache'})
-    .then(function(r){ if(!r.ok) throw new Error(MODEL_MANIFEST + ' ' + r.status); return r.json(); })
-    .then(function(meta){
-      return fetch(meta.file).then(function(r){
-        if(!r.ok) throw new Error(meta.file + ' ' + r.status);
-        return r.arrayBuffer();
-      }).then(function(buf){ return {meta:meta, buf:buf}; });
-    })
-    .catch(function(e){ modelPromise = null; throw e; });
-  return modelPromise;
-}
-function parseModel(THREE, data){
-  return new Promise(function(res, rej){
-    new THREE.GLTFLoader().parse(data.buf.slice(0), '', res, rej);
-  });
-}
-function applyManifest(meta){
-  var rg = meta && meta.regions;
-  if(!rg) return;
-  Object.keys(rg).forEach(function(k){
-    if(!REGIONS[k]) return;
-    ['pos', 'dir', 'zoom', 'off', 'nrm'].forEach(function(f){ if(rg[k][f] !== undefined) REGIONS[k][f] = rg[k][f]; });
-  });
-}
-
-/* ------------------------------------------------------------------ */
 /* Body regions (model: 1.82 m tall, faces +Z, anatomical LEFT = +X)   */
 /* kind: sym = always left/right, opt = centre unless a side is given, */
 /*       ctr = centre only                                             */
 /* ------------------------------------------------------------------ */
 var REGIONS = {
-  head:      {label:'Head', kind:'ctr', pos:[0,1.74,-0.01], dir:[0,0.18,1], zoom:1.3},
-  eye:       {label:'Eye', kind:'sym', pos:[0.036,1.683,0.05], dir:[0,0,1], zoom:1.2, nrm:'dir'},
-  ear:       {label:'Ear', kind:'sym', pos:[0.05,1.655,-0.02], dir:[1,0,0], zoom:1.2},
-  nose:      {label:'Nose', kind:'ctr', pos:[0,1.647,0.05], dir:[0,0,1], zoom:1.2},
-  mouth:     {label:'Mouth / Teeth / Jaw', kind:'ctr', pos:[0,1.607,0.05], dir:[0,-0.1,1], zoom:1.2},
-  face:      {label:'Face', kind:'sym', pos:[0.045,1.635,0.05], dir:[0.3,0,1], zoom:1.2},
-  neck:      {label:'Neck', kind:'ctr', pos:[0,1.515,-0.02], dir:[0,0,1], zoom:1.3},
-  throat:    {label:'Throat', kind:'ctr', pos:[0,1.535,-0.02], dir:[0,0,1], zoom:1.3},
-  shoulder:  {label:'Shoulder', kind:'sym', pos:[0.17,1.4,-0.04], dir:[0.35,1,0.1], zoom:1.3},
-  upper_arm: {label:'Upper Arm', kind:'sym', pos:[0.236,1.297,-0.045], dir:[0.35,0,0.94], zoom:1.3},
-  elbow:     {label:'Elbow', kind:'sym', pos:[0.296,1.171,-0.032], dir:[0.6,0,0.8], zoom:1.3},
-  forearm:   {label:'Forearm', kind:'sym', pos:[0.358,1.068,0], dir:[0.35,0,0.94], zoom:1.2},
-  wrist:     {label:'Wrist', kind:'sym', pos:[0.42,0.965,0.037], dir:[0.2,0,1], zoom:1.3},
-  hand:      {label:'Hand', kind:'sym', pos:[0.447,0.915,0.045], dir:[0.1,0,1], zoom:1.3},
-  finger:    {label:'Finger / Thumb', kind:'sym', pos:[0.49,0.822,0.054], dir:[0.6,0,0.8], zoom:1.2},
-  chest:     {label:'Chest', kind:'opt', pos:[0,1.31,0], dir:[0,0,1], zoom:1.7, off:0.075},
-  upper_back:{label:'Upper Back', kind:'opt', pos:[0,1.31,0], dir:[0,0,-1], zoom:1.7, off:0.075},
-  lower_back:{label:'Lower Back', kind:'opt', pos:[0,1.08,0], dir:[0,0,-1], zoom:1.7, off:0.07},
-  abdomen:   {label:'Abdomen / Stomach', kind:'opt', pos:[0,1.1,0], dir:[0,0,1], zoom:1.7, off:0.07},
-  pelvis:    {label:'Groin / Pelvis', kind:'ctr', pos:[0,0.9,0], dir:[0,-0.25,1], zoom:1.7},
-  buttock:   {label:'Buttock', kind:'opt', pos:[0,0.9,0], dir:[0,0,-1], zoom:1.7, off:0.08},
-  hip:       {label:'Hip', kind:'sym', pos:[0.1,0.95,0], dir:[0.55,0.1,0.83], zoom:1.6},
-  thigh:     {label:'Thigh', kind:'sym', pos:[0.09,0.71,0.01], dir:[0.2,0,1], zoom:1.6},
-  knee:      {label:'Knee', kind:'sym', pos:[0.106,0.503,0.007], dir:[0,0,1], zoom:1.2},
-  shin:      {label:'Lower Leg / Shin', kind:'sym', pos:[0.118,0.3,0], dir:[0,0,1], zoom:1.4},
-  calf:      {label:'Calf', kind:'sym', pos:[0.115,0.36,0], dir:[0,0,-1], zoom:1.4},
-  ankle:     {label:'Ankle', kind:'sym', pos:[0.13,0.09,-0.03], dir:[0.5,0,0.8], zoom:1.3},
-  foot:      {label:'Foot / Heel', kind:'sym', pos:[0.145,0.05,0.06], dir:[0,1,0.5], zoom:1.3},
-  toe:       {label:'Toe', kind:'sym', pos:[0.17,0.03,0.15], dir:[0,1,0.4], zoom:1.2},
-  general:   {label:'General / Whole body', kind:'ctr', pos:[0,1.2,0], dir:[0,0,1], zoom:3.2}
+  head:       {label:'Head',            kind:'ctr', pos:[0,1.765,0.0],     dir:[0,0.18,1],      zoom:1.3},
+  eye:        {label:'Eye',             kind:'sym', pos:[0.034,1.718,0.05], dir:[0,0,1],         zoom:1.2},
+  ear:        {label:'Ear',             kind:'sym', pos:[0.087,1.695,0],    dir:[1,0,0],         zoom:1.2},
+  nose:       {label:'Nose',            kind:'ctr', pos:[0,1.678,0.05],     dir:[0,0,1],         zoom:1.2},
+  mouth:      {label:'Mouth / Teeth / Jaw', kind:'ctr', pos:[0,1.635,0.05], dir:[0,-0.1,1],      zoom:1.2},
+  face:       {label:'Face',            kind:'sym', pos:[0.055,1.66,0.05],  dir:[0.3,0,1],       zoom:1.2},
+  neck:       {label:'Neck',            kind:'ctr', pos:[0,1.545,0],        dir:[0,0,1],         zoom:1.3},
+  throat:     {label:'Throat',          kind:'ctr', pos:[0,1.555,0],        dir:[0,0,1],         zoom:1.3},
+  shoulder:   {label:'Shoulder',        kind:'sym', pos:[0.205,1.46,0],     dir:[0.35,1,0.1],    zoom:1.3},
+  upper_arm:  {label:'Upper Arm',       kind:'sym', pos:[0.25,1.30,0],      dir:[0.35,0,0.94],   zoom:1.3},
+  elbow:      {label:'Elbow',           kind:'sym', pos:[0.30,1.15,0],      dir:[0.6,0,0.8],     zoom:1.3},
+  forearm:    {label:'Forearm',         kind:'sym', pos:[0.335,1.015,0],    dir:[0.35,0,0.94],   zoom:1.2},
+  wrist:      {label:'Wrist',           kind:'sym', pos:[0.37,0.88,0],      dir:[0.2,0,1],       zoom:1.3},
+  hand:       {label:'Hand',            kind:'sym', pos:[0.39,0.80,0],      dir:[0.1,0,1],       zoom:1.3},
+  finger:     {label:'Finger / Thumb',  kind:'sym', pos:[0.405,0.71,0],     dir:[0.1,0,1],       zoom:1.2},
+  chest:      {label:'Chest',           kind:'opt', pos:[0,1.33,0],         dir:[0,0,1],         zoom:1.7, off:0.075},
+  upper_back: {label:'Upper Back',      kind:'opt', pos:[0,1.33,0],         dir:[0,0,-1],        zoom:1.7, off:0.075},
+  lower_back: {label:'Lower Back',      kind:'opt', pos:[0,1.06,0],         dir:[0,0,-1],        zoom:1.7, off:0.07},
+  abdomen:    {label:'Abdomen / Stomach', kind:'opt', pos:[0,1.08,0],       dir:[0,0,1],         zoom:1.7, off:0.07},
+  pelvis:     {label:'Groin / Pelvis',  kind:'ctr', pos:[0,0.93,0],         dir:[0,-0.25,1],     zoom:1.7},
+  buttock:    {label:'Buttock',         kind:'opt', pos:[0,0.93,0],         dir:[0,0,-1],        zoom:1.7, off:0.08},
+  hip:        {label:'Hip',             kind:'sym', pos:[0.17,0.96,0],      dir:[1,0,0.3],       zoom:1.6},
+  thigh:      {label:'Thigh',           kind:'sym', pos:[0.095,0.735,0],    dir:[0.2,0,1],       zoom:1.6},
+  knee:       {label:'Knee',            kind:'sym', pos:[0.10,0.52,0],      dir:[0,0,1],         zoom:1.2},
+  shin:       {label:'Lower Leg / Shin',kind:'sym', pos:[0.098,0.32,0],     dir:[0,0,1],         zoom:1.4},
+  calf:       {label:'Calf',            kind:'sym', pos:[0.098,0.36,0],     dir:[0,0,-1],        zoom:1.4},
+  ankle:      {label:'Ankle',           kind:'sym', pos:[0.095,0.09,0],     dir:[0.5,0,0.8],     zoom:1.3},
+  foot:       {label:'Foot / Heel',     kind:'sym', pos:[0.095,0.05,0.07],  dir:[0,1,0.5],       zoom:1.3},
+  toe:        {label:'Toe',             kind:'sym', pos:[0.095,0.035,0.17], dir:[0,1,0.4],       zoom:1.2},
+  general:    {label:'General / Whole body', kind:'ctr', pos:[0,1.2,0],     dir:[0,0,1],         zoom:3.2}
 };
 
 /* Keyword rules. Order matters: a matched phrase is blanked out so later,
@@ -461,7 +422,7 @@ function mount(containerId, cfg){
   var disposed = false, raf = 0, ro = null, cleanup = [];
   var api = {};
 
-  function init3D(THREE, gltf){
+  function init3D(THREE){
     if(disposed) return;
     var W = stage.clientWidth || 600, H = stage.clientHeight || 500;
     var renderer;
@@ -487,28 +448,76 @@ function mount(containerId, cfg){
     camera.position.set(0, 0.93 + HOME.dist * Math.cos(HOME.pol), HOME.dist * Math.sin(HOME.pol));
     controls.update();
 
-    scene.add(new THREE.HemisphereLight(0xeef8ff, 0x3a4f5c, 0.95));
-    var key = new THREE.DirectionalLight(0xfff6ee, 0.95); key.position.set(1.5, 2.6, 3); scene.add(key);
+    scene.add(new THREE.HemisphereLight(0xdff4ff, 0x0a2230, 0.8));
+    var key = new THREE.DirectionalLight(0xffffff, 0.85); key.position.set(1.5, 2.6, 3); scene.add(key);
     var rim = new THREE.DirectionalLight(0x4dd0e1, 0.8); rim.position.set(-2, 1.6, -2.6); scene.add(rim);
     var fill = new THREE.DirectionalLight(0x80cbc4, 0.35); fill.position.set(-2, 0.5, 2); scene.add(fill);
 
-    /* ----- body ----- */
+    /* ----- realistic human body (web model, not procedural) ----- */
     var body = new THREE.Group(); scene.add(body);
     var V = function(a){ return new THREE.Vector3(a[0], a[1], a[2] || 0); };
-    var pickable = [];                       // meshes that pins / clicks may land on
-    var maxAniso = Math.min(8, renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 1);
-    var parts = [];
-    gltf.scene.traverse(function(o){ if(o.isMesh) parts.push(o); });
-    parts.forEach(function(m){
-      m.frustumCulled = false;
-      (Array.isArray(m.material) ? m.material : [m.material]).forEach(function(mt){
-        if(mt.map) mt.map.anisotropy = maxAniso;
-        if(mt.normalMap) mt.normalMap.anisotropy = maxAniso;
+    var MODEL_URLS = [
+      'models/body-male.glb',
+      'https://cdn.jsdelivr.net/npm/@broberg/bodymap@0.16.0/models/body-male.glb',
+      'models/male_base_mesh.glb'
+    ];
+    var modelReady = false;
+    function fitModel(root){
+      var box = new THREE.Box3().setFromObject(root);
+      var size = box.getSize(new THREE.Vector3());
+      var center = box.getCenter(new THREE.Vector3());
+      var targetH = 1.82;
+      var scale = targetH / Math.max(size.y, 0.001);
+      root.scale.setScalar(scale);
+      // recompute after scale
+      box.setFromObject(root);
+      size = box.getSize(new THREE.Vector3());
+      center = box.getCenter(new THREE.Vector3());
+      root.position.x -= center.x;
+      root.position.z -= center.z;
+      root.position.y -= box.min.y; // feet on ground
+      root.traverse(function(o){
+        if(o.isMesh){
+          o.castShadow = false; o.receiveShadow = false;
+          if(o.material){
+            var mats = Array.isArray(o.material) ? o.material : [o.material];
+            mats.forEach(function(mat){
+              mat.side = THREE.DoubleSide;
+              if(mat.color && mat.color.getHex() < 0x222222){
+                // keep texture; slight lift if pure black
+              }
+              mat.roughness = typeof mat.roughness === 'number' ? mat.roughness : 0.5;
+              mat.metalness = typeof mat.metalness === 'number' ? Math.min(mat.metalness, 0.15) : 0.05;
+              if(mat.map) mat.map.encoding = THREE.sRGBEncoding;
+            });
+          }
+        }
       });
-      body.add(m);
-      if(!/eyelash|teeth/i.test(m.name)) pickable.push(m);
-    });
-    // ground
+      body.add(root);
+      body.updateMatrixWorld(true);
+      modelReady = true;
+      if(msgEl) msgEl.textContent = 'Realistic body ready · drag to rotate · click a pin or report';
+      // rebuild pins now that surface exists
+      try{ if(typeof tryPlacePins === 'function') tryPlacePins(); else if(typeof applyPinStates === 'function') applyPinStates(); }catch(e){}
+    }
+    function loadRealisticBody(i){
+      if(i >= MODEL_URLS.length){
+        if(msgEl) msgEl.textContent = 'Could not load body model';
+        return;
+      }
+      if(msgEl) msgEl.textContent = 'Loading realistic human model…';
+      var loader = new THREE.GLTFLoader();
+      loader.load(MODEL_URLS[i], function(gltf){
+        fitModel(gltf.scene);
+      }, function(xhr){
+        if(xhr.total && msgEl) msgEl.textContent = 'Loading realistic body… ' + Math.round(xhr.loaded / xhr.total * 100) + '%';
+      }, function(err){
+        console.warn('Body GLB failed', MODEL_URLS[i], err);
+        loadRealisticBody(i + 1);
+      });
+    }
+    loadRealisticBody(0);
+    // ground ring
     var ringM = new THREE.MeshBasicMaterial({color:0x26c6da, transparent:true, opacity:0.55, side:THREE.DoubleSide});
     var ring = new THREE.Mesh(new THREE.RingGeometry(0.46, 0.475, 72), ringM); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.002; scene.add(ring);
     var disc = new THREE.Mesh(new THREE.CircleGeometry(0.46, 72), new THREE.MeshBasicMaterial({color:0x26c6da, transparent:true, opacity:0.10})); disc.rotation.x = -Math.PI / 2; scene.add(disc);
@@ -516,14 +525,12 @@ function mount(containerId, cfg){
 
     /* ----- surface helper ----- */
     var ray = new THREE.Raycaster();
-    function surface(pos, dir, dirNormal){
+    function surface(pos, dir){
       var d = dir.clone().normalize();
       ray.set(pos.clone().add(d.clone().multiplyScalar(0.9)), d.clone().negate());
-      var hit = ray.intersectObjects(pickable, false)[0];
+      var hit = ray.intersectObjects(body.children, true)[0];
       if(!hit) return {p: pos.clone().add(d.clone().multiplyScalar(0.05)), n: d};
       var n = hit.face.normal.clone().transformDirection(hit.object.matrixWorld).normalize();
-      if(n.dot(d) < 0) n.negate();                       // mirrored / double-sided triangles
-      if(dirNormal || n.dot(d) < 0.15) n.copy(d);        // tiny curved parts (eyes): use the authored direction
       return {p: hit.point.clone(), n: n};
     }
     function anchor(key, side, extra){
@@ -533,7 +540,7 @@ function mount(containerId, cfg){
       if(R.kind === 'sym'){ pos.x *= s; dir.x *= s; }
       else if(R.kind === 'opt' && (side === 'L' || side === 'R')){ pos.x = s * R.off; }
       if(extra){ pos.add(extra); }
-      return surface(pos, dir, R.nrm === 'dir');
+      return surface(pos, dir);
     }
     function tangentOffset(n, k, total){
       if(total <= 1) return null;
@@ -585,21 +592,40 @@ function mount(containerId, cfg){
       (pinsOf[rep.id] = pinsOf[rep.id] || []).push(pin);
       allPins.push(pin);
     }
-    // group by region so overlapping pins fan out
-    var groups = {};
-    reports.forEach(function(rep){
-      rep.regions.forEach(function(g){
-        var R = REGIONS[g.key], sides = [null];
-        if(R.kind === 'sym') sides = g.side === 'B' ? ['L', 'R'] : [g.side || 'R'];
-        else if(R.kind === 'opt' && g.side === 'B') sides = ['L', 'R'];
-        else if(R.kind === 'opt' && (g.side === 'L' || g.side === 'R')) sides = [g.side];
-        sides.forEach(function(s){ (groups[g.key + '|' + (s || '')] = groups[g.key + '|' + (s || '')] || []).push({rep:rep, g:g, side:s}); });
+    // group by region so overlapping pins fan out — deferred until realistic mesh is ready
+    function placeAllPins(){
+      while(pinRoot.children.length) pinRoot.remove(pinRoot.children[0]);
+      allPins.length = 0;
+      for(var k in pinsOf) delete pinsOf[k];
+      var groups = {};
+      reports.forEach(function(rep){
+        rep.regions.forEach(function(g){
+          var R = REGIONS[g.key], sides = [null];
+          if(R.kind === 'sym') sides = g.side === 'B' ? ['L', 'R'] : [g.side || 'R'];
+          else if(R.kind === 'opt' && g.side === 'B') sides = ['L', 'R'];
+          else if(R.kind === 'opt' && (g.side === 'L' || g.side === 'R')) sides = [g.side];
+          sides.forEach(function(s){ (groups[g.key + '|' + (s || '')] = groups[g.key + '|' + (s || '')] || []).push({rep:rep, g:g, side:s}); });
+        });
       });
-    });
-    Object.keys(groups).forEach(function(id){
-      var arr = groups[id];
-      arr.forEach(function(it, k){ makePin(it.rep, it.g, it.side, k, arr.length); });
-    });
+      Object.keys(groups).forEach(function(id){
+        var arr = groups[id];
+        arr.forEach(function(it, k){ makePin(it.rep, it.g, it.side, k, arr.length); });
+      });
+      applyPinStates();
+    }
+    // place once mesh is in, or after timeout so UI is never empty
+    var pinsPlaced = false;
+    function tryPlacePins(){
+      if(pinsPlaced) return;
+      pinsPlaced = true;
+      placeAllPins();
+    }
+    // Hook: fitModel already tries applyPinStates; override to place pins
+    var _prevFitDone = false;
+    var waitPins = setInterval(function(){
+      if(modelReady){ clearInterval(waitPins); tryPlacePins(); }
+    }, 200);
+    setTimeout(function(){ clearInterval(waitPins); tryPlacePins(); }, 8000);
 
     /* marker for a clicked body area */
     var areaMark = new THREE.Mesh(new THREE.RingGeometry(0.035, 0.05, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0.95, side:THREE.DoubleSide, depthWrite:false}));
@@ -726,7 +752,7 @@ function mount(containerId, cfg){
       return null;
     }
     function pickBody(){
-      var hit = ray.intersectObjects(pickable, false)[0];
+      var hit = ray.intersectObjects(body.children, false)[0];
       if(!hit) return null;
       var n = hit.face.normal.clone().transformDirection(hit.object.matrixWorld);
       var best = null, bd = 1e9;
@@ -831,10 +857,7 @@ function mount(containerId, cfg){
       try{ controls.dispose(); }catch(e){}
       scene.traverse(function(o){
         if(o.geometry) o.geometry.dispose();
-        if(o.material){ (Array.isArray(o.material) ? o.material : [o.material]).forEach(function(m){
-          ['map', 'normalMap', 'roughnessMap', 'aoMap'].forEach(function(k){ if(m[k]) m[k].dispose(); });
-          m.dispose();
-        }); }
+        if(o.material){ (Array.isArray(o.material) ? o.material : [o.material]).forEach(function(m){ m.dispose(); }); }
       });
       try{ renderer.dispose(); renderer.forceContextLoss(); }catch(e){}
       if(renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
@@ -855,19 +878,14 @@ function mount(containerId, cfg){
   instances[containerId] = inst;
 
   loadThree().then(function(THREE){
-    return loadModelData().then(function(data){
-      applyManifest(data.meta);
-      return parseModel(THREE, data);
-    }).then(function(gltf){ return {THREE:THREE, gltf:gltf}; });
-  }).then(function(a){
     if(disposed || instances[containerId] !== inst) return;
-    try{ init3D(a.THREE, a.gltf); }
+    try{ init3D(THREE); }
     catch(err){
       msgEl.innerHTML = '<div><i class="fas fa-cube" style="font-size:28px;opacity:.5"></i><br><br>The 3D view needs WebGL, which isn’t available here.<br>The report list and details still work.</div>';
       if(window.console) console.warn('[bodymap]', err);
     }
   }).catch(function(err){
-    msgEl.innerHTML = '<div><i class="fas fa-wifi" style="font-size:28px;opacity:.5"></i><br><br>Couldn’t load the 3D body (vendor/three.min.js, vendor/GLTFLoader.js, bodymap-model.json or models/human_body.glb).<br>The report list and details still work.</div>';
+    msgEl.innerHTML = '<div><i class="fas fa-wifi" style="font-size:28px;opacity:.5"></i><br><br>Couldn’t load the 3D engine (vendor/three.min.js).<br>The report list and details still work.</div>';
     if(window.console) console.warn('[bodymap]', err);
   });
   return inst;

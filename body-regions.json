@@ -1,0 +1,13 @@
+{
+  "version": "3.1",
+  "model": {
+    "primary": "models/body-male.glb",
+    "cdn": "https://cdn.jsdelivr.net/npm/@broberg/bodymap@0.16.0/models/body-male.glb",
+    "fallback": "models/male_base_mesh.glb",
+    "source": "@broberg/bodymap (medical body-map human mesh)",
+    "license": "See package; body mesh for interactive injury mapping",
+    "note": "Realistic human male body mesh loaded via GLTFLoader \u2014 not a procedural mannequin"
+  },
+  "heightMeters": 1.82,
+  "interaction": "Click report -> pin on body; click pin -> select report"
+}
