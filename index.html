@@ -21,6 +21,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<script src="bodymap.js" defer></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -4451,6 +4452,7 @@ function renderCategory(cat){
   }
   html += '<div id="top3ObserversSection" class="obs-leaderboard-section"></div>';
   html += '<div class="chart-grid" id="catCharts"></div>';
+  html += '<div id="incBodyMapSection"></div>';
   html += '<div id="incPhotoFramesSection"></div>';
   html += '<div class="glass-card animate-in">';
   html += '<div class="card-header"><div class="card-title"><i class="fas fa-filter"></i> Data Explorer</div>';
@@ -7758,6 +7760,7 @@ function incAutoMeta(r){
 }
 
 function renderIncPhotoFrames(sk){
+  if(typeof mblBodyMapMountIncidents === 'function') try{ mblBodyMapMountIncidents(sk); }catch(e){ console.warn('body map', e); }
   var sec = document.getElementById('incPhotoFramesSection');
   if(!sec) return;
   if(sk !== 'incidents'){ sec.innerHTML = ''; return; }
@@ -12333,6 +12336,9 @@ function renderClinicPage(){
   html += kpiCard('Medical Team', medTeamData.length, '#4dd0e1', 'fa-user-md');
   html += '</div>';
 
+  // 3D body map (interactive, one pin per clinic report)
+  html += '<div id="clinicBodyMapSection"></div>';
+
   // Medical Team section (after KPIs)
   html += '<div class="glass-card animate-in" style="margin:16px 0;padding:16px">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">';
@@ -12388,6 +12394,7 @@ function renderClinicPage(){
   currentSubKey = 'clinic';
   window.lastSubKey = 'clinic';
   renderSubData('clinic');
+  if(typeof mblBodyMapMountClinic === 'function') try{ mblBodyMapMountClinic(); }catch(e){ console.warn('body map', e); }
   setTimeout(function(){
     buildClinicCharts(rows);
     medTeamData.forEach(function(m, idx){

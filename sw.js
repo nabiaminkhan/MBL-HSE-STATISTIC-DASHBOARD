@@ -7,7 +7,7 @@
  *  - cross-origin CDN  : runtime cache only after a real successful fetch
  *                        (never precached, so a CDN hiccup cannot break install)
  */
-const CACHE = 'mbl-hse-v19-bridge-both';
+const CACHE = 'mbl-hse-v20-body-map';
 
 /* Only local, guaranteed-present files are precached. Precaching opaque
    cross-origin CDN responses used to poison the cache with broken entries. */
@@ -17,6 +17,9 @@ const PRECACHE = [
   '/logo.png',
   '/bg-welcome.jpg',
   '/bg-dashboard.jpg',
+  '/bodymap.js',
+  '/vendor/three.min.js',
+  '/vendor/OrbitControls.js',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
