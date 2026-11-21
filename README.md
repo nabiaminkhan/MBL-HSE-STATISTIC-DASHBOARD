@@ -284,3 +284,12 @@ offline tool — the data simply stays on the device where you entered it.
 ## 13. Login still failing?
 
 Almost always environment variables or cache — follow section 7 in order (self-check → ADMIN_PASSWORD → redeploy → hard refresh). The password is never inside `index.html`.
+
+---
+
+## 3D body map model
+
+The Incident Tracker and Our Clinic body maps now draw a smooth human body mesh from
+`models/human-body.json` (settings in `models/human-config.json`). A realistic scanned GLB can be
+dropped in at `models/human-realistic.glb` - see `models/README.md`. `bodymap.js` falls back to the
+old simple body if no model file can be loaded.

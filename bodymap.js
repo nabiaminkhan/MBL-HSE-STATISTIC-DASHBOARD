@@ -38,6 +38,226 @@ function loadThree(){
 }
 
 /* ------------------------------------------------------------------ */
+/* Body model assets (realistic mesh)                                  */
+/* models/human-config.json lists candidates in priority order:        */
+/*   1. models/human-realistic.glb  (drop-in scanned / MakeHuman body)  */
+/*   2. models/human-body.json      (baked mesh shipped with the app)   */
+/* If none can be read the built-in simple body is drawn instead.       */
+/* Only raw typed arrays are cached here; every widget builds its own   */
+/* THREE geometry so disposing one widget never breaks the other.       */
+/* ------------------------------------------------------------------ */
+var CONFIG_URL = 'models/human-config.json';
+var DEFAULT_MATERIAL = {color:'#7d98ad', roughness:0.55, metalness:0.08, emissive:'#0b1c28', emissiveIntensity:0.45};
+var assetPromise = null;
+
+function b64ToBuf(b64){
+  var bin = atob(b64), n = bin.length, u = new Uint8Array(n);
+  for(var i = 0; i < n; i++) u[i] = bin.charCodeAt(i);
+  return u.buffer;
+}
+function fetchJSON(url){
+  return fetch(url, {cache:'no-cache'}).then(function(r){
+    if(!r.ok) throw new Error(url + ' → HTTP ' + r.status);
+    return r.json();
+  });
+}
+function fetchBuf(url){
+  return fetch(url).then(function(r){
+    if(!r.ok) throw new Error(url + ' → HTTP ' + r.status);
+    return r.arrayBuffer();
+  });
+}
+
+/* models/human-body.json  ->  [{positions:Float32Array, indices:Uint16Array}] */
+function decodeMblJSON(j){
+  if(!j || j.format !== 'mbl-body-mesh' || !j.positions || !j.indices) throw new Error('not an mbl-body-mesh file');
+  var q = new Int16Array(b64ToBuf(j.positions.data)), o = j.positions.origin, sc = j.positions.scale;
+  var pos = new Float32Array(q.length);
+  for(var i = 0; i < q.length; i += 3){
+    pos[i]     = o[0] + (q[i]     + 32767) * sc[0];
+    pos[i + 1] = o[1] + (q[i + 1] + 32767) * sc[1];
+    pos[i + 2] = o[2] + (q[i + 2] + 32767) * sc[2];
+  }
+  var idx = new Uint16Array(b64ToBuf(j.indices.data));
+  return {meshes:[{positions:pos, normals:null, indices:idx, name:'body'}], prescaled:true};
+}
+
+/* Minimal static GLB reader: triangle meshes, node transforms, bind pose.
+   (Skinning / animation / textures are ignored - the body map only needs
+   the shape; colour comes from the dashboard skin material.)          */
+function parseGLB(buf){
+  var dv = new DataView(buf);
+  if(dv.getUint32(0, true) !== 0x46546C67) throw new Error('not a GLB file');
+  var off = 12, json = null, bin = null;
+  while(off + 8 <= buf.byteLength){
+    var len = dv.getUint32(off, true), type = dv.getUint32(off + 4, true);
+    var start = off + 8;
+    if(type === 0x4E4F534A) json = JSON.parse(new TextDecoder('utf-8').decode(new Uint8Array(buf, start, len)));
+    else if(type === 0x004E4942 && !bin) bin = buf.slice(start, start + len);
+    off = start + ((len + 3) & ~3);
+  }
+  if(!json || !bin) throw new Error('GLB has no JSON/BIN chunk');
+  (json.extensionsRequired || []).forEach(function(x){
+    if(x === 'KHR_draco_mesh_compression' || x === 'EXT_meshopt_compression' || x === 'KHR_mesh_quantization')
+      throw new Error('GLB uses ' + x + ' (not supported) - export it uncompressed');
+  });
+  var COMP = {5120:[Int8Array,1], 5121:[Uint8Array,1], 5122:[Int16Array,2], 5123:[Uint16Array,2], 5125:[Uint32Array,4], 5126:[Float32Array,4]};
+  var NCOMP = {SCALAR:1, VEC2:2, VEC3:3, VEC4:4};
+  function readAccessor(ai){
+    var a = json.accessors[ai], bv = json.bufferViews[a.bufferView], C = COMP[a.componentType], n = NCOMP[a.type];
+    if(a.sparse) throw new Error('sparse accessors not supported');
+    var base = (bv.byteOffset || 0) + (a.byteOffset || 0), stride = bv.byteStride || (C[1] * n);
+    var out = new C[0](a.count * n);
+    if(stride === C[1] * n && base % C[1] === 0){
+      out.set(new C[0](bin, base, a.count * n));
+    } else {
+      var src = new DataView(bin);
+      for(var i = 0; i < a.count; i++) for(var k = 0; k < n; k++){
+        var p = base + i * stride + k * C[1];
+        out[i * n + k] = C[0] === Float32Array ? src.getFloat32(p, true) : C[0] === Uint16Array ? src.getUint16(p, true) :
+                         C[0] === Uint32Array ? src.getUint32(p, true) : C[0] === Int16Array ? src.getInt16(p, true) :
+                         C[0] === Int8Array ? src.getInt8(p) : src.getUint8(p);
+      }
+    }
+    return out;
+  }
+  function mulM(a, b){   // column-major 4x4
+    var o = new Float64Array(16);
+    for(var c = 0; c < 4; c++) for(var r = 0; r < 4; r++){
+      var v = 0; for(var k = 0; k < 4; k++) v += a[k * 4 + r] * b[c * 4 + k]; o[c * 4 + r] = v;
+    }
+    return o;
+  }
+  function nodeM(n){
+    if(n.matrix) return Float64Array.from(n.matrix);
+    var t = n.translation || [0, 0, 0], q = n.rotation || [0, 0, 0, 1], s = n.scale || [1, 1, 1];
+    var x = q[0], y = q[1], z = q[2], w = q[3];
+    return Float64Array.from([
+      (1 - 2 * (y * y + z * z)) * s[0], (2 * (x * y + z * w)) * s[0], (2 * (x * z - y * w)) * s[0], 0,
+      (2 * (x * y - z * w)) * s[1], (1 - 2 * (x * x + z * z)) * s[1], (2 * (y * z + x * w)) * s[1], 0,
+      (2 * (x * z + y * w)) * s[2], (2 * (y * z - x * w)) * s[2], (1 - 2 * (x * x + y * y)) * s[2], 0,
+      t[0], t[1], t[2], 1]);
+  }
+  var meshes = [], I = new Float64Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+  function walk(ni, parent){
+    var n = json.nodes[ni];
+    var M = (n.skin !== undefined) ? parent : mulM(parent, nodeM(n));   // skinned meshes ignore their node transform
+    if(n.mesh !== undefined){
+      json.meshes[n.mesh].primitives.forEach(function(pr){
+        if(pr.mode !== undefined && pr.mode !== 4) return;
+        if(pr.attributes.POSITION === undefined) return;
+        var P = readAccessor(pr.attributes.POSITION), N = pr.attributes.NORMAL !== undefined ? readAccessor(pr.attributes.NORMAL) : null;
+        var cnt = P.length / 3, ind;
+        if(pr.indices !== undefined) ind = readAccessor(pr.indices);
+        else { ind = new Uint32Array(cnt); for(var i = 0; i < cnt; i++) ind[i] = i; }
+        var pos = new Float32Array(P.length), nrm = N ? new Float32Array(N.length) : null;
+        for(var i = 0; i < cnt; i++){
+          var x = P[i*3], y = P[i*3+1], z = P[i*3+2];
+          pos[i*3]   = M[0]*x + M[4]*y + M[8]*z  + M[12];
+          pos[i*3+1] = M[1]*x + M[5]*y + M[9]*z  + M[13];
+          pos[i*3+2] = M[2]*x + M[6]*y + M[10]*z + M[14];
+          if(nrm){
+            var nx = N[i*3], ny = N[i*3+1], nz = N[i*3+2];
+            var ax = M[0]*nx + M[4]*ny + M[8]*nz, ay = M[1]*nx + M[5]*ny + M[9]*nz, az = M[2]*nx + M[6]*ny + M[10]*nz;
+            var l = Math.sqrt(ax*ax + ay*ay + az*az) || 1;
+            nrm[i*3] = ax / l; nrm[i*3+1] = ay / l; nrm[i*3+2] = az / l;
+          }
+        }
+        meshes.push({positions:pos, normals:nrm, indices:ind, name:(n.name || '') + '|' + (json.meshes[n.mesh].name || '')});
+      });
+    }
+    (n.children || []).forEach(function(c){ walk(c, M); });
+  }
+  var sc = json.scenes[json.scene || 0];
+  sc.nodes.forEach(function(ni){ walk(ni, I); });
+  if(!meshes.length) throw new Error('GLB contains no triangle meshes');
+  return {meshes:meshes, prescaled:false};
+}
+
+/* scale to targetHeight, stand on y = 0, centre on x/z, optional Y rotation */
+function normalizeAsset(asset, targetH, rotateYdeg){
+  var r = (rotateYdeg || 0) * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+  var mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9];
+  asset.meshes.forEach(function(m){
+    var p = m.positions, nn = m.normals;
+    if(r){
+      for(var i = 0; i < p.length; i += 3){
+        var x = p[i], z = p[i + 2]; p[i] = c * x + s * z; p[i + 2] = -s * x + c * z;
+        if(nn){ var a = nn[i], b = nn[i + 2]; nn[i] = c * a + s * b; nn[i + 2] = -s * a + c * b; }
+      }
+    }
+    for(var j = 0; j < p.length; j += 3) for(var k = 0; k < 3; k++){
+      if(p[j + k] < mn[k]) mn[k] = p[j + k];
+      if(p[j + k] > mx[k]) mx[k] = p[j + k];
+    }
+  });
+  if(asset.prescaled) return {height: mx[1] - mn[1]};
+  var h = mx[1] - mn[1]; if(!(h > 0)) throw new Error('model has no height');
+  // centre on the pelvis / thighs (45-80 % of height) so protruding feet or hands cannot shift the body
+  var sx = 0, sz = 0, cnt = 0, y1 = mn[1] + h * 0.45, y2 = mn[1] + h * 0.80;
+  asset.meshes.forEach(function(m){
+    var p = m.positions;
+    for(var i = 0; i < p.length; i += 3) if(p[i + 1] >= y1 && p[i + 1] <= y2){ sx += p[i]; sz += p[i + 2]; cnt++; }
+  });
+  var k = targetH / h, cx = cnt ? sx / cnt : (mn[0] + mx[0]) / 2, cz = cnt ? sz / cnt : (mn[2] + mx[2]) / 2;
+  asset.meshes.forEach(function(m){
+    var p = m.positions;
+    for(var i = 0; i < p.length; i += 3){ p[i] = (p[i] - cx) * k; p[i + 1] = (p[i + 1] - mn[1]) * k; p[i + 2] = (p[i + 2] - cz) * k; }
+  });
+  return {height: targetH};
+}
+
+function loadBodyAsset(){
+  if(assetPromise) return assetPromise;
+  assetPromise = fetchJSON(CONFIG_URL).then(function(cfg){
+    var targetH = cfg.targetHeight || 1.82;
+    var list = (cfg.candidates || []).slice();
+    function next(i){
+      if(i >= list.length) return null;
+      var cand = list[i];
+      var p = cand.type === 'glb' ? fetchBuf(cand.url).then(parseGLB)
+            : cand.type === 'mbl-json' ? fetchJSON(cand.url).then(decodeMblJSON)
+            : Promise.reject(new Error('unknown model type ' + cand.type));
+      return p.then(function(asset){
+        if(cand.excludeMeshNames && cand.excludeMeshNames.length){
+          var re = new RegExp(cand.excludeMeshNames.join('|'), 'i');
+          asset.meshes = asset.meshes.filter(function(m){ return !re.test(m.name); });
+        }
+        normalizeAsset(asset, targetH, cand.rotateY);
+        // region anchors: shared config first, then the candidate's own overrides
+        var regs = {};
+        [cfg.regions || {}, cand.regions || {}].forEach(function(src){
+          Object.keys(src).forEach(function(k){ regs[k] = Object.assign(regs[k] || {}, src[k]); });
+        });
+        asset.regions = regs;
+        asset.material = Object.assign({}, DEFAULT_MATERIAL, cfg.material || {});
+        asset.source = cand.url;
+        return asset;
+      }).catch(function(err){
+        if(window.console && cand.type !== 'glb') console.warn('[bodymap] model "' + cand.url + '" failed:', err && err.message || err);
+        return next(i + 1);
+      });
+    }
+    return next(0);
+  }).catch(function(err){
+    if(window.console) console.warn('[bodymap] no model config, using built-in body:', err && err.message || err);
+    return null;
+  }).then(function(asset){
+    if(asset) applyRegionOverrides(asset.regions);
+    return asset;
+  });
+  return assetPromise;
+}
+function applyRegionOverrides(regs){
+  Object.keys(regs || {}).forEach(function(k){
+    var R = REGIONS[k], o = regs[k]; if(!R || !o) return;
+    ['pos', 'dir'].forEach(function(f){ if(Array.isArray(o[f]) && o[f].length === 3) R[f] = o[f].slice(); });
+    if(typeof o.zoom === 'number') R.zoom = o.zoom;
+    if(typeof o.off === 'number') R.off = o.off;
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /* Body regions (model: 1.82 m tall, faces +Z, anatomical LEFT = +X)   */
 /* kind: sym = always left/right, opt = centre unless a side is given, */
 /*       ctr = centre only                                             */
@@ -421,7 +641,7 @@ function mount(containerId, cfg){
   var disposed = false, raf = 0, ro = null, cleanup = [];
   var api = {};
 
-  function init3D(THREE){
+  function init3D(THREE, asset){
     if(disposed) return;
     var W = stage.clientWidth || 600, H = stage.clientHeight || 500;
     var renderer;
@@ -454,7 +674,8 @@ function mount(containerId, cfg){
 
     /* ----- body ----- */
     var body = new THREE.Group(); scene.add(body);
-    var skin = new THREE.MeshStandardMaterial({color:0x7d98ad, roughness:0.55, metalness:0.08, emissive:0x0b1c28, emissiveIntensity:0.45});
+    var SM = (asset && asset.material) || DEFAULT_MATERIAL;
+    var skin = new THREE.MeshStandardMaterial({color:new THREE.Color(SM.color), roughness:SM.roughness, metalness:SM.metalness, emissive:new THREE.Color(SM.emissive), emissiveIntensity:SM.emissiveIntensity});
     var V = function(a){ return new THREE.Vector3(a[0], a[1], a[2] || 0); };
     function mesh(geo, x, y, z){ var m = new THREE.Mesh(geo, skin); m.position.set(x, y, z); body.add(m); return m; }
     function ell(rx, ry, rz, x, y, z){ return mesh(new THREE.SphereGeometry(1, 36, 24).scale(rx, ry, rz), x, y, z); }
@@ -463,6 +684,7 @@ function mount(containerId, cfg){
       var m = mesh(new THREE.CylinderGeometry(r2, r1, len, 28, 1), (A.x + B.x) / 2, (A.y + B.y) / 2, (A.z + B.z) / 2);
       m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), B.clone().sub(A).normalize());
     }
+    function buildProcedural(){
     // torso (lathe, flattened front-to-back)
     var prof = [[0.001,0.86],[0.12,0.865],[0.17,0.90],[0.186,0.97],[0.166,1.04],[0.146,1.11],[0.15,1.2],[0.175,1.30],[0.196,1.38],[0.186,1.43],[0.13,1.47],[0.07,1.50],[0.05,1.53],[0.001,1.536]]
       .map(function(p){ return new THREE.Vector2(p[0], p[1]); });
@@ -487,6 +709,20 @@ function mount(containerId, cfg){
       ell(0.04, 0.04, 0.04, s * 0.095, 0.09, 0);                      // ankle
       ell(0.046, 0.036, 0.115, s * 0.095, 0.04, 0.065);               // foot
     });
+    }
+    function buildFromAsset(){
+      asset.meshes.forEach(function(m){
+        var g = new THREE.BufferGeometry();
+        g.setAttribute('position', new THREE.BufferAttribute(m.positions, 3));
+        g.setIndex(new THREE.BufferAttribute(m.indices, 1));
+        if(m.normals) g.setAttribute('normal', new THREE.BufferAttribute(m.normals, 3)); else g.computeVertexNormals();
+        g.computeBoundingSphere(); g.computeBoundingBox();
+        var mm = new THREE.Mesh(g, skin); mm.userData.isBody = true; body.add(mm);
+      });
+    }
+    var usedAsset = false;
+    if(asset){ try{ buildFromAsset(); usedAsset = body.children.length > 0; }catch(e){ if(window.console) console.warn('[bodymap] model build failed, using built-in body', e); while(body.children.length) body.remove(body.children[0]); } }
+    if(!usedAsset) buildProcedural();
     // ground
     var ringM = new THREE.MeshBasicMaterial({color:0x26c6da, transparent:true, opacity:0.55, side:THREE.DoubleSide});
     var ring = new THREE.Mesh(new THREE.RingGeometry(0.46, 0.475, 72), ringM); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.002; scene.add(ring);
@@ -494,11 +730,29 @@ function mount(containerId, cfg){
     body.updateMatrixWorld(true);
 
     /* ----- surface helper ----- */
+    function nearestSkin(pos, maxD){
+      var best = 1e9, bi = -1, bg = null, px = pos.x, py = pos.y, pz = pos.z;
+      body.children.forEach(function(m){
+        var P = m.geometry.attributes.position.array;
+        for(var i = 0; i < P.length; i += 3){
+          var dx = P[i] - px, dy = P[i + 1] - py, dz = P[i + 2] - pz, d2 = dx * dx + dy * dy + dz * dz;
+          if(d2 < best){ best = d2; bi = i; bg = m.geometry; }
+        }
+      });
+      if(!bg || best > maxD * maxD) return null;
+      var N = bg.attributes.normal.array, P2 = bg.attributes.position.array;
+      return {p: new THREE.Vector3(P2[bi], P2[bi + 1], P2[bi + 2]), n: new THREE.Vector3(N[bi], N[bi + 1], N[bi + 2]).normalize()};
+    }
     var ray = new THREE.Raycaster();
     function surface(pos, dir){
       var d = dir.clone().normalize();
       ray.set(pos.clone().add(d.clone().multiplyScalar(0.9)), d.clone().negate());
-      var hit = ray.intersectObjects(body.children, false)[0];
+      var hit = ray.intersectObject(body, true)[0];
+      if(!hit && usedAsset){
+        // the ray slipped through a gap (e.g. between fingers): snap to the closest point on the skin
+        var nv = nearestSkin(pos, 0.09);
+        if(nv) return nv;
+      }
       if(!hit) return {p: pos.clone().add(d.clone().multiplyScalar(0.05)), n: d};
       var n = hit.face.normal.clone().transformDirection(hit.object.matrixWorld).normalize();
       return {p: hit.point.clone(), n: n};
@@ -703,7 +957,7 @@ function mount(containerId, cfg){
       return null;
     }
     function pickBody(){
-      var hit = ray.intersectObjects(body.children, false)[0];
+      var hit = ray.intersectObject(body, true)[0];
       if(!hit) return null;
       var n = hit.face.normal.clone().transformDirection(hit.object.matrixWorld);
       var best = null, bd = 1e9;
@@ -829,8 +1083,11 @@ function mount(containerId, cfg){
   instances[containerId] = inst;
 
   loadThree().then(function(THREE){
+    return loadBodyAsset().then(function(asset){ return {THREE:THREE, asset:asset}; });
+  }).then(function(pkg){
+    var THREE = pkg.THREE;
     if(disposed || instances[containerId] !== inst) return;
-    try{ init3D(THREE); }
+    try{ init3D(THREE, pkg.asset); }
     catch(err){
       msgEl.innerHTML = '<div><i class="fas fa-cube" style="font-size:28px;opacity:.5"></i><br><br>The 3D view needs WebGL, which isn’t available here.<br>The report list and details still work.</div>';
       if(window.console) console.warn('[bodymap]', err);
@@ -868,5 +1125,6 @@ window.mblBodyMapMountIncidents = function(sk){
     reports: incidentReports(rows)
   });
 };
-window.mblBodyMap = { regionsFromText: regionsFromText, instances: instances, dispose: disposeInstance };
+window.mblBodyMap = { regionsFromText: regionsFromText, instances: instances, dispose: disposeInstance,
+  _internals: { REGIONS: REGIONS, parseGLB: parseGLB, decodeMblJSON: decodeMblJSON, normalizeAsset: normalizeAsset, applyRegionOverrides: applyRegionOverrides } };
 })();
