@@ -13,6 +13,10 @@ four settings.
 | File / folder | What it is |
 |---|---|
 | `index.html` | The whole dashboard (all pages, charts, reports) |
+| `bodymap.js` | The interactive 3D body map (Incident Tracker + Our Clinic) |
+| `bodymap-model.json` | Describes the 3D human model and the position of every body part (edit to move a pin) |
+| `models/human_body.glb` | The realistic human 3D model (credits and licence note in `models/CREDITS.md`) |
+| `vendor/` | three.js, OrbitControls and GLTFLoader used by the body map |
 | `api/login.js` | Checks the admin password on the server |
 | `api/publish.js` | Saves the admin's data so everyone can see it |
 | `api/data.js` | Gives every visitor the latest published data |
