@@ -1,0 +1,921 @@
+/* MBL HSE Dashboard — Interactive 3D Body Map
+ * ------------------------------------------------------------------
+ * Used by:  OUR CLINIC page      -> mblBodyMapMountClinic()
+ *           INCIDENT TRACKER page -> mblBodyMapMountIncidents(subKey)
+ *
+ * Every report that names a body part / complaint gets a pointer pin on a
+ * rotatable 3D human body. Click a report in the list and the body turns to
+ * that spot and the pin pulses; click a pin (or any body area) and the
+ * matching reports are selected / filtered.
+ *
+ * Three.js is loaded lazily from /vendor (same-origin, cached by sw.js).
+ * Nothing is stored or published by this module - it only reads the rows
+ * already held in APP_DATA.
+ */
+(function(){
+'use strict';
+
+/* ------------------------------------------------------------------ */
+/* Lazy loader                                                         */
+/* ------------------------------------------------------------------ */
+var threePromise = null;
+function loadScript(src){
+  return new Promise(function(res, rej){
+    var s = document.createElement('script');
+    s.src = src; s.async = false;
+    s.onload = res; s.onerror = function(){ rej(new Error('Failed to load '+src)); };
+    document.head.appendChild(s);
+  });
+}
+function loadThree(){
+  if(window.THREE && window.THREE.OrbitControls && window.THREE.GLTFLoader) return Promise.resolve(window.THREE);
+  if(threePromise) return threePromise;
+  threePromise = loadScript('vendor/three.min.js')
+    .then(function(){ return loadScript('vendor/OrbitControls.js'); })
+    .then(function(){ return loadScript('vendor/GLTFLoader.js'); })
+    .then(function(){ return window.THREE; })
+    .catch(function(e){ threePromise = null; throw e; });
+  return threePromise;
+}
+
+/* ------------------------------------------------------------------ */
+/* Body regions (model: 1.82 m tall, faces +Z, anatomical LEFT = +X)   */
+/* kind: sym = always left/right, opt = centre unless a side is given, */
+/*       ctr = centre only                                             */
+/* ------------------------------------------------------------------ */
+var REGIONS = {
+  head:       {label:'Head',            kind:'ctr', pos:[0,1.765,0.0],     dir:[0,0.18,1],      zoom:1.3},
+  eye:        {label:'Eye',             kind:'sym', pos:[0.034,1.718,0.05], dir:[0,0,1],         zoom:1.2},
+  ear:        {label:'Ear',             kind:'sym', pos:[0.087,1.695,0],    dir:[1,0,0],         zoom:1.2},
+  nose:       {label:'Nose',            kind:'ctr', pos:[0,1.678,0.05],     dir:[0,0,1],         zoom:1.2},
+  mouth:      {label:'Mouth / Teeth / Jaw', kind:'ctr', pos:[0,1.635,0.05], dir:[0,-0.1,1],      zoom:1.2},
+  face:       {label:'Face',            kind:'sym', pos:[0.055,1.66,0.05],  dir:[0.3,0,1],       zoom:1.2},
+  neck:       {label:'Neck',            kind:'ctr', pos:[0,1.545,0],        dir:[0,0,1],         zoom:1.3},
+  throat:     {label:'Throat',          kind:'ctr', pos:[0,1.555,0],        dir:[0,0,1],         zoom:1.3},
+  shoulder:   {label:'Shoulder',        kind:'sym', pos:[0.205,1.46,0],     dir:[0.35,1,0.1],    zoom:1.3},
+  upper_arm:  {label:'Upper Arm',       kind:'sym', pos:[0.25,1.30,0],      dir:[0.35,0,0.94],   zoom:1.3},
+  elbow:      {label:'Elbow',           kind:'sym', pos:[0.30,1.15,0],      dir:[0.6,0,0.8],     zoom:1.3},
+  forearm:    {label:'Forearm',         kind:'sym', pos:[0.335,1.015,0],    dir:[0.35,0,0.94],   zoom:1.2},
+  wrist:      {label:'Wrist',           kind:'sym', pos:[0.37,0.88,0],      dir:[0.2,0,1],       zoom:1.3},
+  hand:       {label:'Hand',            kind:'sym', pos:[0.39,0.80,0],      dir:[0.1,0,1],       zoom:1.3},
+  finger:     {label:'Finger / Thumb',  kind:'sym', pos:[0.405,0.71,0],     dir:[0.1,0,1],       zoom:1.2},
+  chest:      {label:'Chest',           kind:'opt', pos:[0,1.33,0],         dir:[0,0,1],         zoom:1.7, off:0.075},
+  upper_back: {label:'Upper Back',      kind:'opt', pos:[0,1.33,0],         dir:[0,0,-1],        zoom:1.7, off:0.075},
+  lower_back: {label:'Lower Back',      kind:'opt', pos:[0,1.06,0],         dir:[0,0,-1],        zoom:1.7, off:0.07},
+  abdomen:    {label:'Abdomen / Stomach', kind:'opt', pos:[0,1.08,0],       dir:[0,0,1],         zoom:1.7, off:0.07},
+  pelvis:     {label:'Groin / Pelvis',  kind:'ctr', pos:[0,0.93,0],         dir:[0,-0.25,1],     zoom:1.7},
+  buttock:    {label:'Buttock',         kind:'opt', pos:[0,0.93,0],         dir:[0,0,-1],        zoom:1.7, off:0.08},
+  hip:        {label:'Hip',             kind:'sym', pos:[0.17,0.96,0],      dir:[1,0,0.3],       zoom:1.6},
+  thigh:      {label:'Thigh',           kind:'sym', pos:[0.095,0.735,0],    dir:[0.2,0,1],       zoom:1.6},
+  knee:       {label:'Knee',            kind:'sym', pos:[0.10,0.52,0],      dir:[0,0,1],         zoom:1.2},
+  shin:       {label:'Lower Leg / Shin',kind:'sym', pos:[0.098,0.32,0],     dir:[0,0,1],         zoom:1.4},
+  calf:       {label:'Calf',            kind:'sym', pos:[0.098,0.36,0],     dir:[0,0,-1],        zoom:1.4},
+  ankle:      {label:'Ankle',           kind:'sym', pos:[0.095,0.09,0],     dir:[0.5,0,0.8],     zoom:1.3},
+  foot:       {label:'Foot / Heel',     kind:'sym', pos:[0.095,0.05,0.07],  dir:[0,1,0.5],       zoom:1.3},
+  toe:        {label:'Toe',             kind:'sym', pos:[0.095,0.035,0.17], dir:[0,1,0.4],       zoom:1.2},
+  general:    {label:'General / Whole body', kind:'ctr', pos:[0,1.2,0],     dir:[0,0,1],         zoom:3.2}
+};
+
+/* Keyword rules. Order matters: a matched phrase is blanked out so later,
+   broader rules (e.g. "back", "arm") cannot match it again.             */
+var RULES = [
+  ['eye',       /\b(eyes?|ocular|cornea\w*|conjunctiv\w*|vision|retina\w*|eyelids?|arc\s*eye|welding\s*flash)\b/],
+  ['ear',       /\b(ears?|hearing|tinnitus|earache|eardrum)\b/],
+  ['nose',      /\b(nose|nasal|nosebleed|epistaxis|sinus\w*|rhinitis)\b/],
+  ['mouth',     /\b(mouth|teeth|tooth\w*|dental|jaw|lips?|tongue|gums?)\b/],
+  ['face',      /\b(face|facial|cheeks?|chin)\b/],
+  ['head',      /\b(head|headache|head\s*ache|forehead|scalp|skull|migraine|dizz\w*|vertigo|concussion|faint\w*|syncope)\b/],
+  ['throat',    /\b(throat|tonsil\w*|laryn\w*|pharyn\w*|hoarse\w*|swallow\w*)\b/],
+  ['neck',      /\b(neck|cervical|nape|whiplash)\b/],
+  ['upper_back',/\b(upper\s*back|thoracic|scapula\w*|shoulder\s*blades?)\b/],
+  ['shoulder',  /\b(shoulders?|clavicle|collar\s*bone|rotator)\b/],
+  ['forearm',   /\b(fore\s*arms?|radius|ulna)\b/],
+  ['upper_arm', /\b(upper\s*arms?|arms?|biceps?|triceps?|humerus)\b/],
+  ['elbow',     /\belbows?\b/],
+  ['wrist',     /\bwrists?\b/],
+  ['finger',    /\b(fingers?|thumbs?|fingertips?|index|nails?)\b/],
+  ['hand',      /\b(hands?|palms?|knuckles?)\b/],
+  ['chest',     /\b(chest|ribs?|rib\s*cage|breath\w*|cough\w*|asthma\w*|lungs?|respirat\w*|heart|cardiac|palpitation\w*|hypertension|blood\s*pressure|bp|sternum|pectoral)\b/],
+  ['lower_back',/\b(lower\s*back|lumbar|lumbago|back|spine|spinal|sciatica|kidneys?|renal|flank|coccyx|tailbone)\b/],
+  ['abdomen',   /\b(abdom\w*|stomach|belly|gastr\w*|vomit\w*|nausea|diarr\w*|colic|epigastr\w*|dyspepsia|constipat\w*|acidity|indigestion|gas|bloating|appendic\w*|liver)\b/],
+  ['pelvis',    /\b(groin|pelvi\w*|genital\w*|hernia|urin\w*|bladder|uti|testic\w*|inguinal)\b/],
+  ['buttock',   /\b(buttocks?|gluteal|glutes?)\b/],
+  ['hip',       /\bhips?\b/],
+  ['thigh',     /\b(thighs?|hamstrings?|quadricep\w*|femur)\b/],
+  ['knee',      /\b(knees?|patella|kneecap|meniscus|acl)\b/],
+  ['calf',      /\b(calf|calves)\b/],
+  ['toe',       /\btoes?\b/],
+  ['foot',      /\b(foot|feet|heel|soles?|plantar)\b/],
+  ['ankle',     /\bankles?\b/],
+  ['shin',      /\b(shins?|legs?|tibia|lower\s*leg)\b/],
+  ['general',   /\b(fever|flu|influenza|cold|fatigue|weak\w*|heat\s*(stress|stroke|exhaustion|rash)?|heatstroke|dehydrat\w*|sun\s*stroke|allerg\w*|rash\w*|skin|itch\w*|body\s*(ache|aches|pain|pains)|malaise|diabet\w*|glucose|sugar|burns?|whole\s*body|multiple|general|unwell|sick|bruis\w*)\b/]
+];
+var SMALLPIN = {eye:0.55, ear:0.6, nose:0.55, mouth:0.6, finger:0.6, toe:0.6, wrist:0.75, ankle:0.8, hand:0.8, elbow:0.85, face:0.8};
+var SUPPRESS = { finger:'hand', toe:'foot' };   // more specific region wins
+var NONE_RE = /^\s*(none|n\/?a|nil|no|not\s*applicable|not\s*reported|-+|#value!?)\s*$/i;
+
+function sideOf(txt){
+  var l = /\b(left|lt\.?)\b/.test(txt), r = /\b(right|rt\.?)\b/.test(txt);
+  if(/\b(both|bilateral|b\/l)\b/.test(txt) || (l && r)) return 'B';
+  if(l) return 'L';
+  if(r) return 'R';
+  return null;
+}
+/* text -> [{key, side}] (side: 'L' | 'R' | 'B' | null) */
+function regionsFromText(text){
+  text = String(text == null ? '' : text).toLowerCase().replace(/b\/l/g, 'bilateral');
+  if(!text.trim() || NONE_RE.test(text)) return [];
+  var wholeSide = sideOf(text);
+  var wholeSingle = (wholeSide === 'L' || wholeSide === 'R') ? wholeSide : null;
+  var clauses = text.split(/[,;|\/&\n]|\band\b|\bwith\b|\.\s/);
+  var out = [], seen = {};
+  clauses.forEach(function(c){
+    if(!c.trim()) return;
+    var cs = sideOf(c) || wholeSingle || (wholeSide === 'B' ? 'B' : null);
+    var work = c, hits = [];
+    RULES.forEach(function(rule){
+      var re = new RegExp(rule[1].source, 'g'), m, any = false;
+      while((m = re.exec(work))){
+        any = true;
+        work = work.slice(0, m.index) + new Array(m[0].length + 1).join(' ') + work.slice(m.index + m[0].length);
+      }
+      if(any) hits.push(rule[0]);
+    });
+    var specific = hits.filter(function(k){ return k !== 'general'; });
+    if(specific.length) hits = specific;
+    hits.forEach(function(k){
+      if(SUPPRESS[k] && hits.indexOf(SUPPRESS[k]) >= 0) hits = hits.filter(function(x){ return x !== SUPPRESS[k]; });
+    });
+    hits.forEach(function(k){
+      var id = k + '|' + (cs || '');
+      if(seen[id]) return; seen[id] = 1;
+      out.push({key:k, side:cs});
+    });
+  });
+  var hasSpecific = out.some(function(o){ return o.key !== 'general'; });
+  if(hasSpecific) out = out.filter(function(o){ return o.key !== 'general'; });
+  return out.slice(0, 4);
+}
+function sideName(s){ return s === 'L' ? 'Left ' : s === 'R' ? 'Right ' : s === 'B' ? 'Both ' : ''; }
+function regionLabel(key, side){
+  var r = REGIONS[key]; if(!r) return key;
+  return (r.kind === 'ctr' ? '' : sideName(side)) + r.label;
+}
+
+/* ------------------------------------------------------------------ */
+/* Report builders                                                     */
+/* ------------------------------------------------------------------ */
+function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function tr(v){ return String(v == null ? '' : v).trim(); }
+function dateOnly(v){ return tr(v).substring(0, 10); }
+function short(s, n){ s = tr(s); return s.length > n ? s.substring(0, n - 1) + '…' : s; }
+
+function clinicReports(rows){
+  var out = (rows || []).map(function(r, i){
+    var occ = tr(r['Occupational Illness Classification']);
+    var non = tr(r['Non-Occupational Illness Classification']);
+    var complaint = tr(r['Chief Complaint']);
+    var fa = /^(y|yes)$/i.test(tr(r['First Aid Provided?']));
+    var src = [complaint, non, occ].filter(Boolean).join(', ');
+    var color = fa ? '#ef5350' : (occ ? '#ff7043' : '#ab47bc');
+    var cls = fa ? 'First aid case' : (occ ? 'Occupational illness' : 'Non-occupational / medication');
+    var vitals = [];
+    if(tr(r['Temperature (°C)'])) vitals.push('Temp ' + tr(r['Temperature (°C)']));
+    if(tr(r['Blood Pressure'])) vitals.push('BP ' + tr(r['Blood Pressure']));
+    if(tr(r['Pulse Rate (BPM)'])) vitals.push('Pulse ' + tr(r['Pulse Rate (BPM)']));
+    if(tr(r['SpO₂ (%)'])) vitals.push('SpO₂ ' + tr(r['SpO₂ (%)']) + '%');
+    if(tr(r['Blood Glucose (mg/dL)'])) vitals.push('Glucose ' + tr(r['Blood Glucose (mg/dL)']));
+    var d = dateOnly(r['Date']) || dateOnly(r['Timestamp']);
+    return {
+      id: 'c' + i, i: i, color: color, cls: cls,
+      title: tr(r['Patient / Employee Name']) || ('Visit #' + (i + 1)),
+      sub: [d, short(complaint || non || occ, 46)].filter(Boolean).join(' · '),
+      sortKey: tr(r['Timestamp']) || d,
+      regions: regionsFromText(src),
+      areaSource: src,
+      fields: [
+        ['Date / Time', [d, tr(r['Time'])].filter(Boolean).join('  ')],
+        ['Patient', tr(r['Patient / Employee Name'])], ['Employee ID', tr(r['Employee ID'])],
+        ['Company', tr(r['Company'])], ['Location', tr(r['Location / Area'])],
+        ['Visit type', tr(r['Visit Type'])], ['Chief complaint', complaint],
+        ['Vitals', vitals.join('  ·  ')],
+        ['First aid', tr(r['First Aid Provided?'])],
+        ['Treatment / medication', tr(r['Treatment / Medication Given'])],
+        ['Occupational illness', occ], ['Non-occupational illness', non],
+        ['Reporting nurse', tr(r['Reporting Nurse'])], ['Shift', tr(r['Shift'])]
+      ],
+      searchText: [r['Patient / Employee Name'], r['Employee ID'], r['Company'], complaint, non, occ, r['Location / Area']].join(' ').toLowerCase()
+    };
+  });
+  out.sort(function(a, b){ return a.sortKey < b.sortKey ? 1 : a.sortKey > b.sortKey ? -1 : 0; });
+  return out;
+}
+function sevColor(sev){
+  sev = tr(sev).toLowerCase();
+  if(/crit|fatal|catastroph|major|high|severe|serious/.test(sev)) return '#ef5350';
+  if(/med|moder/.test(sev)) return '#ffa726';
+  if(/low|minor|negligible/.test(sev)) return '#66bb6a';
+  return '#26c6da';
+}
+function incidentReports(rows){
+  var out = (rows || []).map(function(r, i){
+    var bp = tr(r['Body Part']), inj = tr(r['Injury Type']);
+    var injured = inj && !NONE_RE.test(inj);
+    var regs = regionsFromText(bp), src = bp;
+    if(!regs.length && injured){
+      src = inj + ', ' + tr(r['Description / What Happened']);
+      regs = regionsFromText(inj);
+      if(!regs.length) regs = regionsFromText(tr(r['Description / What Happened']));
+    }
+    var d = dateOnly(r['Event Date']);
+    return {
+      id: 'i' + i, i: i, color: sevColor(r['Severity']), cls: 'Severity: ' + (tr(r['Severity']) || 'n/a'),
+      title: [tr(r['Event Type']), tr(r['Incident Category'])].filter(Boolean).join(' · ') || ('Incident #' + (i + 1)),
+      sub: [d, tr(r['Building / Area'])].filter(Boolean).join(' · '),
+      sortKey: d + ' ' + tr(r['Event Time']),
+      regions: regs, areaSource: src,
+      noBodyNote: (!regs.length) ? (injured ? 'Injury recorded, but no body part could be matched' : 'No injury / body part recorded') : '',
+      fields: [
+        ['Record ID', tr(r['Record ID'])],
+        ['Date / Time', [d, tr(r['Event Time'])].filter(Boolean).join('  ')],
+        ['Event type', tr(r['Event Type'])], ['Category', tr(r['Incident Category'])],
+        ['Building / Area', tr(r['Building / Area'])], ['Exact location', tr(r['Exact Location'])],
+        ['Company', tr(r['Company'])], ['Severity', tr(r['Severity'])], ['Status', tr(r['Status'])],
+        ['Injury type', inj], ['Body part', bp], ['No. injured', tr(r['No. Injured'])],
+        ['Days lost', tr(r['Days Lost'])], ['LTI?', tr(r['LTI?'])],
+        ['What happened', tr(r['Description / What Happened'])],
+        ['Immediate action', tr(r['Immediate Action Taken'])],
+        ['Root cause', tr(r['Root Cause'])],
+        ['Corrective action', tr(r['Corrective / Preventive Action'])]
+      ],
+      searchText: [r['Record ID'], r['Event Type'], r['Incident Category'], r['Building / Area'], r['Company'], bp, inj, r['Description / What Happened']].join(' ').toLowerCase()
+    };
+  });
+  out.sort(function(a, b){ return a.sortKey < b.sortKey ? 1 : a.sortKey > b.sortKey ? -1 : 0; });
+  return out;
+}
+
+/* ------------------------------------------------------------------ */
+/* Styles (injected once)                                              */
+/* ------------------------------------------------------------------ */
+function ensureStyles(){
+  if(document.getElementById('bmStyles')) return;
+  var st = document.createElement('style'); st.id = 'bmStyles';
+  st.textContent =
+  '.bm-card{margin:16px 0;padding:0;overflow:hidden}' +
+  '.bm-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:14px 16px 6px}' +
+  '.bm-title{font-weight:700;font-size:15px;color:var(--text-primary);display:flex;align-items:center;gap:8px}' +
+  '.bm-tools{display:flex;gap:6px;flex-wrap:wrap}' +
+  '.bm-btn{font:600 11px/1 inherit;font-family:inherit;padding:8px 11px;border-radius:9px;cursor:pointer;color:var(--text-secondary);background:rgba(255,255,255,.06);border:1px solid var(--glass-border)}' +
+  '.bm-btn:hover{color:var(--text-primary);border-color:rgba(var(--accent-rgb),.6)}' +
+  '.bm-btn.on{color:#fff;background:rgba(var(--accent-rgb),.28);border-color:rgba(var(--accent-rgb),.7)}' +
+  '.bm-hint{margin:0;padding:0 16px 12px;font-size:12px;line-height:1.5;color:var(--text-secondary)}' +
+  '.bm-body{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:14px;padding:0 16px 16px}' +
+  '@media(max-width:900px){.bm-body{grid-template-columns:1fr}}' +
+  '.bm-stage{position:relative;height:580px;border-radius:14px;overflow:hidden;border:1px solid var(--glass-border);' +
+    'background:radial-gradient(ellipse at 50% 38%,rgba(var(--accent-rgb),.20),rgba(0,0,0,.30) 70%);touch-action:none}' +
+  '@media(max-width:900px){.bm-stage{height:440px}}' +
+  '.bm-stage canvas{display:block;width:100%;height:100%;outline:none;cursor:grab}' +
+  '.bm-stage canvas:active{cursor:grabbing}' +
+  '.bm-over{position:absolute;pointer-events:none;font-size:11px;color:var(--text-muted)}' +
+  '.bm-over.bl{left:12px;bottom:10px}' +
+  '.bm-legend{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.38);font-size:11px;color:var(--text-secondary);pointer-events:none}' +
+  '.bm-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:-1px}' +
+  '.bm-label{position:absolute;left:0;top:0;z-index:3;pointer-events:none;max-width:210px;padding:7px 10px;border-radius:10px;font-size:12px;line-height:1.35;' +
+    'color:#fff;background:rgba(6,24,26,.92);border:1px solid rgba(255,255,255,.28);box-shadow:0 6px 22px rgba(0,0,0,.45);transition:opacity .2s;display:none}' +
+  '.bm-label b{display:block;font-size:12px}' +
+  '.bm-label span{opacity:.8}' +
+  '.bm-label:after{content:"";position:absolute;left:50%;bottom:-6px;width:10px;height:10px;margin-left:-5px;transform:rotate(45deg);background:rgba(6,24,26,.92);border-right:1px solid rgba(255,255,255,.28);border-bottom:1px solid rgba(255,255,255,.28)}' +
+  '.bm-tip{position:absolute;z-index:4;pointer-events:none;padding:4px 8px;border-radius:7px;font-size:11px;color:#fff;background:rgba(0,0,0,.8);display:none;white-space:nowrap}' +
+  '.bm-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--text-secondary);font-size:13px;z-index:2}' +
+  '.bm-side{display:flex;flex-direction:column;gap:10px;min-width:0}' +
+  '.bm-search{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--glass-border);background:rgba(255,255,255,.06);color:var(--text-primary);font-family:inherit;font-size:13px}' +
+  '.bm-count{font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}' +
+  '.bm-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600;background:rgba(var(--accent-rgb),.22);color:var(--text-primary);border:1px solid rgba(var(--accent-rgb),.5);cursor:pointer}' +
+  '.bm-list{display:flex;flex-direction:column;gap:6px;max-height:250px;overflow:auto;padding-right:3px}' +
+  '.bm-item{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;padding:9px 11px;border-radius:11px;cursor:pointer;font-family:inherit;color:var(--text-primary);background:rgba(var(--surface-rgb),.55);border:1px solid var(--glass-border)}' +
+  '.bm-item:hover{border-color:rgba(var(--accent-rgb),.6)}' +
+  '.bm-item.sel{border-color:var(--accent-cyan);background:rgba(var(--accent-rgb),.20);box-shadow:0 0 0 1px var(--accent-cyan) inset}' +
+  '.bm-item.nobody{opacity:.62}' +
+  '.bm-dot{flex:0 0 11px;height:11px;border-radius:50%;margin-top:4px}' +
+  '.bm-it{min-width:0;flex:1}' +
+  '.bm-it b{display:block;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+  '.bm-it small{display:block;font-size:11px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+  '.bm-it em{display:block;font-style:normal;font-size:11px;margin-top:2px;color:var(--accent-cyan)}' +
+  '.bm-it em.none{color:var(--text-muted)}' +
+  '.bm-detail{border:1px solid var(--glass-border);border-radius:12px;padding:12px 14px;background:rgba(var(--surface-rgb),.45);font-size:12px;max-height:260px;overflow:auto}' +
+  '.bm-detail h4{margin:0 0 8px;font-size:13px;color:var(--text-primary);display:flex;align-items:center;gap:8px}' +
+  '.bm-detail dl{margin:0;display:grid;grid-template-columns:130px 1fr;gap:5px 10px}' +
+  '.bm-detail dt{color:var(--text-muted)} .bm-detail dd{margin:0;color:var(--text-primary);word-break:break-word}' +
+  '@media(max-width:520px){.bm-detail dl{grid-template-columns:1fr}.bm-detail dt{margin-top:4px}}' +
+  '.bm-empty{padding:14px;color:var(--text-muted);font-size:12px;text-align:center}';
+  document.head.appendChild(st);
+}
+
+/* ------------------------------------------------------------------ */
+/* Widget                                                              */
+/* ------------------------------------------------------------------ */
+var instances = {};
+function disposeInstance(id){
+  var inst = instances[id];
+  if(inst){ try{ inst.dispose(); }catch(e){} delete instances[id]; }
+}
+
+function mount(containerId, cfg){
+  var host = document.getElementById(containerId);
+  if(!host) return;
+  disposeInstance(containerId);
+  ensureStyles();
+
+  var reports = cfg.reports;
+  var withBody = reports.filter(function(r){ return r.regions.length; }).length;
+  host.innerHTML =
+    '<div class="glass-card bm-card animate-in">' +
+      '<div class="bm-head"><div class="bm-title"><i class="fas fa-person" style="color:var(--accent-cyan)"></i> ' + esc(cfg.title) + '</div>' +
+        '<div class="bm-tools">' +
+          '<button class="bm-btn" data-v="front">Front</button><button class="bm-btn" data-v="back">Back</button>' +
+          '<button class="bm-btn" data-v="left">Left</button><button class="bm-btn" data-v="right">Right</button>' +
+          '<button class="bm-btn on" data-t="pins" title="Show a pin for every report">All pins</button>' +
+          '<button class="bm-btn" data-t="spin" title="Slowly rotate the body">Auto-rotate</button>' +
+          '<button class="bm-btn" data-v="reset"><i class="fas fa-undo"></i> Reset</button>' +
+        '</div></div>' +
+      '<p class="bm-hint">' + esc(cfg.hint) + '</p>' +
+      '<div class="bm-body">' +
+        '<div class="bm-stage"><div class="bm-msg">Loading 3D body…</div>' +
+          '<div class="bm-legend">' + cfg.legend.map(function(l){ return '<div><i style="background:' + l[0] + '"></i>' + esc(l[1]) + '</div>'; }).join('') + '</div>' +
+          '<div class="bm-over bl">Drag to rotate · scroll / pinch to zoom · click a pin or body area</div>' +
+          '<div class="bm-label"></div><div class="bm-tip"></div></div>' +
+        '<div class="bm-side">' +
+          '<input class="bm-search" type="search" placeholder="Search reports…" aria-label="Search reports">' +
+          '<div class="bm-count"><span class="bm-n"></span><span class="bm-filter"></span></div>' +
+          '<div class="bm-list" role="listbox" aria-label="Reports"></div>' +
+          '<div class="bm-detail"><div class="bm-empty">Select a report to see its details and the exact spot on the body.</div></div>' +
+        '</div>' +
+      '</div></div>';
+
+  var stage = host.querySelector('.bm-stage');
+  var msgEl = host.querySelector('.bm-msg');
+  var labelEl = host.querySelector('.bm-label');
+  var tipEl = host.querySelector('.bm-tip');
+  var listEl = host.querySelector('.bm-list');
+  var detailEl = host.querySelector('.bm-detail');
+  var searchEl = host.querySelector('.bm-search');
+  var nEl = host.querySelector('.bm-n');
+  var filterEl = host.querySelector('.bm-filter');
+
+  var state = { sel: null, q: '', region: null, pins: true, spin: false };
+  var byId = {}; reports.forEach(function(r){ byId[r.id] = r; });
+
+  /* ---------- list / detail (work even without WebGL) ---------- */
+  function regionText(r){
+    return r.regions.map(function(g){ return regionLabel(g.key, g.side); }).join(' + ');
+  }
+  function visible(){
+    return reports.filter(function(r){
+      if(state.q && r.searchText.indexOf(state.q) < 0) return false;
+      if(state.region){
+        var f = state.region;
+        return r.regions.some(function(g){
+          if(g.key !== f.key) return false;
+          if(REGIONS[g.key].kind === 'sym'){
+            var s = g.side || 'R';
+            return s === 'B' || s === f.side;
+          }
+          return true;
+        });
+      }
+      return true;
+    });
+  }
+  function renderList(){
+    var list = visible();
+    nEl.textContent = list.length + ' of ' + reports.length + ' reports · ' + withBody + ' with a body area';
+    filterEl.innerHTML = state.region
+      ? '<span class="bm-chip" data-clear="1" title="Clear area filter">' + esc(regionLabel(state.region.key, state.region.side)) + ' <i class="fas fa-times"></i></span>' : '';
+    if(!list.length){
+      listEl.innerHTML = '<div class="bm-empty">' + (state.region
+        ? 'No reports for ' + esc(regionLabel(state.region.key, state.region.side)) + '.'
+        : (reports.length ? 'No reports match your search.' : esc(cfg.empty))) + '</div>';
+      return;
+    }
+    listEl.innerHTML = list.map(function(r){
+      return '<button type="button" class="bm-item' + (r.id === state.sel ? ' sel' : '') + (r.regions.length ? '' : ' nobody') + '" data-id="' + r.id + '" role="option" aria-selected="' + (r.id === state.sel) + '">' +
+        '<span class="bm-dot" style="background:' + r.color + '"></span><span class="bm-it"><b>' + esc(r.title) + '</b><small>' + esc(r.sub) + '</small>' +
+        (r.regions.length ? '<em><i class="fas fa-crosshairs"></i> ' + esc(regionText(r)) + '</em>' : '<em class="none">' + esc(r.noBodyNote || 'No body area matched') + '</em>') +
+        '</span></button>';
+    }).join('');
+  }
+  function renderDetail(){
+    var r = byId[state.sel];
+    if(!r){ detailEl.innerHTML = '<div class="bm-empty">Select a report to see its details and the exact spot on the body.</div>'; return; }
+    var h = '<h4><span class="bm-dot" style="background:' + r.color + ';margin:0"></span>' + esc(r.title) + '</h4><dl>';
+    h += '<dt>Body area</dt><dd>' + (r.regions.length ? esc(regionText(r)) + (r.areaSource ? ' <span style="color:var(--text-muted)">(from “' + esc(short(r.areaSource, 60)) + '”)</span>' : '') : esc(r.noBodyNote || 'Not recorded')) + '</dd>';
+    r.regions.forEach(function(g){
+      if(REGIONS[g.key].kind === 'sym' && !g.side) h += '<dt></dt><dd style="color:var(--text-muted)">Side not stated – shown on the right.</dd>';
+    });
+    r.fields.forEach(function(f){ if(f[1]) h += '<dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd>'; });
+    detailEl.innerHTML = h + '</dl>';
+  }
+  renderList();
+
+  /* ---------- 3D ---------- */
+  var disposed = false, raf = 0, ro = null, cleanup = [];
+  var api = {};
+
+  function init3D(THREE){
+    if(disposed) return;
+    var W = stage.clientWidth || 600, H = stage.clientHeight || 500;
+    var renderer;
+    try{
+      renderer = new THREE.WebGLRenderer({antialias:true, alpha:true, powerPreference:'default'});
+    }catch(e){ throw new Error('WebGL unavailable'); }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(W, H);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.domElement.setAttribute('aria-label', '3D human body. Drag to rotate, scroll to zoom.');
+    renderer.domElement.tabIndex = 0;
+    stage.insertBefore(renderer.domElement, stage.firstChild);
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(32, W / H, 0.05, 40);
+    var controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true; controls.dampingFactor = 0.08;
+    controls.minDistance = 0.7; controls.maxDistance = 6;
+    controls.minPolarAngle = 0.15; controls.maxPolarAngle = Math.PI - 0.15;
+    controls.autoRotateSpeed = 1.6;
+    var HOME = {az:0, pol:Math.PI / 2 - 0.04, dist:4.3, t:new THREE.Vector3(0, 0.93, 0)};
+    controls.target.copy(HOME.t);
+    camera.position.set(0, 0.93 + HOME.dist * Math.cos(HOME.pol), HOME.dist * Math.sin(HOME.pol));
+    controls.update();
+
+    scene.add(new THREE.HemisphereLight(0xdff4ff, 0x0a2230, 0.8));
+    var key = new THREE.DirectionalLight(0xffffff, 0.85); key.position.set(1.5, 2.6, 3); scene.add(key);
+    var rim = new THREE.DirectionalLight(0x4dd0e1, 0.8); rim.position.set(-2, 1.6, -2.6); scene.add(rim);
+    var fill = new THREE.DirectionalLight(0x80cbc4, 0.35); fill.position.set(-2, 0.5, 2); scene.add(fill);
+
+    /* ----- realistic human body (web model, not procedural) ----- */
+    var body = new THREE.Group(); scene.add(body);
+    var V = function(a){ return new THREE.Vector3(a[0], a[1], a[2] || 0); };
+    var MODEL_URLS = [
+      'models/body-male.glb',
+      'https://cdn.jsdelivr.net/npm/@broberg/bodymap@0.16.0/models/body-male.glb',
+      'models/male_base_mesh.glb'
+    ];
+    var modelReady = false;
+    function fitModel(root){
+      var box = new THREE.Box3().setFromObject(root);
+      var size = box.getSize(new THREE.Vector3());
+      var center = box.getCenter(new THREE.Vector3());
+      var targetH = 1.82;
+      var scale = targetH / Math.max(size.y, 0.001);
+      root.scale.setScalar(scale);
+      // recompute after scale
+      box.setFromObject(root);
+      size = box.getSize(new THREE.Vector3());
+      center = box.getCenter(new THREE.Vector3());
+      root.position.x -= center.x;
+      root.position.z -= center.z;
+      root.position.y -= box.min.y; // feet on ground
+      root.traverse(function(o){
+        if(o.isMesh){
+          o.castShadow = false; o.receiveShadow = false;
+          if(o.material){
+            var mats = Array.isArray(o.material) ? o.material : [o.material];
+            mats.forEach(function(mat){
+              mat.side = THREE.DoubleSide;
+              if(mat.color && mat.color.getHex() < 0x222222){
+                // keep texture; slight lift if pure black
+              }
+              mat.roughness = typeof mat.roughness === 'number' ? mat.roughness : 0.5;
+              mat.metalness = typeof mat.metalness === 'number' ? Math.min(mat.metalness, 0.15) : 0.05;
+              if(mat.map) mat.map.encoding = THREE.sRGBEncoding;
+            });
+          }
+        }
+      });
+      body.add(root);
+      body.updateMatrixWorld(true);
+      modelReady = true;
+      if(msgEl) msgEl.textContent = 'Realistic body ready · drag to rotate · click a pin or report';
+      // rebuild pins now that surface exists
+      try{ if(typeof tryPlacePins === 'function') tryPlacePins(); else if(typeof applyPinStates === 'function') applyPinStates(); }catch(e){}
+    }
+    function loadRealisticBody(i){
+      if(i >= MODEL_URLS.length){
+        if(msgEl) msgEl.textContent = 'Could not load body model';
+        return;
+      }
+      if(msgEl) msgEl.textContent = 'Loading realistic human model…';
+      var loader = new THREE.GLTFLoader();
+      loader.load(MODEL_URLS[i], function(gltf){
+        fitModel(gltf.scene);
+      }, function(xhr){
+        if(xhr.total && msgEl) msgEl.textContent = 'Loading realistic body… ' + Math.round(xhr.loaded / xhr.total * 100) + '%';
+      }, function(err){
+        console.warn('Body GLB failed', MODEL_URLS[i], err);
+        loadRealisticBody(i + 1);
+      });
+    }
+    loadRealisticBody(0);
+    // ground ring
+    var ringM = new THREE.MeshBasicMaterial({color:0x26c6da, transparent:true, opacity:0.55, side:THREE.DoubleSide});
+    var ring = new THREE.Mesh(new THREE.RingGeometry(0.46, 0.475, 72), ringM); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.002; scene.add(ring);
+    var disc = new THREE.Mesh(new THREE.CircleGeometry(0.46, 72), new THREE.MeshBasicMaterial({color:0x26c6da, transparent:true, opacity:0.10})); disc.rotation.x = -Math.PI / 2; scene.add(disc);
+    body.updateMatrixWorld(true);
+
+    /* ----- surface helper ----- */
+    var ray = new THREE.Raycaster();
+    function surface(pos, dir){
+      var d = dir.clone().normalize();
+      ray.set(pos.clone().add(d.clone().multiplyScalar(0.9)), d.clone().negate());
+      var hit = ray.intersectObjects(body.children, true)[0];
+      if(!hit) return {p: pos.clone().add(d.clone().multiplyScalar(0.05)), n: d};
+      var n = hit.face.normal.clone().transformDirection(hit.object.matrixWorld).normalize();
+      return {p: hit.point.clone(), n: n};
+    }
+    function anchor(key, side, extra){
+      var R = REGIONS[key];
+      var s = side === 'L' ? 1 : -1;
+      var pos = V(R.pos), dir = V(R.dir);
+      if(R.kind === 'sym'){ pos.x *= s; dir.x *= s; }
+      else if(R.kind === 'opt' && (side === 'L' || side === 'R')){ pos.x = s * R.off; }
+      if(extra){ pos.add(extra); }
+      return surface(pos, dir);
+    }
+    function tangentOffset(n, k, total){
+      if(total <= 1) return null;
+      var up = Math.abs(n.y) > 0.85 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
+      var u = new THREE.Vector3().crossVectors(up, n).normalize(), v = new THREE.Vector3().crossVectors(n, u).normalize();
+      var ang = k * 2.39996, rad = 0.026 * Math.sqrt(k + 0.5);
+      return u.multiplyScalar(Math.cos(ang) * rad).add(v.multiplyScalar(Math.sin(ang) * rad));
+    }
+
+    /* click-lookup table of anchors (one per region/side) */
+    var table = [];
+    Object.keys(REGIONS).forEach(function(k){
+      var R = REGIONS[k];
+      if(R.kind === 'sym'){ ['L', 'R'].forEach(function(s){ var a = anchor(k, s); table.push({key:k, side:s, p:a.p, n:a.n}); }); }
+      else { var a = anchor(k, null); table.push({key:k, side:null, p:a.p, n:a.n}); }
+    });
+
+    /* ----- pins ----- */
+    var pinRoot = new THREE.Group(); scene.add(pinRoot);
+    var pinsOf = {};            // report id -> [pin]
+    var allPins = [];
+    var geoCone = new THREE.ConeGeometry(0.0125, 0.07, 16); geoCone.rotateX(Math.PI); geoCone.translate(0, 0.035, 0);
+    var geoHead = new THREE.SphereGeometry(0.02, 20, 14);
+    var geoRing = new THREE.RingGeometry(0.03, 0.04, 40); geoRing.rotateX(-Math.PI / 2);
+
+    function makePin(rep, g, side, k, total){
+      var R = REGIONS[g.key];
+      var a0 = anchor(g.key, side);
+      var off = tangentOffset(a0.n, k, total);
+      var a = off ? anchor(g.key, side, off) : a0;
+      var col = new THREE.Color(rep.color);
+      var grp = new THREE.Group();
+      grp.position.copy(a.p);
+      grp.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), a.n);
+      var mCone = new THREE.MeshStandardMaterial({color:col, emissive:col, emissiveIntensity:0.55, roughness:0.4, transparent:true});
+      var mHead = new THREE.MeshStandardMaterial({color:col, emissive:col, emissiveIntensity:0.8, roughness:0.3, transparent:true});
+      var cone = new THREE.Mesh(geoCone, mCone);
+      var head = new THREE.Mesh(geoHead, mHead); head.position.y = 0.088;
+      var mRing = new THREE.MeshBasicMaterial({color:col, transparent:true, opacity:0.9, side:THREE.DoubleSide, depthWrite:false});
+      var rg = new THREE.Mesh(geoRing, mRing); rg.position.y = 0.004;
+      // the pointer leans upward so it reads as a pin from the front; the ring lies flat on the skin
+      var axisW = a.n.clone(); if(Math.abs(a.n.y) < 0.8){ axisW.y += 0.8; axisW.normalize(); }
+      var axisL = axisW.applyQuaternion(grp.quaternion.clone().invert());
+      var pinG = new THREE.Group(); pinG.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), axisL);
+      pinG.add(cone, head); grp.add(pinG, rg);
+      [cone, head, rg].forEach(function(m){ m.userData.pin = true; m.userData.rid = rep.id; });
+      pinRoot.add(grp);
+      var pin = {rid:rep.id, grp:grp, cone:mCone, head:mHead, ring:rg, ringM:mRing, p:a.p, n:a.n, key:g.key, side:side, zoom:R.zoom, scale:1, tscale:1, base:(SMALLPIN[g.key] || 1), phase:Math.random() * 6};
+      (pinsOf[rep.id] = pinsOf[rep.id] || []).push(pin);
+      allPins.push(pin);
+    }
+    // group by region so overlapping pins fan out — deferred until realistic mesh is ready
+    function placeAllPins(){
+      while(pinRoot.children.length) pinRoot.remove(pinRoot.children[0]);
+      allPins.length = 0;
+      for(var k in pinsOf) delete pinsOf[k];
+      var groups = {};
+      reports.forEach(function(rep){
+        rep.regions.forEach(function(g){
+          var R = REGIONS[g.key], sides = [null];
+          if(R.kind === 'sym') sides = g.side === 'B' ? ['L', 'R'] : [g.side || 'R'];
+          else if(R.kind === 'opt' && g.side === 'B') sides = ['L', 'R'];
+          else if(R.kind === 'opt' && (g.side === 'L' || g.side === 'R')) sides = [g.side];
+          sides.forEach(function(s){ (groups[g.key + '|' + (s || '')] = groups[g.key + '|' + (s || '')] || []).push({rep:rep, g:g, side:s}); });
+        });
+      });
+      Object.keys(groups).forEach(function(id){
+        var arr = groups[id];
+        arr.forEach(function(it, k){ makePin(it.rep, it.g, it.side, k, arr.length); });
+      });
+      applyPinStates();
+    }
+    // place once mesh is in, or after timeout so UI is never empty
+    var pinsPlaced = false;
+    function tryPlacePins(){
+      if(pinsPlaced) return;
+      pinsPlaced = true;
+      placeAllPins();
+    }
+    // Hook: fitModel already tries applyPinStates; override to place pins
+    var _prevFitDone = false;
+    var waitPins = setInterval(function(){
+      if(modelReady){ clearInterval(waitPins); tryPlacePins(); }
+    }, 200);
+    setTimeout(function(){ clearInterval(waitPins); tryPlacePins(); }, 8000);
+
+    /* marker for a clicked body area */
+    var areaMark = new THREE.Mesh(new THREE.RingGeometry(0.035, 0.05, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0.95, side:THREE.DoubleSide, depthWrite:false}));
+    areaMark.visible = false; scene.add(areaMark);
+
+    /* ----- camera tween ----- */
+    var tween = null;
+    controls.addEventListener('start', function(){ tween = null; });
+    function flyTo(spec, dur){
+      var off = camera.position.clone().sub(controls.target);
+      var sp = new THREE.Spherical().setFromVector3(off);
+      tween = {t0:performance.now(), dur:dur || 900, az0:sp.theta, pol0:sp.phi, d0:sp.radius, t0v:controls.target.clone(), to:spec};
+    }
+    function ease(t){ return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function stepTween(now){
+      if(!tween) return;
+      var k = Math.min(1, (now - tween.t0) / tween.dur), e = ease(k), to = tween.to;
+      var dAz = to.az - tween.az0; dAz = Math.atan2(Math.sin(dAz), Math.cos(dAz));
+      var th = tween.az0 + dAz * e, ph = tween.pol0 + (to.pol - tween.pol0) * e, rd = tween.d0 + (to.dist - tween.d0) * e;
+      controls.target.lerpVectors(tween.t0v, to.t, e);
+      camera.position.set(
+        controls.target.x + rd * Math.sin(ph) * Math.sin(th),
+        controls.target.y + rd * Math.cos(ph),
+        controls.target.z + rd * Math.sin(ph) * Math.cos(th));
+      if(k >= 1) tween = null;
+    }
+    function viewSpec(name){
+      if(name === 'front') return {az:0, pol:HOME.pol, dist:HOME.dist, t:HOME.t};
+      if(name === 'back')  return {az:Math.PI, pol:HOME.pol, dist:HOME.dist, t:HOME.t};
+      if(name === 'left')  return {az:Math.PI / 2, pol:HOME.pol, dist:HOME.dist, t:HOME.t};
+      if(name === 'right') return {az:-Math.PI / 2, pol:HOME.pol, dist:HOME.dist, t:HOME.t};
+      return {az:0, pol:HOME.pol, dist:HOME.dist, t:HOME.t};
+    }
+    function focusPins(pins){
+      var c = new THREE.Vector3(), n = new THREE.Vector3(), z = 0;
+      pins.forEach(function(p){ c.add(p.p); n.add(p.n); z = Math.max(z, p.zoom); });
+      c.multiplyScalar(1 / pins.length); n.normalize();
+      var spread = 0;
+      pins.forEach(function(p){ spread = Math.max(spread, p.p.distanceTo(c)); });
+      var el = Math.asin(Math.max(-0.6, Math.min(0.6, n.y)));
+      flyTo({az:Math.atan2(n.x, n.z), pol:Math.PI / 2 - el * 0.55, dist:Math.max(z, Math.min(3.6, z + spread * 3)),
+             t:new THREE.Vector3(c.x * 0.7, c.y, c.z * 0.5)});
+    }
+
+    /* ----- selection ----- */
+    function applyPinStates(){
+      var selPins = state.sel ? (pinsOf[state.sel] || []) : [];
+      allPins.forEach(function(p){
+        var isSel = p.rid === state.sel;
+        var shown = state.pins || isSel;
+        if(state.region && !isSel){
+          shown = shown && regionMatch(p);
+        }
+        p.grp.visible = shown;
+        p.tscale = p.base * (isSel ? 1.45 : (state.sel ? 0.8 : 1));
+        var dim = (state.sel && !isSel) ? 0.5 : 1;
+        p.cone.opacity = dim; p.head.opacity = dim; p.ringM.opacity = isSel ? 0.95 : 0.55 * dim;
+        p.isSel = isSel;
+      });
+      return selPins;
+    }
+    function regionMatch(p){
+      if(!state.region) return true;
+      if(p.key !== state.region.key) return false;
+      return REGIONS[p.key].kind !== 'sym' || p.side === state.region.side;
+    }
+    function select(id, fly){
+      state.sel = id;
+      var pins = applyPinStates();
+      renderList(); renderDetail();
+      var it = listEl.querySelector('.bm-item.sel');
+      if(it && it.scrollIntoView) it.scrollIntoView({block:'nearest', behavior:'smooth'});
+      if(pins.length){
+        labelFor = pins[0];
+        if(fly !== false) focusPins(pins);
+      } else {
+        labelFor = null;
+        if(fly !== false) flyTo(viewSpec('front'));
+      }
+    }
+    var labelFor = null;
+    function setRegion(r){
+      state.region = r;
+      if(r){
+        var t = table.filter(function(x){ return x.key === r.key && (x.side === r.side || !x.side); })[0];
+        if(t){ areaMark.position.copy(t.p).addScaledVector(t.n, 0.004); areaMark.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), t.n); areaMark.visible = true; }
+      } else areaMark.visible = false;
+      applyPinStates(); renderList();
+    }
+
+    /* ----- UI wiring ----- */
+    host.querySelectorAll('[data-v]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var v = b.getAttribute('data-v');
+        if(v === 'reset'){ state.sel = null; state.region = null; labelFor = null; areaMark.visible = false; applyPinStates(); renderList(); renderDetail(); }
+        flyTo(viewSpec(v));
+      });
+    });
+    host.querySelector('[data-t="pins"]').addEventListener('click', function(e){
+      state.pins = !state.pins; e.currentTarget.classList.toggle('on', state.pins); applyPinStates();
+    });
+    host.querySelector('[data-t="spin"]').addEventListener('click', function(e){
+      state.spin = !state.spin; e.currentTarget.classList.toggle('on', state.spin); controls.autoRotate = state.spin; tween = null;
+    });
+    listEl.addEventListener('click', function(e){
+      var b = e.target.closest('.bm-item'); if(!b) return;
+      var id = b.getAttribute('data-id');
+      select(id, true);
+    });
+    filterEl.addEventListener('click', function(e){ if(e.target.closest('[data-clear]')) setRegion(null); });
+    searchEl.addEventListener('input', function(){ state.q = searchEl.value.trim().toLowerCase(); renderList(); });
+
+    /* ----- pointer picking ----- */
+    var down = null, mouse = new THREE.Vector2();
+    var dom = renderer.domElement;
+    function setMouse(e){
+      var rc = dom.getBoundingClientRect();
+      mouse.set(((e.clientX - rc.left) / rc.width) * 2 - 1, -((e.clientY - rc.top) / rc.height) * 2 + 1);
+      ray.setFromCamera(mouse, camera);
+    }
+    function pickPin(){
+      var hits = ray.intersectObjects(pinRoot.children.filter(function(g){ return g.visible; }), true);
+      for(var i = 0; i < hits.length; i++) if(hits[i].object.userData.pin) return hits[i];
+      return null;
+    }
+    function pickBody(){
+      var hit = ray.intersectObjects(body.children, false)[0];
+      if(!hit) return null;
+      var n = hit.face.normal.clone().transformDirection(hit.object.matrixWorld);
+      var best = null, bd = 1e9;
+      table.forEach(function(t){
+        var d = t.p.distanceTo(hit.point) + (t.n.dot(n) < 0 ? 0.35 : 0);
+        if(d < bd){ bd = d; best = t; }
+      });
+      return best;
+    }
+    dom.addEventListener('pointerdown', function(e){ down = {x:e.clientX, y:e.clientY}; });
+    dom.addEventListener('pointerup', function(e){
+      if(!down) return;
+      var moved = Math.hypot(e.clientX - down.x, e.clientY - down.y); down = null;
+      if(moved > 5) return;
+      setMouse(e);
+      var p = pickPin();
+      if(p){ var rid = p.object.userData.rid; setRegion(null); select(rid, true); return; }
+      var t = pickBody();
+      if(t){
+        if(state.region && state.region.key === t.key && state.region.side === t.side){ setRegion(null); return; }
+        setRegion({key:t.key, side:t.side});
+        var first = visible()[0];
+        if(first && first.regions.length) select(first.id, false); else { state.sel = null; labelFor = null; applyPinStates(); renderList(); renderDetail(); }
+        flyTo({az:Math.atan2(t.n.x, t.n.z), pol:Math.PI / 2 - Math.asin(Math.max(-0.6, Math.min(0.6, t.n.y))) * 0.55, dist:Math.max(1.4, REGIONS[t.key].zoom + 0.3), t:new THREE.Vector3(t.p.x * 0.7, t.p.y, t.p.z * 0.5)});
+      } else if(state.region){ setRegion(null); }
+    });
+    dom.addEventListener('pointermove', function(e){
+      if(e.pointerType === 'touch' || e.buttons) { tipEl.style.display = 'none'; return; }
+      setMouse(e);
+      var p = pickPin(), rc = stage.getBoundingClientRect();
+      if(p){
+        var rep = byId[p.object.userData.rid];
+        tipEl.textContent = rep.title + ' — ' + regionText(rep);
+        tipEl.style.display = 'block';
+        tipEl.style.left = Math.min(e.clientX - rc.left + 12, rc.width - 220) + 'px';
+        tipEl.style.top = (e.clientY - rc.top + 14) + 'px';
+        dom.style.cursor = 'pointer';
+      } else { tipEl.style.display = 'none'; dom.style.cursor = ''; }
+    });
+    dom.addEventListener('pointerleave', function(){ tipEl.style.display = 'none'; });
+
+    /* ----- resize ----- */
+    function resize(){
+      var w = stage.clientWidth, h = stage.clientHeight;
+      if(!w || !h) return;
+      renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+    }
+    if(window.ResizeObserver){ ro = new ResizeObserver(resize); ro.observe(stage); }
+    else { window.addEventListener('resize', resize); cleanup.push(function(){ window.removeEventListener('resize', resize); }); }
+
+    /* ----- frame loop ----- */
+    var tmp = new THREE.Vector3(), camDir = new THREE.Vector3();
+    function frame(now){
+      if(disposed) return;
+      if(!host.isConnected || !stage.isConnected){ delete instances[containerId]; api.dispose(); return; }
+      raf = requestAnimationFrame(frame);
+      stepTween(now);
+      controls.update();
+      var t = now / 1000;
+      allPins.forEach(function(p){
+        if(!p.grp.visible) return;
+        p.scale += (p.tscale - p.scale) * 0.18;
+        p.grp.scale.setScalar(p.scale);
+        var pulse = (t * (p.isSel ? 1.4 : 0.6) + p.phase) % 1;
+        p.ring.scale.setScalar(1 + pulse * (p.isSel ? 1.9 : 0.9));
+        p.ringM.opacity = (p.isSel ? 0.95 : 0.55 * (state.sel ? 0.5 : 1)) * (1 - pulse);
+      });
+      if(areaMark.visible){ var s = 1 + 0.12 * Math.sin(t * 5); areaMark.scale.setScalar(s); }
+      // label follows selected pin
+      if(labelFor && labelFor.grp.visible && state.sel){
+        camDir.copy(camera.position).sub(labelFor.p).normalize();
+        var facing = labelFor.n.dot(camDir);
+        tmp.copy(labelFor.p).project(camera);
+        var w = stage.clientWidth, h = stage.clientHeight;
+        var x = (tmp.x * 0.5 + 0.5) * w, y = (-tmp.y * 0.5 + 0.5) * h - 62 * Math.min(1.2, labelFor.scale);
+        var lw = labelEl.offsetWidth || 150, lh = labelEl.offsetHeight || 40;
+        var cx = Math.max(lw / 2 + 6, Math.min(w - lw / 2 - 6, x)), cy = Math.max(lh + 14, Math.min(h - 8, y));
+        labelEl.style.display = 'block';
+        labelEl.style.transform = 'translate(' + (cx - lw / 2) + 'px,' + (cy - lh - 8) + 'px)';
+        labelEl.style.opacity = facing > -0.1 ? 1 : 0.28;
+        if(labelEl.getAttribute('data-for') !== state.sel){
+          var rep = byId[state.sel];
+          labelEl.innerHTML = '<b>' + esc(rep.title) + '</b><span>' + esc(regionText(rep)) + '</span>' + (facing <= -0.1 ? '' : '');
+          labelEl.setAttribute('data-for', state.sel);
+        }
+      } else { labelEl.style.display = 'none'; labelEl.removeAttribute('data-for'); }
+      renderer.render(scene, camera);
+    }
+    raf = requestAnimationFrame(frame);
+    msgEl.style.display = 'none';
+
+    api.select = function(id, fly){ select(id, fly); };
+    api.setRegion = setRegion;
+    api.view = function(n){ flyTo(viewSpec(n)); };
+    api.pins = allPins;
+    api.camera = camera; api.controls = controls; api.THREE = THREE; api.renderer = renderer;
+    api.dispose = function(){
+      if(disposed) return; disposed = true;
+      cancelAnimationFrame(raf);
+      try{ ro && ro.disconnect(); }catch(e){}
+      cleanup.forEach(function(f){ try{ f(); }catch(e){} });
+      try{ controls.dispose(); }catch(e){}
+      scene.traverse(function(o){
+        if(o.geometry) o.geometry.dispose();
+        if(o.material){ (Array.isArray(o.material) ? o.material : [o.material]).forEach(function(m){ m.dispose(); }); }
+      });
+      try{ renderer.dispose(); renderer.forceContextLoss(); }catch(e){}
+      if(renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+    };
+  }
+
+  /* list works before / without 3D: clicking just shows details */
+  function fallbackSelect(e){
+    var b = e.target.closest('.bm-item'); if(!b) return;
+    state.sel = b.getAttribute('data-id'); renderList(); renderDetail();
+  }
+  listEl.addEventListener('click', fallbackSelect);   // replaced by 3D wiring once ready (both run; harmless)
+
+  var inst = {
+    dispose: function(){ if(api.dispose) api.dispose(); else disposed = true; },
+    api: api
+  };
+  instances[containerId] = inst;
+
+  loadThree().then(function(THREE){
+    if(disposed || instances[containerId] !== inst) return;
+    try{ init3D(THREE); }
+    catch(err){
+      msgEl.innerHTML = '<div><i class="fas fa-cube" style="font-size:28px;opacity:.5"></i><br><br>The 3D view needs WebGL, which isn’t available here.<br>The report list and details still work.</div>';
+      if(window.console) console.warn('[bodymap]', err);
+    }
+  }).catch(function(err){
+    msgEl.innerHTML = '<div><i class="fas fa-wifi" style="font-size:28px;opacity:.5"></i><br><br>Couldn’t load the 3D engine (vendor/three.min.js).<br>The report list and details still work.</div>';
+    if(window.console) console.warn('[bodymap]', err);
+  });
+  return inst;
+}
+
+/* ------------------------------------------------------------------ */
+/* Public entry points                                                 */
+/* ------------------------------------------------------------------ */
+window.mblBodyMapMountClinic = function(){
+  var rows = (window.APP_DATA && APP_DATA.clinic && APP_DATA.clinic.rows) || (typeof APP_DATA !== 'undefined' && APP_DATA.clinic && APP_DATA.clinic.rows) || [];
+  return mount('clinicBodyMapSection', {
+    title: '3D Body Map — Clinic Reports',
+    hint: 'Click a clinic report to see exactly where on the body the injury or condition is. The body turns to the pin; click any pin or body area to jump to its reports.',
+    empty: 'No clinic reports yet.',
+    legend: [['#ef5350', 'First aid case'], ['#ff7043', 'Occupational illness'], ['#ab47bc', 'Non-occupational / medication']],
+    reports: clinicReports(rows)
+  });
+};
+window.mblBodyMapMountIncidents = function(sk){
+  var host = document.getElementById('incBodyMapSection');
+  if(!host) return;
+  if(sk !== 'incidents'){ disposeInstance('incBodyMapSection'); host.innerHTML = ''; return; }
+  var rows = (typeof APP_DATA !== 'undefined' && APP_DATA.incidents && APP_DATA.incidents.rows) || [];
+  return mount('incBodyMapSection', {
+    title: '3D Body Map — Incident Tracker',
+    hint: 'Incidents with an injury are pinned to the body part recorded in the tracker. Click an incident to locate it; incidents with no injury stay in the list without a pin.',
+    empty: 'No incidents on record yet.',
+    legend: [['#ef5350', 'High / critical severity'], ['#ffa726', 'Medium severity'], ['#66bb6a', 'Low severity']],
+    reports: incidentReports(rows)
+  });
+};
+window.mblBodyMap = { regionsFromText: regionsFromText, instances: instances, dispose: disposeInstance };
+})();
